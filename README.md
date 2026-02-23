@@ -42,36 +42,31 @@ A centralized campus event platform that allows students to discover, browse, an
 ---
 
 ## Meeting Minutes
-<!--
-### Meeting – Feb 25, 2026
+
+### Meeting – Feb 20, 2026
 
 #### Date
-Friday, February 25, 2026
+
+Friday, February 20, 2026
+3:30 PM
 
 #### Attendance
-- Anmol  
-- Amir  
-- Michael  
-- Jehanzeb  
-- Tharidu  
-- Dillon  
+
+* Hamania Asim
+* Hafsah Nasir
+* Ammara Haroon
+* Elizeh Faisal
+* Sameen Abid
 
 ---
 
 #### Key Takeaways
-- Document meeting minutes for **every meeting** going forward.
-- Ensure assignments are **evenly divided** and all members contribute to **all areas** (wiki, code, design, etc.).
-- UML guidelines:
-  - Controllers should be explicitly represented.
-  - Model classes should be simple POJOs.
-  - All CRUD operations belong in controller classes.
-- Storyboard requirements:
-  - Must be **fully documented** and submitted in **picture form**.
-  - A **complete, high-level storyboard** is required.
-  - Additional videos or smaller feature storyboards may be submitted alongside.
-- Experiment search should be implemented in a **controller class**, not a static class.
-- Storyboard must include **Experiment Search** and **Experiment execution flow**.
 
+* Create and use a **private GitHub repository** within the organization moving forward.
+* Develop and maintain a detailed **Wiki** including team info, backlog, storyboard, and meeting logs for every meeting.
+
+---
+<!--
 ---
 
 #### Prepared Questions & Decisions
