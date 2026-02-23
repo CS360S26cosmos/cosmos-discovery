@@ -9,14 +9,14 @@ A centralized campus event platform that allows students to discover, browse, an
 ## Quick Links
 
 - **GitHub Project (Backlog & Kanban Board):**  
-  [https://github.com/orgs/CS360S26cosmos/projects/1]
+  [https://github.com/orgs/CS360S26cosmos/projects/1](https://github.com/orgs/CS360S26cosmos/projects/1)
 
 - **Figma Wireframes:**  
   <!--https://figma.com/YOUR-FIGMA-LINK-->
   _to be added_
 
 - **Repository:**
-  [https://github.com/CS360S26cosmos/cosmos-discovery]  
+  [https://github.com/CS360S26cosmos/cosmos-discovery](https://github.com/CS360S26cosmos/cosmos-discovery)  
   
 
 ---
@@ -87,7 +87,7 @@ Friday, February 20, 2026 – 3:30 PM
 
 ### GitHub Project Link
 View full backlog and Kanban board here:  
-[https://github.com/YOUR-ORG/YOUR-REPO/projects/1](https://github.com/orgs/CS360S26cosmos/projects/1)
+[https://github.com/orgs/CS360S26cosmos/projects/1](https://github.com/orgs/CS360S26cosmos/projects/1)
 
 
 ### Kanban Board (Screenshot)
