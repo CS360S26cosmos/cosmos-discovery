@@ -47,9 +47,7 @@ A centralized campus event platform that allows students to discover, browse, an
 
 ## Meeting Minutes
 
-### Meeting – Feb 20, 2026
-
-#### Date
+### Meeting 1
 Friday, February 20, 2026 – 3:30 PM  
 
 #### Attendance
@@ -64,6 +62,22 @@ Friday, February 20, 2026 – 3:30 PM
 - Maintaining documentation inside a **Markdown file instead of Wiki**
 - Agreed to use **GitHub Projects** for backlog and Kanban board
 - Divided initial responsibilities among team members
+
+#### Meeting 2
+Monday, 2nd March, 2026
+3:30 PM
+
+#### Attendance
+Hamania Asim
+Hafsah Nasir
+Ammara Haroon
+Elizeh Faisal
+Sameen Abid
+
+#### Key Takeaways
+The team discussed the progress made in Phase 2 of the project.
+The assigned Teaching Assistant was informed that the team has completed the user stories.
+Clarification was sought regarding the roles and responsibilities of club leaders, particularly how their roles differ from those of organizers.
 
 #### Action Items
 - [ ] Create GitHub Project board
