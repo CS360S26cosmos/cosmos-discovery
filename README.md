@@ -9,8 +9,11 @@ A centralized campus event platform that allows students to discover, browse, an
 - **GitHub Project (Backlog & Kanban Board):**  
   [https://github.com/orgs/CS360S26cosmos/projects/1](https://github.com/orgs/CS360S26cosmos/projects/1)
 
-- **Figma Wireframes:**  
+- **Figma Wireframes Project:**  
 [https://www.figma.com/design/C7owJyFcqekHeiwLDJa8yK/cosmos?node-id=0-1&t=tJ61SlJb9eBeLEu7-1](https://www.figma.com/design/C7owJyFcqekHeiwLDJa8yK/cosmos?node-id=0-1&t=tJ61SlJb9eBeLEu7-1)
+
+- **Figma Protype:**
+[https://www.figma.com/proto/C7owJyFcqekHeiwLDJa8yK/cosmos?node-id=0-1&t=RZctIBNvKEOgiAH6-1](https://www.figma.com/proto/C7owJyFcqekHeiwLDJa8yK/cosmos?node-id=0-1&t=RZctIBNvKEOgiAH6-1)
 
 - **Repository:**
   [https://github.com/CS360S26cosmos/cosmos-discovery](https://github.com/CS360S26cosmos/cosmos-discovery)  
