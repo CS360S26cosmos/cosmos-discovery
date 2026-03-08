@@ -88,7 +88,7 @@ Wednesday, 4th March - 7:30 PM
 ## CRC Diagrams
 
 <!--_Add CRC screenshots below._-->
-
+_to be added_
 
 ## Product Backlog
 
@@ -98,8 +98,8 @@ View full backlog and Kanban board here:
 
 
 ### Kanban Board (Screenshot)
+<img width="2454" height="1792" alt="08 03 2026 at 02 54 53 PM" src="https://github.com/user-attachments/assets/40ad2948-6698-4ab0-aa5d-f8b5d3cb0467" />
 
-<img width="3024" height="1864" alt="23 02 2026 at 01 13 14 PM" src="https://github.com/user-attachments/assets/bd4ce119-8084-4076-aa21-d8639c4e2589" />
 
 ---
 <!--
