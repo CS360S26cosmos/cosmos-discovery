@@ -12,8 +12,7 @@ A centralized campus event platform that allows students to discover, browse, an
   [https://github.com/orgs/CS360S26cosmos/projects/1](https://github.com/orgs/CS360S26cosmos/projects/1)
 
 - **Figma Wireframes:**  
-  <!--https://figma.com/YOUR-FIGMA-LINK-->
-  _to be added_
+[https://www.figma.com/design/C7owJyFcqekHeiwLDJa8yK/cosmos?node-id=0-1&t=tJ61SlJb9eBeLEu7-1](https://www.figma.com/design/C7owJyFcqekHeiwLDJa8yK/cosmos?node-id=0-1&t=tJ61SlJb9eBeLEu7-1)
 
 - **Repository:**
   [https://github.com/CS360S26cosmos/cosmos-discovery](https://github.com/CS360S26cosmos/cosmos-discovery)  
@@ -25,7 +24,7 @@ A centralized campus event platform that allows students to discover, browse, an
 
 - [Team Information](#team-information)
 - [Meeting Minutes](#meeting-minutes)
-- [UML Diagrams](#uml-diagrams)
+- [CRC Diagrams](#crc-diagrams)
 - [Product Backlog](#product-backlog)
 - [Wireframes](#wireframes)
 
@@ -63,39 +62,42 @@ Friday, February 20, 2026 – 3:30 PM
 - Agreed to use **GitHub Projects** for backlog and Kanban board
 - Divided initial responsibilities among team members
 
-#### Meeting 2
-Monday, 2nd March, 2026
-3:30 PM
+### Meeting 2
+Monday, 2nd March, 2026 - 3:30 PM
 
 #### Attendance
-Hamania Asim
-Hafsah Nasir
-Ammara Haroon
-Elizeh Faisal
-Sameen Abid
+- Hamania Asim
+- Hafsah Nasir
+- Ammara Haroon
+- Elizeh Faisal
+- Sameen Abid
 
 #### Key Takeaways
-The team discussed the progress made in Phase 2 of the project.
-The assigned Teaching Assistant was informed that the team has completed the user stories.
-Clarification was sought regarding the roles and responsibilities of club leaders, particularly how their roles differ from those of organizers.
+- Discussed the progress made in Phase 2 of the project.
+- TA was informed that we completed the user stories.
+- Asked clarification on the roles and responsibilities of club leaders, particularly how their - roles differ from those of organizers.
 
-#### Action Items
-- [ ] Create GitHub Project board
-- [ ] Draft initial product backlog
-- [ ] Create low-fidelity wireframes
-- [ ] Upload documentation to README
+### Meeting 3
+Wednesday, 4th March - 7:30 PM
 
----
+#### Attendance
+- Hamania Asim
+- Hafsah Nasir
+- Ammara Haroon
+- Elizeh Faisal
+- Sameen Abid
 
-## UML Diagrams
+#### Key Takeaways
+- How to login as an admin, how are requests to create an event being approved?
+- How to use Figma, making frames and how the site works
+- Possible Unique Feature: Points system
+- Dividing user stories into frames, discussing workflow
 
-<!--_Add UML screenshots below._-->
 
-### System Architecture Diagram
+## CRC Diagrams
 
-<!--![UML Diagram](docs/images/uml-diagram.png)-->
+<!--_Add CRC screenshots below._-->
 
----
 
 ## Product Backlog
 
