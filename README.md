@@ -2,8 +2,6 @@
 
 A centralized campus event platform that allows students to discover, browse, and RSVP to events while enabling organizers to create, manage, and track attendance efficiently.
 
----
-
 # Project Documentation
 
 ## Quick Links
@@ -16,9 +14,6 @@ A centralized campus event platform that allows students to discover, browse, an
 
 - **Repository:**
   [https://github.com/CS360S26cosmos/cosmos-discovery](https://github.com/CS360S26cosmos/cosmos-discovery)  
-  
-
----
 
 ## Table of Contents
 
@@ -27,8 +22,6 @@ A centralized campus event platform that allows students to discover, browse, an
 - [CRC Diagrams](#crc-diagrams)
 - [Product Backlog](#product-backlog)
 - [Wireframes](#wireframes)
-
----
 
 ## Team Information
 
@@ -41,8 +34,6 @@ A centralized campus event platform that allows students to discover, browse, an
 | Ammara Haroon | 27100088   | amm4ra          |
 | Elizeh Faisal | 27100052   | ElizehFaisal    |
 | Sameen Abid   | 27100337   | sameenabid101   |
-
----
 
 ## Meeting Minutes
 
