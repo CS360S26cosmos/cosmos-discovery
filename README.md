@@ -91,7 +91,8 @@ Wednesday, 4th March - 7:30 PM
 ## CRC Diagrams
 
 <!--_Add CRC screenshots below._-->
-_to be added_
+<img width="5694" height="1625" alt="image" src="https://github.com/user-attachments/assets/2843cedb-e556-4de6-b3d3-f9dd891262e2" />
+
 
 ## Product Backlog
 
