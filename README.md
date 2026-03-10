@@ -107,29 +107,14 @@ View full backlog and Kanban board here:
 
 
 ---
-<!--
+
 ## Wireframes
+<img width="3730" height="2453" alt="Student" src="https://github.com/user-attachments/assets/792d46cb-ce79-4d99-87d2-7ddbb3134bac" />
+<img width="1107" height="1140" alt="Shared" src="https://github.com/user-attachments/assets/94582b7f-3cf8-4347-8b13-9430e2bb91eb" />
+<img width="5694" height="2453" alt="Organiser" src="https://github.com/user-attachments/assets/6cc5bb44-8c5e-44df-9391-05de8f4fb1ed" />
+<img width="2549" height="1140" alt="Authentication" src="https://github.com/user-attachments/assets/5f33b09a-5957-4ec1-8d33-ac24f112b5b6" />
+<img width="3229" height="2650" alt="Admin" src="https://github.com/user-attachments/assets/fd36a719-bd0b-428c-b975-5c41823b711c" />
 
-### Figma Link
-https://figma.com/YOUR-FIGMA-LINK
 
----
-
-### Home Screen Wireframe
-
-![Home Wireframe](docs/images/wireframe-home.png)
-
----
-
-### Event Details Screen
-
-![Event Details Wireframe](docs/images/wireframe-event.png)
-
----
-
-### Organizer Dashboard
-
-![Organizer Dashboard Wireframe](docs/images/wireframe-organizer.png)
-
----
--->
+#### Figma Link
+[https://www.figma.com/design/C7owJyFcqekHeiwLDJa8yK/cosmos?node-id=1-2&t=MyYM3oleXK5TR2gI-1](https://www.figma.com/design/C7owJyFcqekHeiwLDJa8yK/cosmos?node-id=1-2&t=MyYM3oleXK5TR2gI-1)
