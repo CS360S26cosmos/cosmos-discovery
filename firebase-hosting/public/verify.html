@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Verify Your Email — Cosmos Discovery</title>
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f3eef5;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                padding: 24px;
+            }
+
+            .card {
+                background: #ffffff;
+                border-radius: 24px;
+                padding: 48px 36px;
+                max-width: 420px;
+                width: 100%;
+                text-align: center;
+                box-shadow: 0 4px 24px rgba(92, 26, 90, 0.12);
+            }
+
+            .icon {
+                font-size: 48px;
+                margin-bottom: 24px;
+            }
+
+            h1 {
+                font-size: 22px;
+                font-weight: bold;
+                color: #5c1a5a;
+                margin-bottom: 12px;
+            }
+
+            p {
+                font-size: 15px;
+                color: #666666;
+                line-height: 1.6;
+                margin-bottom: 32px;
+            }
+
+            button {
+                background-color: #5c1a5a;
+                color: #ffffff;
+                border: none;
+                border-radius: 100px;
+                padding: 16px 40px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                width: 100%;
+                transition: background-color 0.2s;
+            }
+
+            button:hover {
+                background-color: #3d0f3b;
+            }
+
+            button:disabled {
+                background-color: #c9a8d8;
+                cursor: not-allowed;
+            }
+
+            .message {
+                margin-top: 24px;
+                font-size: 15px;
+                font-weight: bold;
+                display: none;
+            }
+
+            .message.success {
+                color: #2e7d32;
+            }
+
+            .message.error {
+                color: #b71c1c;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <div class="icon">✉️</div>
+            <h1>Verify Your Email</h1>
+            <p>
+                Click the button below to verify your email address and activate
+                your Cosmos Discovery account.
+            </p>
+
+            <button id="verifyBtn" onclick="verifyEmail()">
+                Verify My Email
+            </button>
+
+            <div class="message success" id="successMsg">
+                ✅ Email verified! You can now sign in to the app.
+            </div>
+            <div class="message error" id="errorMsg">
+                ❌ Verification failed. The link may have expired. Please
+                request a new one from the app.
+            </div>
+        </div>
+
+        <!-- Firebase SDKs -->
+        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+        <script>
+            // ── Firebase config ───────────────────────────────────────────────────
+            // Replace these values with your actual Firebase project config.
+            // Find them in Firebase Console → Project Settings → Your apps → SDK setup
+            const firebaseConfig = {
+                apiKey: "AIzaSyBNHJBjJVVoRXV8Xsm5BP8bVJW7ueGeBTk",
+                authDomain: "cosmos-discovery.firebaseapp.com",
+                projectId: "cosmos-discovery",
+                storageBucket: "cosmos-discovery.firebasestorage.app",
+                messagingSenderId: "188035901686",
+                appId: "1:188035901686:android:780f26b5e7a5a3933824d7",
+            };
+
+            firebase.initializeApp(firebaseConfig);
+
+            // ── Read the oobCode from the URL ─────────────────────────────────────
+            // Firebase puts the verification code in the URL as ?oobCode=XXXX
+            // We read it here but do NOT apply it yet — only on button click.
+            const urlParams = new URLSearchParams(window.location.search);
+            const oobCode = urlParams.get("oobCode");
+
+            if (!oobCode) {
+                // No code in URL — this page was visited directly, not from an email
+                document.getElementById("verifyBtn").disabled = true;
+                showError(
+                    "No verification code found. Please use the link from your email.",
+                );
+            }
+
+            // ── Apply the code only when the user clicks the button ───────────────
+            function verifyEmail() {
+                if (!oobCode) return;
+
+                const btn = document.getElementById("verifyBtn");
+                btn.disabled = true;
+                btn.textContent = "Verifying...";
+
+                firebase
+                    .auth()
+                    .applyActionCode(oobCode)
+                    .then(() => {
+                        showSuccess();
+                    })
+                    .catch((error) => {
+                        console.error("Verification error:", error);
+                        showError();
+                    });
+            }
+
+            function showSuccess() {
+                document.getElementById("verifyBtn").style.display = "none";
+                const msg = document.getElementById("successMsg");
+                msg.style.display = "block";
+            }
+
+            function showError(customMessage) {
+                document.getElementById("verifyBtn").style.display = "none";
+                const msg = document.getElementById("errorMsg");
+                if (customMessage) msg.textContent = "❌ " + customMessage;
+                msg.style.display = "block";
+            }
+        </script>
+    </body>
+</html>
