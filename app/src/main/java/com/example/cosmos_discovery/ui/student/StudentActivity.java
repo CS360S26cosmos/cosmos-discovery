@@ -2,9 +2,13 @@ package com.example.cosmos_discovery.ui.student;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,6 +40,22 @@ public class StudentActivity extends AppCompatActivity {
 
     // Top bar
     private TextView  mTextTitle;
+
+    // Search bar
+    private View         mSearchBarInclude;
+    private View         mSearchActiveBar;
+    private EditText     mEtSearchInput;
+    private boolean      mInSearchMode     = false;
+    private int          mTabBeforeSearch  = TAB_DISCOVER;
+    private SearchFragment mSearchFragment;
+
+    private final TextWatcher mSearchTextWatcher = new TextWatcher() {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (mSearchFragment != null) mSearchFragment.updateQuery(s.toString());
+        }
+        @Override public void afterTextChanged(Editable s) {}
+    };
 
     // Nav bar tabs + icons
     private LinearLayout mNavHome;
@@ -79,6 +99,10 @@ public class StudentActivity extends AppCompatActivity {
     private void bindViews() {
         mTextTitle    = findViewById(R.id.textTitle);
 
+        mSearchBarInclude = findViewById(R.id.searchBarInclude);
+        mSearchActiveBar  = findViewById(R.id.searchActiveBar);
+        mEtSearchInput    = findViewById(R.id.etSearchInput);
+
         mNavHome      = findViewById(R.id.navHome);
         mNavMyEvents  = findViewById(R.id.navMyEvents);
         mNavFriends   = findViewById(R.id.navFriends);
@@ -94,6 +118,12 @@ public class StudentActivity extends AppCompatActivity {
         ImageView iconMenu = findViewById(R.id.iconMenu);
         iconMenu.setOnClickListener(v -> showSidebar());
         // Profile icon (left) — placeholder, no action yet
+
+        // Search bar tap → enter search mode
+        mSearchBarInclude.findViewById(R.id.searchClickableArea)
+                .setOnClickListener(v -> enterSearchMode());
+
+
     }
 
     private void setupNavBar() {
@@ -177,6 +207,45 @@ public class StudentActivity extends AppCompatActivity {
         mIconFriends.setBackground(null);
     }
 
+    // ── Search helpers ────────────────────────────────────────────────────
+
+    private void enterSearchMode() {
+        mInSearchMode    = true;
+        mTabBeforeSearch = mCurrentTab;
+
+        mSearchBarInclude.setVisibility(View.GONE);
+        mSearchActiveBar.setVisibility(View.VISIBLE);
+
+        mSearchFragment = new SearchFragment();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.studentFragmentContainer, mSearchFragment)
+                .commit();
+
+        mEtSearchInput.requestFocus();
+        mEtSearchInput.addTextChangedListener(mSearchTextWatcher);
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mEtSearchInput, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    private void exitSearchMode() {
+        mInSearchMode = false;
+
+        mEtSearchInput.removeTextChangedListener(mSearchTextWatcher);
+        mEtSearchInput.setText("");
+
+        mSearchActiveBar.setVisibility(View.GONE);
+        mSearchBarInclude.setVisibility(View.VISIBLE);
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mEtSearchInput.getWindowToken(), 0);
+
+        mSearchFragment = null;
+        mCurrentTab = -1; // force fragment reload
+        selectTab(mTabBeforeSearch);
+    }
+
     // ── Sidebar helpers ──────────────────────────────────────────────────
 
     private void showSidebar() {
@@ -219,10 +288,12 @@ public class StudentActivity extends AppCompatActivity {
                 .start();
     }
 
-    /** Close sidebar on back press if it is open. */
+    /** Exit search or close sidebar on back press before delegating to super. */
     @Override
     public void onBackPressed() {
-        if (mSidebarView.getVisibility() == View.VISIBLE) {
+        if (mInSearchMode) {
+            exitSearchMode();
+        } else if (mSidebarView.getVisibility() == View.VISIBLE) {
             hideSidebar();
         } else {
             super.onBackPressed();
