@@ -87,7 +87,27 @@ Wednesday, 4th March - 7:30 PM
 - Possible Unique Feature: Points system
 - Dividing user stories into frames, discussing workflow
 
+### Meeting 4
+Wednesday, 25th March - 10:00 PM
 
+#### Attendance
+- Hamania Asim
+- Hafsah Nasir
+- Ammara Haroon
+- Elizeh Faisal
+- Sameen Abid
+
+#### Key Takeaways
+#### Sprint Planning
+- Conducted a sprint planning session with the team  
+- Finalized user stories and tasks for the first sprint  
+- Began working collaboratively to design and lay out the authorization screens  
+- Set up the database to handle login and sign up functionality successfully via Firestore
+
+- For Sprint 1 we decided to break screens into reusable components (e.g., top bar, search bar, navigation bar)  
+- Planned to create the main UI structure and began connecting these components across screens so they remain consistent
+- Each team member works on a feature in a separate branch, pushes their changes, and submits it for review before it is merged by another team member
+    
 ## CRC Diagrams
 
 <!--_Add CRC screenshots below._-->
