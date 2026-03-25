@@ -1,12 +1,102 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Student shell layout.
+    Layer 1 (ConstraintLayout): purple header (top bar + search pill) +
+                                content fragment container (rounded top) +
+                                bottom nav bar.
+    Layer 2 (include): full-screen sidebar overlay, GONE by default.
+-->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:text="STUDENT SCREEN"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <!-- ── Main screen chrome ────────────────────────────────────────── -->
+    <!-- Purple background here is what shows through the card's rounded top corners,
+         matching the login page where the root ConstraintLayout is also color_primary. -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_primary">
+
+        <!-- Purple header: top bar + search bar pill -->
+        <LinearLayout
+            android:id="@+id/layoutTopBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/color_primary"
+            android:paddingTop="12dp"
+            android:paddingBottom="32dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <include
+                android:id="@+id/topBarView"
+                layout="@layout/view_top_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Search bar placeholder — non-interactive pill shape -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/bg_search_placeholder"
+                android:clickable="false"
+                android:focusable="false" />
+
+        </LinearLayout>
+
+        <!--
+            MaterialCardView wraps the fragment container and reliably clips its
+            children to the 32dp rounded top corners — same radius as bg_bottom_card
+            used on the login/signup screens. clipToOutline on a raw FrameLayout does
+            NOT clip child views, which is why the plain drawable approach failed.
+            Bottom extends to screen edge so it slides behind the nav bar (drawn on top).
+        -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/contentCard"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:shapeAppearance="@style/ShapeAppearance.ContentCard"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/color_surface"
+            app:strokeWidth="0dp"
+            app:layout_constraintTop_toBottomOf="@id/layoutTopBar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/studentFragmentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Bottom nav bar — declared after contentCard so it renders on top -->
+        <include
+            android:id="@+id/navBarView"
+            layout="@layout/component_navbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ── Sidebar overlay (GONE until menu icon tapped) ─────────────── -->
+    <include
+        android:id="@+id/sidebarView"
+        layout="@layout/component_sidebar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 </FrameLayout>

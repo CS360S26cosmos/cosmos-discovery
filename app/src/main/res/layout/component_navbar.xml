@@ -24,8 +24,8 @@
             android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp">
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
 
             <!-- Home -->
             <LinearLayout
@@ -38,13 +38,13 @@
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
 
                 <ImageView
                     android:id="@+id/iconHome"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:adjustViewBounds="true"
                     android:clickable="false"
                     android:contentDescription="@string/home"
@@ -56,11 +56,11 @@
                     android:id="@+id/textHome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:fontFamily="@font/inter_variable"
                     android:text="Home"
                     android:textColor="@color/color_text_secondary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- My Events -->
@@ -74,13 +74,13 @@
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
 
                 <ImageView
                     android:id="@+id/iconMyEvents"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:adjustViewBounds="true"
                     android:clickable="false"
                     android:contentDescription="@string/my_events"
@@ -92,11 +92,11 @@
                     android:id="@+id/textMyEvents"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:fontFamily="@font/inter_variable"
                     android:text="My Events"
                     android:textColor="@color/color_text_secondary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- Friends -->
@@ -110,13 +110,13 @@
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
 
                 <ImageView
                     android:id="@+id/iconFriends"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:adjustViewBounds="true"
                     android:clickable="false"
                     android:contentDescription="@string/friends"
@@ -128,11 +128,11 @@
                     android:id="@+id/textFriends"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:fontFamily="@font/inter_variable"
                     android:text="Friends"
                     android:textColor="@color/color_text_secondary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
         </LinearLayout>

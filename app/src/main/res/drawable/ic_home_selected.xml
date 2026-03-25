@@ -13,7 +13,7 @@
     </item>
 
     <item
-        android:drawable="@drawable/ic_home_outline"
+        android:drawable="@drawable/ic_home_filled"
         android:width="24dp"
         android:height="24dp"
         android:gravity="center" />

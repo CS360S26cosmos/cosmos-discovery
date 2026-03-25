@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cosmos_discovery.R;
+import com.example.cosmos_discovery.adapter.EventBigAdapter;
 import com.example.cosmos_discovery.adapter.EventSmallAdapter;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.util.RsvpHandler;
@@ -21,12 +22,18 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 
 /**
- * Displays the scrollable list of upcoming approved events for the student role.
- * Hosted by {@link com.example.cosmos_discovery.ui.shared.MainActivity}.
+ * Discover screen for the student role.
+ *
+ * Two sections:
+ *   • "Suggested"  — horizontal carousel of big cards ({@code recyclerViewSuggested})
+ *   • "This Week"  — vertical list of small cards  ({@code recyclerViewThisWeek})
+ *
+ * Both sections are driven by the same upcoming-events Firestore listener for now.
  */
 public class DiscoverFragment extends Fragment {
 
-    private EventSmallAdapter    mAdapter;
+    private EventBigAdapter      mSuggestedAdapter;
+    private EventSmallAdapter    mThisWeekAdapter;
     private final RsvpHandler    mRsvpHandler  = new RsvpHandler();
     private final EventService   mEventService = new EventService();
     private ListenerRegistration mEventsListener;
@@ -41,29 +48,42 @@ public class DiscoverFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewEvents);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        // ── Suggested — horizontal carousel ──────────────────────────────
+        RecyclerView rvSuggested = view.findViewById(R.id.recyclerViewSuggested);
+        rvSuggested.setLayoutManager(
+                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
 
-        mAdapter = new EventSmallAdapter(requireContext(), new ArrayList<>(), (event, pos) ->
+        mSuggestedAdapter = new EventBigAdapter(requireContext(), new ArrayList<>(), (event, pos) ->
                 mRsvpHandler.toggle(event,
-                        () -> mAdapter.notifyItemChanged(pos),
+                        () -> mSuggestedAdapter.notifyItemChanged(pos),
                         err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()));
-        recyclerView.setAdapter(mAdapter);
+        rvSuggested.setAdapter(mSuggestedAdapter);
+
+        // ── This Week — vertical list ─────────────────────────────────────
+        RecyclerView rvThisWeek = view.findViewById(R.id.recyclerViewThisWeek);
+        rvThisWeek.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        mThisWeekAdapter = new EventSmallAdapter(requireContext(), new ArrayList<>(), (event, pos) ->
+                mRsvpHandler.toggle(event,
+                        () -> mThisWeekAdapter.notifyItemChanged(pos),
+                        err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()));
+        rvThisWeek.setAdapter(mThisWeekAdapter);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        // Attach listener when fragment becomes visible
         mEventsListener = mEventService.listenUpcomingEvents(
-                events -> mAdapter.updateData(events),
+                events -> {
+                    mSuggestedAdapter.updateData(events);
+                    mThisWeekAdapter.updateData(events);
+                },
                 err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        // Detach listener when fragment leaves screen to stop unnecessary reads
         if (mEventsListener != null) {
             mEventsListener.remove();
             mEventsListener = null;
