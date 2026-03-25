@@ -10,6 +10,14 @@
     <color name="color_surface">#F6EBF5</color>        <!-- light purple bg -->
     <color name="color_surface_white">#FFFFFF</color>
     <color name="color_card_bg">#FFFFFF</color>
+    <color name="color_card_event">#FFFCFE</color>     <!-- event card background -->
+
+    <!-- Chip -->
+    <color name="color_chip_stroke">#CAC4D0</color>   <!-- outlined chip border -->
+    <color name="color_chip_text">#49454F</color>      <!-- chip label text -->
+
+    <!-- RSVP button -->
+    <color name="color_button_going_stroke">#1C1B1F</color>  <!-- "Going" state outline + text -->
 
 
     <!-- Text -->
