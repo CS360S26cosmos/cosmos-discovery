@@ -33,6 +33,12 @@
         <activity
             android:name=".ui.shared.MainActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminActivity" />
+        <activity
+            android:name=".ui.organizer.OrganizerActivity" />
+        <activity
+            android:name=".ui.student.StudentActivity" />
 
     </application>
 
