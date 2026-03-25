@@ -3,4 +3,6 @@
     <string name="home" />
     <string name="friends" />
     <string name="my_events" />
+    <string name="filter" />
+    <string name="search" />
 </resources>
