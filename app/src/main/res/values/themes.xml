@@ -14,6 +14,15 @@
         <item name="cornerSize">17dp</item>
     </style>
 
+    <!-- Student content card: top corners rounded 32dp, bottom corners sharp (flush to nav bar) -->
+    <style name="ShapeAppearance.ContentCard" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">32dp</item>
+        <item name="cornerSizeTopRight">32dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
     <!-- Chip style with fully transparent background (no Material3 surface tint) -->
     <style name="Chip.Transparent" parent="Widget.MaterialComponents.Chip.Action">
         <item name="chipBackgroundColor">@android:color/transparent</item>

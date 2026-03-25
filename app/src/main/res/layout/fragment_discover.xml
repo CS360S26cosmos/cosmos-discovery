@@ -1,8 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recyclerViewEvents"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp"
-    android:clipToPadding="false" />
+    android:background="@color/color_surface"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:clipChildren="false"
+        android:paddingBottom="24dp">
+
+        <!-- ── Suggested section ──────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✦  Suggested"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_text_secondary"
+            android:includeFontPadding="false"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Horizontal carousel — peek of next card visible at right edge -->
+        <!-- paddingBottom + clipChildren=false gives shadow room to render below cards -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewSuggested"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="10dp"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            android:overScrollMode="never" />
+
+        <!-- ── This Week section ──────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⏱  This Week"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_text_secondary"
+            android:includeFontPadding="false"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="6dp" />
+
+        <!-- Vertical list — nestedScrollingEnabled=false hands scroll to outer NestedScrollView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewThisWeek"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

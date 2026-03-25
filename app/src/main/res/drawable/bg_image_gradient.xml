@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Bottom-to-top dark gradient scrim placed over event images.
+    Ensures white title/date text stays readable on any photo.
+    transparent at top → ~70% black at bottom.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="linear"
+        android:angle="270"
+        android:startColor="#00000000"
+        android:endColor="#B3000000" />
+</shape>
