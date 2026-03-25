@@ -4,12 +4,22 @@
 
     <font
         android:fontStyle="normal"
-        android:fontWeight="100"
+        android:fontWeight="400"
+        android:font="@font/inter_variable" />
+
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="700"
         android:font="@font/inter_variable" />
 
     <font
         android:fontStyle="italic"
-        android:fontWeight="100"
+        android:fontWeight="400"
+        android:font="@font/inter_italic_variable" />
+
+    <font
+        android:fontStyle="italic"
+        android:fontWeight="700"
         android:font="@font/inter_italic_variable" />
 
 </font-family>

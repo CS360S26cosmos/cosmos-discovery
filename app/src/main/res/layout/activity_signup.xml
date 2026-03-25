@@ -46,7 +46,7 @@
                     android:textSize="26sp"
                     android:textStyle="bold"
                     android:textColor="@color/color_text_secondary"
-                    android:layout_marginBottom="32dp" />
+                    android:layout_marginBottom="24dp" />
 
                 <!-- Full Name -->
                 <com.google.android.material.card.MaterialCardView
@@ -78,7 +78,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textPersonName|textCapWords"
-                            android:textColor="@color/color_text_primary"
+                            android:textColor="@color/color_text_secondary"
                             android:textColorHint="@color/color_text_hint"
                             android:background="@null" />
 
@@ -116,7 +116,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textEmailAddress"
-                            android:textColor="@color/color_text_primary"
+                            android:textColor="@color/color_text_secondary"
                             android:textColorHint="@color/color_text_hint"
                             android:background="@null" />
 
@@ -155,7 +155,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textPassword"
-                            android:textColor="@color/color_text_primary"
+                            android:textColor="@color/color_text_secondary"
                             android:textColorHint="@color/color_text_hint"
                             android:background="@null" />
 
@@ -218,7 +218,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:visibility="gone"
-        android:indeterminateTint="@color/color_text_on_primary"
+        android:indeterminateTint="@color/color_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

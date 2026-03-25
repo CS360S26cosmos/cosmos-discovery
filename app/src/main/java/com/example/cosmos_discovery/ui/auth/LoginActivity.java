@@ -43,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ForgotPasswordActivity.class)));
 
         mSignUpLink.setOnClickListener(v ->
-                startActivity(new Intent(this, SignUpActivity.class)));
+                startActivity(new Intent(this, SignupActivity.class)));
     }
 
     private void attemptLogin() {

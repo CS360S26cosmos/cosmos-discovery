@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.cosmos_discovery.ui.shared.MainActivity;
 import com.example.cosmos_discovery.database.AuthService;
+import com.example.cosmos_discovery.util.RoleUtil;
 
 public class SplashActivity extends AppCompatActivity {
 

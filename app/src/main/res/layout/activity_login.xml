@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/color_primary">
 
-    <!-- White card fills the FULL screen height, starts 220dp from top -->
+    <!-- White card fills the remaining screen height, starts 180dp from top -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- White card pinned to bottom, starts 220dp from top -->
+            <!-- White card pinned to bottom, starts 180dp from top -->
             <LinearLayout
                 android:id="@+id/card"
                 android:layout_width="match_parent"
@@ -43,11 +43,12 @@
                     android:id="@+id/textViewTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:fontFamily="@font/inter_variable"
                     android:text="Login"
-                    android:textSize="26sp"
-                    android:textStyle="bold"
                     android:textColor="@color/color_text_secondary"
-                    android:layout_marginBottom="32dp" />
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -55,7 +56,7 @@
                     android:layout_marginBottom="16dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/color_surface_white"
+                    app:cardBackgroundColor="@color/color_surface"
                     app:strokeWidth="0dp">
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -78,7 +79,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textEmailAddress"
-                            android:textColor="@color/color_text_primary"
+                            android:textColor="@color/color_text_secondary"
                             android:textColorHint="@color/color_text_hint"
                             android:background="@null" />
 
@@ -116,7 +117,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textPassword"
-                            android:textColor="@color/color_text_primary"
+                            android:textColor="@color/color_text_secondary"
                             android:textColorHint="@color/color_text_hint"
                             android:background="@null" />
 
@@ -188,7 +189,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:visibility="gone"
-        android:indeterminateTint="@color/color_text_on_primary"
+        android:indeterminateTint="@color/color_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

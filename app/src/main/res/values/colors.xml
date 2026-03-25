@@ -7,7 +7,7 @@
 
 
     <!-- Surfaces -->
-    <color name="color_surface">#F3EEF5</color>        <!-- light purple bg -->
+    <color name="color_surface">#F6EBF5</color>        <!-- light purple bg -->
     <color name="color_surface_white">#FFFFFF</color>
     <color name="color_card_bg">#FFFFFF</color>
 

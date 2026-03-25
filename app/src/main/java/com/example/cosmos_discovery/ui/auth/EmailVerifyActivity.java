@@ -15,7 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class EmailVerifyActivity extends AppCompatActivity {
 
-    private TextView mResendLink;
+    private TextView mResendLink, mGoToLogin;
     private AuthService mAuthService;
 
     @Override
@@ -24,7 +24,8 @@ public class EmailVerifyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_email_verify);
 
         mAuthService  = new AuthService();
-        mResendLink = findViewById(R.id.textViewResend);
+        mResendLink  = findViewById(R.id.textViewResend);
+        mGoToLogin   = findViewById(R.id.textViewGoToLogin);
 
         mResendLink.setOnClickListener(v ->
                 mAuthService.resendVerificationEmail(
@@ -33,6 +34,14 @@ public class EmailVerifyActivity extends AppCompatActivity {
                         err -> Toast.makeText(this, err, Toast.LENGTH_SHORT).show()
                 )
         );
+
+        mGoToLogin.setOnClickListener(v -> {
+            mAuthService.signOut();
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
     }
 
     // When user comes back to the app after clicking the email link,
