@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/searchBarCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="21dp"
+    android:layout_marginEnd="21dp"
+    android:layout_marginTop="16dp"
+    app:cardBackgroundColor="@color/color_card_bg"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:id="@+id/searchBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="12dp">
+
+        <!-- Clickable search area -->
+        <LinearLayout
+            android:id="@+id/searchClickableArea"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:id="@+id/iconSearch"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/search"
+                android:src="@drawable/ic_search_icon"
+                app:tint="@color/color_icon_outline" />
+
+            <TextView
+                android:id="@+id/textSearchPlaceholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:fontFamily="@font/inter_variable"
+                android:text="Search Events"
+                android:textColor="@color/color_text_secondary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Clickable filter button -->
+        <ImageButton
+            android:id="@+id/buttonFilter"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/filter"
+            android:padding="8dp"
+            android:src="@drawable/ic_filter_icon"
+            app:tint="@color/color_icon_outline" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
