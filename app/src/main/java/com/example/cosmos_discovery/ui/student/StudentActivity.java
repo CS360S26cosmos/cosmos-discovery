@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
@@ -18,9 +19,14 @@ import androidx.fragment.app.Fragment;
 
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
+import com.example.cosmos_discovery.database.EventService;
+import com.example.cosmos_discovery.model.FilterState;
 import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.ui.auth.LoginActivity;
 import com.example.cosmos_discovery.util.RoleUtil;
+import com.google.android.flexbox.FlexboxLayout;
+
+import java.util.List;
 
 /**
  * Shell activity for the student role.
@@ -68,7 +74,23 @@ public class StudentActivity extends AppCompatActivity {
     // Sidebar root view
     private View mSidebarView;
 
-    private final AuthService mAuthService = new AuthService();
+    // Filter overlay
+    private View         mFilterOverlay;
+    private List<String> mCachedCategories;   // null = not yet fetched
+    private boolean      mFilterChipsWired = false;
+
+    // Pending chip selections while the filter overlay is open
+    private String                   mPendingCategory;
+    private FilterState.DateFilter   mPendingDate;
+    private FilterState.AccessFilter mPendingAccess;
+
+    // Active chip reference in each single-select group (needed to deselect)
+    private TextView mActiveDateChip;
+    private TextView mActiveCategoryChip;
+    private TextView mActiveAccessChip;
+
+    private final AuthService  mAuthService  = new AuthService();
+    private final EventService mEventService = new EventService();
 
     // ── Lifecycle ────────────────────────────────────────────────────────
 
@@ -110,7 +132,8 @@ public class StudentActivity extends AppCompatActivity {
         mIconMyEvents = findViewById(R.id.iconMyEvents);
         mIconFriends  = findViewById(R.id.iconFriends);
 
-        mSidebarView  = findViewById(R.id.sidebarView);
+        mSidebarView   = findViewById(R.id.sidebarView);
+        mFilterOverlay = findViewById(R.id.filterOverlay);
     }
 
     private void setupTopBar() {
@@ -123,13 +146,24 @@ public class StudentActivity extends AppCompatActivity {
         mSearchBarInclude.findViewById(R.id.searchClickableArea)
                 .setOnClickListener(v -> enterSearchMode());
 
+        // Filter button tap → enter search mode (if needed) then show filter overlay
+        mSearchBarInclude.findViewById(R.id.buttonFilter)
+                .setOnClickListener(v -> onFilterButtonClick());
 
+        // Same filter button, but shown in the active search bar (pill is GONE in search mode)
+        mSearchActiveBar.findViewById(R.id.filterButtonActive)
+                .setOnClickListener(v -> showFilterOverlay());
     }
 
     private void setupNavBar() {
-        mNavHome.setOnClickListener(v     -> selectTab(TAB_DISCOVER));
-        mNavMyEvents.setOnClickListener(v -> selectTab(TAB_MY_EVENTS));
-        mNavFriends.setOnClickListener(v  -> selectTab(TAB_FRIENDS));
+        mNavHome.setOnClickListener(v     -> navigateToTab(TAB_DISCOVER));
+        mNavMyEvents.setOnClickListener(v -> navigateToTab(TAB_MY_EVENTS));
+        mNavFriends.setOnClickListener(v  -> navigateToTab(TAB_FRIENDS));
+    }
+
+    private void navigateToTab(int tab) {
+        if (mInSearchMode) exitSearchMode();
+        selectTab(tab);
     }
 
     private void setupSidebar() {
@@ -210,6 +244,10 @@ public class StudentActivity extends AppCompatActivity {
     // ── Search helpers ────────────────────────────────────────────────────
 
     private void enterSearchMode() {
+        enterSearchMode(true);
+    }
+
+    private void enterSearchMode(boolean showKeyboard) {
         mInSearchMode    = true;
         mTabBeforeSearch = mCurrentTab;
 
@@ -222,15 +260,20 @@ public class StudentActivity extends AppCompatActivity {
                 .replace(R.id.studentFragmentContainer, mSearchFragment)
                 .commit();
 
-        mEtSearchInput.requestFocus();
         mEtSearchInput.addTextChangedListener(mSearchTextWatcher);
 
-        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        imm.showSoftInput(mEtSearchInput, InputMethodManager.SHOW_IMPLICIT);
+        if (showKeyboard) {
+            mEtSearchInput.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.showSoftInput(mEtSearchInput, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
 
     private void exitSearchMode() {
         mInSearchMode = false;
+
+        if (mFilterOverlay.getVisibility() == View.VISIBLE) hideFilterOverlay();
+        resetPendingFilters();
 
         mEtSearchInput.removeTextChangedListener(mSearchTextWatcher);
         mEtSearchInput.setText("");
@@ -244,6 +287,168 @@ public class StudentActivity extends AppCompatActivity {
         mSearchFragment = null;
         mCurrentTab = -1; // force fragment reload
         selectTab(mTabBeforeSearch);
+    }
+
+    // ── Filter overlay helpers ────────────────────────────────────────────
+
+    private void onFilterButtonClick() {
+        if (!mInSearchMode) enterSearchMode(false); // no keyboard — user is filtering, not typing
+        showFilterOverlay();
+    }
+
+    private void showFilterOverlay() {
+        mFilterOverlay.setVisibility(View.VISIBLE);
+        if (!mFilterChipsWired) wireFilterChips();
+        if (mCachedCategories == null) {
+            mEventService.fetchCategories(
+                    names -> { mCachedCategories = names; inflateCategoryChips(names); },
+                    err   -> {
+                        mFilterOverlay.findViewById(R.id.tvCategories).setVisibility(View.GONE);
+                        mFilterOverlay.findViewById(R.id.categoryChipsContainer).setVisibility(View.GONE);
+                    });
+        } else {
+            inflateCategoryChips(mCachedCategories);
+        }
+    }
+
+    private void hideFilterOverlay() {
+        mFilterOverlay.setVisibility(View.GONE);
+    }
+
+    /** Wires click listeners for all static chips and action buttons. Called once. */
+    private void wireFilterChips() {
+        mFilterChipsWired = true;
+
+        TextView chipToday       = mFilterOverlay.findViewById(R.id.chipToday);
+        TextView chipTomorrow    = mFilterOverlay.findViewById(R.id.chipTomorrow);
+        TextView chipThisWeek    = mFilterOverlay.findViewById(R.id.chipThisWeek);
+        TextView chipThisWeekend = mFilterOverlay.findViewById(R.id.chipThisWeekend);
+        TextView chipThisMonth   = mFilterOverlay.findViewById(R.id.chipThisMonth);
+        TextView chipLums        = mFilterOverlay.findViewById(R.id.chipLums);
+        TextView chipOutsiders   = mFilterOverlay.findViewById(R.id.chipOutsiders);
+
+        chipToday.setOnClickListener(v       -> onDateChipClick(chipToday,       FilterState.DateFilter.TODAY));
+        chipTomorrow.setOnClickListener(v    -> onDateChipClick(chipTomorrow,    FilterState.DateFilter.TOMORROW));
+        chipThisWeek.setOnClickListener(v    -> onDateChipClick(chipThisWeek,    FilterState.DateFilter.THIS_WEEK));
+        chipThisWeekend.setOnClickListener(v -> onDateChipClick(chipThisWeekend, FilterState.DateFilter.THIS_WEEKEND));
+        chipThisMonth.setOnClickListener(v   -> onDateChipClick(chipThisMonth,   FilterState.DateFilter.THIS_MONTH));
+
+        chipLums.setOnClickListener(v      -> onAccessChipClick(chipLums,      FilterState.AccessFilter.LUMS_ONLY));
+        chipOutsiders.setOnClickListener(v -> onAccessChipClick(chipOutsiders, FilterState.AccessFilter.OPEN));
+
+        // Backdrop tap closes without applying
+        mFilterOverlay.setOnClickListener(v -> hideFilterOverlay());
+        mFilterOverlay.findViewById(R.id.btnClose)
+                .setOnClickListener(v -> hideFilterOverlay());
+        mFilterOverlay.findViewById(R.id.btnClearFilters)
+                .setOnClickListener(v -> onClearFiltersClick());
+        mFilterOverlay.findViewById(R.id.btnViewResults)
+                .setOnClickListener(v -> onViewResultsClick());
+    }
+
+    /** Inflates category chips from Firestore into the FlexboxLayout. Re-syncs selection state. */
+    private void inflateCategoryChips(List<String> categories) {
+        FlexboxLayout container = mFilterOverlay.findViewById(R.id.categoryChipsContainer);
+        container.removeAllViews();
+
+        float density    = getResources().getDisplayMetrics().density;
+        int   paddingH   = (int)(14 * density);
+        int   marginEnd  = (int)(10 * density);
+        int   marginBot  = (int)(8  * density);
+        int   chipHeight = (int)(23 * density);
+
+        for (String name : categories) {
+            TextView chip = new TextView(this);
+            chip.setText(name);
+            chip.setTextSize(12f);
+            chip.setGravity(android.view.Gravity.CENTER);
+            chip.setPadding(paddingH, 0, paddingH, 0);
+
+            FlexboxLayout.LayoutParams lp = new FlexboxLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, chipHeight);
+            lp.setMargins(0, 0, marginEnd, marginBot);
+            chip.setLayoutParams(lp);
+
+            if (name.equals(mPendingCategory)) {
+                selectChip(chip);
+                mActiveCategoryChip = chip;
+            } else {
+                deselectChip(chip);
+            }
+
+            chip.setOnClickListener(v -> onCategoryChipClick(chip, name));
+            container.addView(chip);
+        }
+    }
+
+    // ── Chip toggle helpers ───────────────────────────────────────────────
+
+    private void selectChip(TextView chip) {
+        chip.setBackgroundResource(R.drawable.bg_chip_selected);
+        chip.setTextColor(getColor(R.color.color_text_on_primary));
+    }
+
+    private void deselectChip(TextView chip) {
+        chip.setBackgroundResource(R.drawable.bg_chip_unselected);
+        chip.setTextColor(getColor(R.color.color_text_secondary));
+    }
+
+    private void onDateChipClick(TextView chip, FilterState.DateFilter value) {
+        if (mActiveDateChip != null) deselectChip(mActiveDateChip);
+        if (mPendingDate == value) { // tap same chip → toggle off
+            mPendingDate = null; mActiveDateChip = null; return;
+        }
+        selectChip(chip);
+        mPendingDate = value;
+        mActiveDateChip = chip;
+    }
+
+    private void onAccessChipClick(TextView chip, FilterState.AccessFilter value) {
+        if (mActiveAccessChip != null) deselectChip(mActiveAccessChip);
+        if (mPendingAccess == value) {
+            mPendingAccess = null; mActiveAccessChip = null; return;
+        }
+        selectChip(chip);
+        mPendingAccess = value;
+        mActiveAccessChip = chip;
+    }
+
+    private void onCategoryChipClick(TextView chip, String name) {
+        if (mActiveCategoryChip != null) deselectChip(mActiveCategoryChip);
+        if (name.equals(mPendingCategory)) {
+            mPendingCategory = null; mActiveCategoryChip = null; return;
+        }
+        selectChip(chip);
+        mPendingCategory = name;
+        mActiveCategoryChip = chip;
+    }
+
+    // ── Filter action buttons ─────────────────────────────────────────────
+
+    private void onViewResultsClick() {
+        FilterState fs = new FilterState();
+        fs.setSelectedCategory(mPendingCategory);
+        fs.setSelectedDate(mPendingDate);
+        fs.setSelectedAccess(mPendingAccess);
+        if (mSearchFragment != null) mSearchFragment.updateFilters(fs);
+        hideFilterOverlay();
+    }
+
+    private void onClearFiltersClick() {
+        if (mActiveDateChip     != null) { deselectChip(mActiveDateChip);     mActiveDateChip     = null; }
+        if (mActiveAccessChip   != null) { deselectChip(mActiveAccessChip);   mActiveAccessChip   = null; }
+        if (mActiveCategoryChip != null) { deselectChip(mActiveCategoryChip); mActiveCategoryChip = null; }
+        mPendingCategory = null; mPendingDate = null; mPendingAccess = null;
+        if (mSearchFragment != null) mSearchFragment.updateFilters(new FilterState());
+        hideFilterOverlay();
+    }
+
+    /** Resets all pending filter state and deselects chips. Called on exitSearchMode(). */
+    private void resetPendingFilters() {
+        if (mActiveDateChip     != null) { deselectChip(mActiveDateChip);     mActiveDateChip     = null; }
+        if (mActiveAccessChip   != null) { deselectChip(mActiveAccessChip);   mActiveAccessChip   = null; }
+        if (mActiveCategoryChip != null) { deselectChip(mActiveCategoryChip); mActiveCategoryChip = null; }
+        mPendingCategory = null; mPendingDate = null; mPendingAccess = null;
     }
 
     // ── Sidebar helpers ──────────────────────────────────────────────────
@@ -288,10 +493,12 @@ public class StudentActivity extends AppCompatActivity {
                 .start();
     }
 
-    /** Exit search or close sidebar on back press before delegating to super. */
+    /** Exit search, close filter overlay, or close sidebar on back press before delegating to super. */
     @Override
     public void onBackPressed() {
-        if (mInSearchMode) {
+        if (mFilterOverlay != null && mFilterOverlay.getVisibility() == View.VISIBLE) {
+            hideFilterOverlay();
+        } else if (mInSearchMode) {
             exitSearchMode();
         } else if (mSidebarView.getVisibility() == View.VISIBLE) {
             hideSidebar();

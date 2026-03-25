@@ -87,6 +87,18 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Filter button stays accessible in active search mode -->
+                <ImageButton
+                    android:id="@+id/filterButtonActive"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/filter"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_filter_icon"
+                    app:tint="@color/color_text_on_primary" />
+
             </LinearLayout>
 
         </LinearLayout>
@@ -134,6 +146,14 @@
     <include
         android:id="@+id/sidebarView"
         layout="@layout/component_sidebar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!-- ── Filter overlay (GONE until filter button tapped) ──────────── -->
+    <include
+        android:id="@+id/filterOverlay"
+        layout="@layout/component_searchbar_filter"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />
