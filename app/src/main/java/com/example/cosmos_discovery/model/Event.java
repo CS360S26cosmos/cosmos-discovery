@@ -1,0 +1,88 @@
+package com.example.cosmos_discovery.model;
+
+import java.util.List;
+
+/**
+ * Firestore-mapped model for a campus event.
+ *
+ * Field names map 1:1 to Firestore document fields — never rename without migrating data.
+ * The empty constructor is required by the Firestore SDK for deserialization; do not use it
+ * in application code.
+ *
+ * {@code id} is the Firestore document ID — it is set after fetch via {@link #setId(String)}
+ * and is NOT stored as a field inside the document itself.
+ */
+public class Event {
+
+    public static final String STATUS_APPROVED = "approved";
+    public static final String STATUS_PENDING  = "pending";
+    public static final String STATUS_REJECTED = "rejected";
+
+    private String       id;          // doc ID — set post-fetch, not a Firestore field
+    private String       title;
+    private long         dateTime;    // epoch ms
+    private String       location;
+    private List<String> tags;
+    private int          rsvpCount;
+    private String       imageUrl;
+    private String       organizerId;
+    private String       status;
+    private List<String> attendeeIds;
+    private long         createdAt;
+
+    /** Required by Firestore for deserialization. Do not use in application code. */
+    protected Event() {}
+
+    public Event(String title, long dateTime, String location, List<String> tags,
+                 String imageUrl, String organizerId) {
+        this.title       = title;
+        this.dateTime    = dateTime;
+        this.location    = location;
+        this.tags        = tags;
+        this.imageUrl    = imageUrl;
+        this.organizerId = organizerId;
+        this.status      = STATUS_PENDING;
+        this.rsvpCount   = 0;
+        this.createdAt   = System.currentTimeMillis();
+    }
+
+    /** Returns true if the given user has RSVPed to this event. */
+    public boolean isRsvped(String userId) {
+        return attendeeIds != null && attendeeIds.contains(userId);
+    }
+
+    // ── Getters & Setters ─────────────────────────────────────────────────
+
+    public String getId()                    { return id; }
+    public void   setId(String id)           { this.id = id; }
+
+    public String getTitle()                 { return title; }
+    public void   setTitle(String title)     { this.title = title; }
+
+    public long   getDateTime()              { return dateTime; }
+    public void   setDateTime(long dateTime) { this.dateTime = dateTime; }
+
+    public String getLocation()              { return location; }
+    public void   setLocation(String loc)   { this.location = loc; }
+
+    public List<String> getTags()            { return tags; }
+    public void         setTags(List<String> tags) { this.tags = tags; }
+
+    public int  getRsvpCount()               { return rsvpCount; }
+    public void setRsvpCount(int count)      { this.rsvpCount = count; }
+
+    public String getImageUrl()              { return imageUrl; }
+    public void   setImageUrl(String url)    { this.imageUrl = url; }
+
+    public String getOrganizerId()           { return organizerId; }
+    public void   setOrganizerId(String id)  { this.organizerId = id; }
+
+    public String getStatus()                { return status; }
+    public void   setStatus(String status)   { this.status = status; }
+
+    public List<String> getAttendeeIds()     { return attendeeIds; }
+    public void setAttendeeIds(List<String> ids) { this.attendeeIds = ids; }
+
+    public long getCreatedAt()               { return createdAt; }
+    public void setCreatedAt(long ts)        { this.createdAt = ts; }
+}

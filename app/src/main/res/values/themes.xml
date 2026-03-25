@@ -7,4 +7,17 @@
     </style>
 
     <style name="Theme.Cosmosdiscovery" parent="Base.Theme.Cosmosdiscovery" />
+
+    <!-- All 4 corners rounded at 17dp — used on event card image via ShapeableImageView -->
+    <style name="ShapeAppearance.EventImage" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">17dp</item>
+    </style>
+
+    <!-- Chip style with fully transparent background (no Material3 surface tint) -->
+    <style name="Chip.Transparent" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="chipBackgroundColor">@android:color/transparent</item>
+        <item name="chipSurfaceColor">@android:color/transparent</item>
+        <item name="rippleColor">@android:color/transparent</item>
+    </style>
 </resources>

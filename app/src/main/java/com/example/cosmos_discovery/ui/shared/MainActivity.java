@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
+import com.example.cosmos_discovery.R;
+import com.example.cosmos_discovery.ui.student.DiscoverFragment;
 import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.ui.admin.AdminActivity;
 import com.example.cosmos_discovery.ui.organizer.OrganizerActivity;
@@ -18,32 +21,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        mAuthService = new AuthService();
-
-        if (RoleUtil.getCurrentUser() == null) {
-            mAuthService.signOut();
-            finish();
-            return;
+        // Only load a fragment on fresh launch, not on config change (rotation etc.)
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, resolveFragment())
+                    .commit();
         }
-
-        routeUser();
     }
 
-    private void routeUser() {
-        Intent intent;
-
-        if (RoleUtil.isAdmin()) {
-            intent = new Intent(this, AdminActivity.class);
-
-        } else if (RoleUtil.isOrganizer()) {
-            intent = new Intent(this, OrganizerActivity.class);
-
-        } else {
-            intent = new Intent(this, StudentActivity.class);
+    /** Returns the correct root fragment based on the signed-in user's role. */
+    private Fragment resolveFragment() {
+        if (RoleUtil.isStudent()) {
+            return new DiscoverFragment();
         }
-
-        startActivity(intent);
-        finish();
+        // Organizer and Admin fragments are not yet built — placeholder for now
+        return new DiscoverFragment();
     }
 }
