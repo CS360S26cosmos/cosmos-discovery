@@ -39,16 +39,55 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!-- Search bar placeholder — non-interactive pill shape -->
-            <View
+            <!-- Search bar — tap to open search -->
+            <include
+                android:id="@+id/searchBarInclude"
+                layout="@layout/component_searchbar"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginTop="32dp"
-                android:background="@drawable/bg_search_placeholder"
-                android:clickable="false"
-                android:focusable="false" />
+                android:layout_marginTop="32dp" />
+
+            <!-- Search active state: back arrow + EditText (GONE until search entered) -->
+            <LinearLayout
+                android:id="@+id/searchActiveBar"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/color_card_bg"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+
+                    <EditText
+                        android:id="@+id/etSearchInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@null"
+                        android:fontFamily="@font/inter_variable"
+                        android:hint="Search Events"
+                        android:inputType="text"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:singleLine="true"
+                        android:textColor="@color/color_text_secondary"
+                        android:textColorHint="@color/color_text_hint"
+                        android:textSize="14sp" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
 
         </LinearLayout>
 
