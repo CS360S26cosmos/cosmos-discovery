@@ -4,12 +4,13 @@
     <color name="color_primary">#803366</color>        <!-- deep purple -->
     <color name="color_primary_dark">#6E054A</color>   <!-- header bg -->
     <color name="color_accent">#7B3FA0</color>         <!-- accent purple -->
-
+    <color name="color_selected">#EDD7EF</color>
+    <color name="color_icon_outline">#393638</color>
 
     <!-- Surfaces -->
-    <color name="color_surface">#F3EEF5</color>        <!-- light purple bg -->
+    <color name="color_surface">#F6EBF5</color>        <!-- light purple bg -->
     <color name="color_surface_white">#FFFFFF</color>
-    <color name="color_card_bg">#FFFFFF</color>
+    <color name="color_card_bg">#FFFCFE</color>
 
 
     <!-- Text -->

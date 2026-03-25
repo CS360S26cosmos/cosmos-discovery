@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bottomNavCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/color_surface"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:strokeWidth="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+
+            <!-- Home -->
+            <LinearLayout
+                android:id="@+id/navHome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/iconHome"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:adjustViewBounds="true"
+                    android:clickable="false"
+                    android:contentDescription="@string/home"
+                    android:focusable="false"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_home_selected" />
+
+                <TextView
+                    android:id="@+id/textHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="Home"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- My Events -->
+            <LinearLayout
+                android:id="@+id/navMyEvents"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/iconMyEvents"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:adjustViewBounds="true"
+                    android:clickable="false"
+                    android:contentDescription="@string/my_events"
+                    android:focusable="false"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_bookmark_outline" />
+
+                <TextView
+                    android:id="@+id/textMyEvents"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="My Events"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Friends -->
+            <LinearLayout
+                android:id="@+id/navFriends"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/iconFriends"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:adjustViewBounds="true"
+                    android:clickable="false"
+                    android:contentDescription="@string/friends"
+                    android:focusable="false"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_heart_outline" />
+
+                <TextView
+                    android:id="@+id/textFriends"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="Friends"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
