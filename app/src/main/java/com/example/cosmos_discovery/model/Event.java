@@ -29,6 +29,7 @@ public class Event {
     private String       status;
     private List<String> attendeeIds;
     private long         createdAt;
+    private String       accessType;  // "lums_only" | "open" | null (null treated as open)
 
     /** Required by Firestore for deserialization. Do not use in application code. */
     protected Event() {}
@@ -85,4 +86,7 @@ public class Event {
 
     public long getCreatedAt()               { return createdAt; }
     public void setCreatedAt(long ts)        { this.createdAt = ts; }
+
+    public String getAccessType()                    { return accessType; }
+    public void   setAccessType(String accessType)   { this.accessType = accessType; }
 }

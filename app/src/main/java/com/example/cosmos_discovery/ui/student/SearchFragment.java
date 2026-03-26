@@ -17,6 +17,7 @@ import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.adapter.EventSmallAdapter;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
+import com.example.cosmos_discovery.model.FilterState;
 import com.example.cosmos_discovery.util.RsvpHandler;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -38,8 +39,9 @@ public class SearchFragment extends Fragment {
     private EventSmallAdapter    mAdapter;
     private ListenerRegistration mEventsListener;
 
-    private List<Event> mAllEvents    = new ArrayList<>();
-    private String      mCurrentQuery = "";
+    private List<Event> mAllEvents     = new ArrayList<>();
+    private String      mCurrentQuery  = "";
+    private FilterState mCurrentFilter = new FilterState();
 
     private RecyclerView mRecyclerView;
     private TextView     mEmptyText;
@@ -95,22 +97,60 @@ public class SearchFragment extends Fragment {
         applyFilter();
     }
 
+    /** Called by StudentActivity when the user taps "View Results" or "Clear Filters". */
+    public void updateFilters(FilterState filter) {
+        mCurrentFilter = filter != null ? filter : new FilterState();
+        applyFilter();
+    }
+
     // ── Search logic ──────────────────────────────────────────────────────
 
     private void applyFilter() {
         if (!isAdded()) return;
 
-        if (mCurrentQuery.trim().isEmpty()) {
+        boolean hasQuery  = !mCurrentQuery.trim().isEmpty();
+        boolean hasFilter = mCurrentFilter.hasActiveFilters();
+
+        if (!hasQuery && !hasFilter) {
             mAdapter.updateData(new ArrayList<>());
-            showEmptyState("Start typing to search events");
+            showEmptyState("Start typing or apply filters to search events");
             return;
         }
 
-        List<Event> results = filter(mAllEvents, mCurrentQuery);
-        mAdapter.updateData(results);
+        // Step 1: start with all events; apply text filter first if there's a query
+        List<Event> results = hasQuery
+                ? filter(mAllEvents, mCurrentQuery)
+                : new ArrayList<>(mAllEvents);
 
+        // Step 2: category — keep events whose tags contain the selected category
+        String selectedCategory = mCurrentFilter.getSelectedCategory();
+        if (selectedCategory != null) {
+            results.removeIf(e -> {
+                List<String> tags = e.getTags();
+                return tags == null || !tags.contains(selectedCategory);
+            });
+        }
+
+        // Step 3: date range — keep events whose dateTime falls within [start, end]
+        long[] range = mCurrentFilter.getDateRange();
+        if (range != null) {
+            results.removeIf(e -> e.getDateTime() < range[0] || e.getDateTime() > range[1]);
+        }
+
+        // Step 4: access type
+        FilterState.AccessFilter access = mCurrentFilter.getSelectedAccess();
+        if (access == FilterState.AccessFilter.LUMS_ONLY) {
+            results.removeIf(e -> !"lums_only".equals(e.getAccessType()));
+        } else if (access == FilterState.AccessFilter.OPEN) {
+            results.removeIf(e -> e.getAccessType() != null && !"open".equals(e.getAccessType()));
+        }
+
+        mAdapter.updateData(results);
         if (results.isEmpty()) {
-            showEmptyState("No events found for \"" + mCurrentQuery.trim() + "\"");
+            String msg = hasQuery
+                    ? "No events found for \"" + mCurrentQuery.trim() + "\""
+                    : "No events match the selected filters";
+            showEmptyState(msg);
         } else {
             hideEmptyState();
         }

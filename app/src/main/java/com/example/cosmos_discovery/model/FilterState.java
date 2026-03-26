@@ -1,0 +1,93 @@
+package com.example.cosmos_discovery.model;
+
+import java.util.Calendar;
+
+/**
+ * Holds the active filter selections for the event filter overlay.
+ *
+ * All fields are nullable — null means "no filter applied" for that group.
+ * Single-select per group: only one date, one access type, and one category
+ * can be active at a time.
+ *
+ * Pass to {@link com.example.cosmos_discovery.ui.student.SearchFragment#updateFilters(FilterState)}
+ * when the user taps "View Results" or "Clear Filters".
+ */
+public class FilterState {
+
+    public enum DateFilter { TODAY, TOMORROW, THIS_WEEK, THIS_WEEKEND, THIS_MONTH }
+    public enum AccessFilter { LUMS_ONLY, OPEN }
+
+    private String       selectedCategory;  // null = no category filter
+    private DateFilter   selectedDate;      // null = no date filter
+    private AccessFilter selectedAccess;    // null = no access filter
+
+    // ── Getters / Setters ──────────────────────────────────────────────────
+
+    public String getSelectedCategory()                    { return selectedCategory; }
+    public void   setSelectedCategory(String category)     { this.selectedCategory = category; }
+
+    public DateFilter getSelectedDate()                    { return selectedDate; }
+    public void       setSelectedDate(DateFilter date)     { this.selectedDate = date; }
+
+    public AccessFilter getSelectedAccess()                { return selectedAccess; }
+    public void         setSelectedAccess(AccessFilter a)  { this.selectedAccess = a; }
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+
+    /** Returns true if any filter criterion is active. */
+    public boolean hasActiveFilters() {
+        return selectedCategory != null || selectedDate != null || selectedAccess != null;
+    }
+
+    /**
+     * Returns [startMs, endMs] for the selected date filter, or null if no date filter is set.
+     * Uses the same Calendar pattern as EventService.currentWeekBounds().
+     */
+    public long[] getDateRange() {
+        if (selectedDate == null) return null;
+
+        Calendar start = Calendar.getInstance();
+        start.set(Calendar.HOUR_OF_DAY, 0);
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+        start.set(Calendar.MILLISECOND, 0);
+
+        Calendar end = (Calendar) start.clone();
+        end.set(Calendar.HOUR_OF_DAY, 23);
+        end.set(Calendar.MINUTE, 59);
+        end.set(Calendar.SECOND, 59);
+        end.set(Calendar.MILLISECOND, 999);
+
+        switch (selectedDate) {
+            case TODAY:
+                // start/end already set to today 00:00 → 23:59
+                break;
+            case TOMORROW:
+                start.add(Calendar.DAY_OF_YEAR, 1);
+                end.add(Calendar.DAY_OF_YEAR, 1);
+                break;
+            case THIS_WEEK:
+                start.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                end.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                break;
+            case THIS_WEEKEND:
+                // Coming Saturday (or next week's if today is already past Saturday)
+                start.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                if (start.getTimeInMillis() < System.currentTimeMillis()) {
+                    start.add(Calendar.WEEK_OF_YEAR, 1);
+                }
+                end = (Calendar) start.clone();
+                end.add(Calendar.DAY_OF_YEAR, 1); // Sunday after that Saturday
+                end.set(Calendar.HOUR_OF_DAY, 23);
+                end.set(Calendar.MINUTE, 59);
+                end.set(Calendar.SECOND, 59);
+                break;
+            case THIS_MONTH:
+                end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+                break;
+            default:
+                return null;
+        }
+        return new long[]{ start.getTimeInMillis(), end.getTimeInMillis() };
+    }
+}

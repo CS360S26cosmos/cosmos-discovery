@@ -8,6 +8,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -221,6 +222,29 @@ public class EventService {
                 )
                 .addOnSuccessListener(unused -> onSuccess.run())
                 .addOnFailureListener(ex -> onFailure.accept("Could not cancel RSVP. Try again."));
+    }
+
+    // ── Categories ────────────────────────────────────────────────────────
+
+    /**
+     * One-shot fetch of all category names from the {@code categories} collection.
+     * Each document must have a {@code name} String field. Results are sorted alphabetically.
+     * Used to populate the filter overlay's category chips.
+     */
+    public void fetchCategories(Consumer<List<String>> onSuccess, Consumer<String> onFailure) {
+        mDb.collection("categories")
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    List<String> names = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        String name = doc.getString("name");
+                        if (name != null && !name.isEmpty()) names.add(name);
+                    }
+                    Collections.sort(names);
+                    onSuccess.accept(names);
+                })
+                .addOnFailureListener(ex -> onFailure.accept(
+                        ex.getMessage() != null ? ex.getMessage() : "Failed to load categories."));
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
