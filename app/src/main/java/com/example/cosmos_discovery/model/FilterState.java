@@ -71,8 +71,11 @@ public class FilterState {
                 end.add(Calendar.DAY_OF_YEAR, 1);
                 break;
             case THIS_WEEK:
-                start.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                end.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                // Use arithmetic add() instead of set(DAY_OF_WEEK) — set() is locale-dependent
+                // and can jump forward when today is past the target day, inverting the range.
+                int dayOfWeek = start.get(Calendar.DAY_OF_WEEK); // SUNDAY=1 … SATURDAY=7
+                start.add(Calendar.DAY_OF_YEAR, -(dayOfWeek - Calendar.SUNDAY)); // roll back to Sunday
+                end.add(Calendar.DAY_OF_YEAR, Calendar.SATURDAY - dayOfWeek);    // roll forward to Saturday
                 break;
             case THIS_WEEKEND:
                 // Coming Saturday (or next week's if today is already past Saturday)

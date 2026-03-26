@@ -16,6 +16,7 @@ The serviceAccountKey.json file is in .gitignore — never commit it.
 import os
 import sys
 import time
+from datetime import datetime, timedelta
 
 # ── Dependency check ──────────────────────────────────────────────────────────
 
@@ -56,6 +57,19 @@ def hours(n):
 def at(day_offset, hour, minute=0):
     """Returns epoch ms for a specific day offset + time-of-day."""
     return NOW + days(day_offset) + hours(hour) + minute * 60 * 1000
+
+def weekday_target(weekday, hour, minute=0):
+    """
+    Returns epoch ms for the upcoming (or today's) occurrence of `weekday` at the given time.
+    weekday: 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun (Python convention).
+    If the target weekday is today, it returns today at that time.
+    Used to anchor events to specific filter windows (TOMORROW, THIS_WEEKEND) regardless
+    of when the script is run.
+    """
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    days_ahead = (weekday - today.weekday()) % 7
+    target = today + timedelta(days=days_ahead, hours=hour, minutes=minute)
+    return int(target.timestamp() * 1000)
 
 def delete_collection(name):
     """Batch-deletes all documents in a collection (Firestore max 500 per batch)."""
@@ -248,6 +262,46 @@ EVENTS = [
         "rsvpCount":   29,
         "imageUrl":    "https://images.unsplash.com/photo-1509541206217-cde45c41aa6d?w=800",
         "organizerId": "seed_organizer_004",
+        "status":      "approved",
+        "attendeeIds": [],
+        "accessType":  "open",
+    },
+
+    # ── Calendar-anchored events (always land in TOMORROW / THIS_WEEKEND filters) ──
+    # weekday_target() pins each event to the correct weekday so re-running the
+    # script on any day still produces events that hit these filter windows.
+    {
+        "title":       "Study Skills Masterclass",
+        "dateTime":    weekday_target((datetime.now().weekday() + 1) % 7, 15),  # tomorrow 3:00pm
+        "location":    "SDSB Lecture Hall 1",
+        "tags":        ["Academic", "Workshop"],
+        "rsvpCount":   28,
+        "imageUrl":    "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800",
+        "organizerId": "seed_organizer_005",
+        "status":      "approved",
+        "attendeeIds": [],
+        "accessType":  "lums_only",
+    },
+    {
+        "title":       "Saturday Astronomy Meetup",
+        "dateTime":    weekday_target(5, 20),   # this Saturday 8:00pm
+        "location":    "LUMS Main Lawn",
+        "tags":        ["Technology", "Academic"],
+        "rsvpCount":   41,
+        "imageUrl":    "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800",
+        "organizerId": "seed_organizer_001",
+        "status":      "approved",
+        "attendeeIds": [],
+        "accessType":  "open",
+    },
+    {
+        "title":       "Sunday Morning Yoga & Wellness",
+        "dateTime":    weekday_target(6, 8),    # this Sunday 8:00am
+        "location":    "LUMS Sports Complex",
+        "tags":        ["Sports", "Cultural"],
+        "rsvpCount":   35,
+        "imageUrl":    "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800",
+        "organizerId": "seed_organizer_006",
         "status":      "approved",
         "attendeeIds": [],
         "accessType":  "open",
