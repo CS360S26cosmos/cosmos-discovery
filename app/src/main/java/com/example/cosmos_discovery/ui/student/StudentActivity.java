@@ -136,6 +136,7 @@ public class StudentActivity extends AppCompatActivity {
         mFilterOverlay = findViewById(R.id.filterOverlay);
     }
 
+    /** Wires the menu icon, search bar pill, and filter button click listeners. */
     private void setupTopBar() {
         // Menu icon (right) opens the sidebar
         ImageView iconMenu = findViewById(R.id.iconMenu);
@@ -155,17 +156,20 @@ public class StudentActivity extends AppCompatActivity {
                 .setOnClickListener(v -> showFilterOverlay());
     }
 
+    /** Wires bottom nav tab click listeners. */
     private void setupNavBar() {
         mNavHome.setOnClickListener(v     -> navigateToTab(TAB_DISCOVER));
         mNavMyEvents.setOnClickListener(v -> navigateToTab(TAB_MY_EVENTS));
         mNavFriends.setOnClickListener(v  -> navigateToTab(TAB_FRIENDS));
     }
 
+    /** Exits search mode if active, then selects the given tab. */
     private void navigateToTab(int tab) {
         if (mInSearchMode) exitSearchMode();
         selectTab(tab);
     }
 
+    /** Populates the sidebar with the current user's name and email, and wires its action listeners. */
     private void setupSidebar() {
         // Populate user info from the in-memory current user
         User user = RoleUtil.getCurrentUser();
@@ -195,6 +199,12 @@ public class StudentActivity extends AppCompatActivity {
 
     // ── Navigation ───────────────────────────────────────────────────────
 
+    /**
+     * Replaces the fragment container with the fragment for the given tab and
+     * updates the top-bar title and nav icons. No-op if the tab is already active.
+     *
+     * @param tab One of {@link #TAB_DISCOVER}, {@link #TAB_MY_EVENTS}, {@link #TAB_FRIENDS}.
+     */
     private void selectTab(int tab) {
         if (mCurrentTab == tab) return;
         mCurrentTab = tab;
@@ -226,6 +236,7 @@ public class StudentActivity extends AppCompatActivity {
                 .commit();
     }
 
+    /** Swaps nav icons between filled (selected) and outline (unselected) drawables. */
     private void updateNavIcons(int tab) {
         // Swap filled ↔ outline icon
         mIconHome.setImageResource(
@@ -247,6 +258,13 @@ public class StudentActivity extends AppCompatActivity {
         enterSearchMode(true);
     }
 
+    /**
+     * Switches the top bar to active-search mode: hides the pill, shows the EditText,
+     * replaces the current fragment with {@link SearchFragment}, and optionally
+     * opens the keyboard.
+     *
+     * @param showKeyboard {@code true} to immediately open the soft keyboard.
+     */
     private void enterSearchMode(boolean showKeyboard) {
         mInSearchMode    = true;
         mTabBeforeSearch = mCurrentTab;
@@ -269,6 +287,11 @@ public class StudentActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Restores the top bar from search mode: closes the filter overlay (if open), clears
+     * the search text, hides the keyboard, and restores the tab that was active before
+     * search was entered.
+     */
     private void exitSearchMode() {
         mInSearchMode = false;
 
@@ -453,6 +476,7 @@ public class StudentActivity extends AppCompatActivity {
 
     // ── Sidebar helpers ──────────────────────────────────────────────────
 
+    /** Slides the sidebar panel in from the right with a fade-in overlay. */
     private void showSidebar() {
         View overlay = mSidebarView.findViewById(R.id.sidebarOverlay);
         View panel   = mSidebarView.findViewById(R.id.sidebarPanel);
@@ -476,6 +500,7 @@ public class StudentActivity extends AppCompatActivity {
                 .start();
     }
 
+    /** Slides the sidebar panel out to the right with a fade-out overlay. */
     private void hideSidebar() {
         View overlay = mSidebarView.findViewById(R.id.sidebarOverlay);
         View panel   = mSidebarView.findViewById(R.id.sidebarPanel);

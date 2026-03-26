@@ -1,0 +1,9 @@
+com.example.cosmos_discovery.adapter
+com.example.cosmos_discovery.database
+com.example.cosmos_discovery.model
+com.example.cosmos_discovery.ui.admin
+com.example.cosmos_discovery.ui.auth
+com.example.cosmos_discovery.ui.organizer
+com.example.cosmos_discovery.ui.shared
+com.example.cosmos_discovery.ui.student
+com.example.cosmos_discovery.util

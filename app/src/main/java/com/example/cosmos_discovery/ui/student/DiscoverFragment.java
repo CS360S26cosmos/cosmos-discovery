@@ -70,6 +70,7 @@ public class DiscoverFragment extends Fragment {
         rvThisWeek.setAdapter(mThisWeekAdapter);
     }
 
+    /** Attaches the Firestore real-time listener; feeds both the Suggested and This Week adapters. */
     @Override
     public void onStart() {
         super.onStart();
@@ -81,6 +82,7 @@ public class DiscoverFragment extends Fragment {
                 err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
     }
 
+    /** Detaches the Firestore listener to prevent memory leaks and unnecessary network traffic. */
     @Override
     public void onStop() {
         super.onStop();

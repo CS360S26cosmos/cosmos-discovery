@@ -16,6 +16,12 @@ import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.util.RoleUtil;
 
+/**
+ * Login screen. Validates the university email domain and delegates sign-in to
+ * {@link com.example.cosmos_discovery.database.AuthService}. Routes to
+ * {@link com.example.cosmos_discovery.ui.shared.MainActivity} on success,
+ * or {@link EmailVerifyActivity} if the email has not yet been verified.
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText mEmailField, mPasswordField;
@@ -46,6 +52,10 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SignupActivity.class)));
     }
 
+    /**
+     * Validates the input fields client-side then calls
+     * {@link com.example.cosmos_discovery.database.AuthService#signIn} with the entered credentials.
+     */
     private void attemptLogin() {
         String email    = mEmailField.getText().toString().trim();
         String password = mPasswordField.getText().toString();
@@ -86,6 +96,11 @@ public class LoginActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Shows or hides the progress spinner and disables or enables the sign-in button.
+     *
+     * @param loading {@code true} to show the spinner and disable the button.
+     */
     private void setLoading(boolean loading) {
         mProgressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
         mSignInButton.setEnabled(!loading);

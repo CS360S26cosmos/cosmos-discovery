@@ -11,6 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
 
+/**
+ * Forgot password screen. Accepts an email address and sends a Firebase password
+ * reset link via {@link com.example.cosmos_discovery.database.AuthService#sendPasswordReset}.
+ */
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private EditText mEmailField;

@@ -15,8 +15,6 @@ public class User {
     /** Role value for admin users. */
     public static final String ROLE_ADMIN     = "admin";
 
-
-
     /** Unique identifier of the user. */
     private String uid;
     /** Display name of the user. */
