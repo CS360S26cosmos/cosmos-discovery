@@ -55,18 +55,26 @@ public class EventBigAdapter extends RecyclerView.Adapter<EventBigAdapter.ViewHo
         notifyDataSetChanged();
     }
 
+    /**
+     * Inflates {@code item_event_card_big.xml} and fixes each card's width at 82% of the
+     * screen width so the right edge of the next card peeks into view, signalling
+     * that the carousel is horizontally scrollable.
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_event_card_big, parent, false);
-        // Fix width at 82% of screen for the horizontal carousel peek effect.
-        // The right edge of the next card stays visible, signalling scrollability.
         int cardWidth = (int) (parent.getContext().getResources().getDisplayMetrics().widthPixels * 0.82f);
         view.getLayoutParams().width = cardWidth;
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds an {@link Event} to the ViewHolder: loads the image via Glide, sets title/location/
+     * datetime/RSVP count, inflates tag chips, and toggles the RSVP button appearance based
+     * on whether the current user has already RSVPed.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = mEvents.get(position);
@@ -137,6 +145,7 @@ public class EventBigAdapter extends RecyclerView.Adapter<EventBigAdapter.ViewHo
         return mEvents == null ? 0 : mEvents.size();
     }
 
+    /** Converts dp to pixels using the current display density. */
     private float dpToPx(float dp) {
         return dp * mContext.getResources().getDisplayMetrics().density;
     }

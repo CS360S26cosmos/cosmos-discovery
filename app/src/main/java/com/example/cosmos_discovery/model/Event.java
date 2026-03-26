@@ -34,6 +34,10 @@ public class Event {
     /** Required by Firestore for deserialization. Do not use in application code. */
     protected Event() {}
 
+    /**
+     * Creates a new pending event. {@code rsvpCount} defaults to 0 and
+     * {@code status} defaults to {@link #STATUS_PENDING}.
+     */
     public Event(String title, long dateTime, String location, List<String> tags,
                  String imageUrl, String organizerId) {
         this.title       = title;

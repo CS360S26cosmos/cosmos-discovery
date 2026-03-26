@@ -13,6 +13,12 @@ import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Email verification screen shown after sign-up. Lets the user resend the verification
+ * email or return to login. On {@code onResume}, checks whether verification has completed
+ * and automatically advances to {@link com.example.cosmos_discovery.ui.shared.MainActivity}
+ * if so.
+ */
 public class EmailVerifyActivity extends AppCompatActivity {
 
     private TextView mResendLink, mGoToLogin;
@@ -44,8 +50,12 @@ public class EmailVerifyActivity extends AppCompatActivity {
         });
     }
 
-    // When user comes back to the app after clicking the email link,
-    // check if they are now verified
+    /**
+     * Checks whether the user has verified their email since this screen was shown.
+     * Fires when the user returns to the app after tapping the verification link.
+     * If verified, fetches the Firestore profile and advances to
+     * {@link com.example.cosmos_discovery.ui.shared.MainActivity}.
+     */
     @Override
     protected void onResume() {
         super.onResume();

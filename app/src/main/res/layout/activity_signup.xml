@@ -37,7 +37,6 @@
                 app:layout_constraintVertical_bias="1.0"
                 android:layout_marginTop="180dp">
 
-                <!-- Title — same color as login (color_text_secondary) -->
                 <TextView
                     android:id="@+id/textViewTitle"
                     android:layout_width="wrap_content"
@@ -124,7 +123,7 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Password — 24dp bottom margin same as login -->
+                <!-- Password -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -163,7 +162,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Button — exactly matching login: cornerRadius 8dp, marginBottom 24dp -->
                 <Button
                     android:id="@+id/buttonSignUp"
                     android:layout_width="match_parent"
@@ -176,13 +174,12 @@
                     android:layout_marginBottom="24dp"
                     app:cornerRadius="8dp" />
 
-                <!-- Spacer — same as login -->
+                <!-- Spacer pushes footer to bottom -->
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1" />
 
-                <!-- Bottom link — same structure as login -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

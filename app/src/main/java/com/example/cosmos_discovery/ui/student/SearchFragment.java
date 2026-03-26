@@ -105,6 +105,11 @@ public class SearchFragment extends Fragment {
 
     // ── Search logic ──────────────────────────────────────────────────────
 
+    /**
+     * Applies the current query and filter state client-side against {@code mAllEvents}.
+     * Updates the adapter and toggles the empty-state view accordingly.
+     * A no-op if the fragment is not yet attached to its activity.
+     */
     private void applyFilter() {
         if (!isAdded()) return;
 
@@ -182,6 +187,10 @@ public class SearchFragment extends Fragment {
         return results;
     }
 
+    /**
+     * Builds a single lowercase searchable string from an event's title, location, and tags.
+     * Used by {@link #filter} to match query tokens across all text fields at once.
+     */
     private String buildSearchable(Event event) {
         List<String> tags = event.getTags();
         String tagText = (tags != null) ? String.join(" ", tags) : "";
@@ -191,12 +200,14 @@ public class SearchFragment extends Fragment {
 
     // ── Empty state helpers ───────────────────────────────────────────────
 
+    /** Shows the empty-state text with {@code message} and hides the RecyclerView. */
     private void showEmptyState(String message) {
         mEmptyText.setText(message);
         mEmptyText.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
     }
 
+    /** Hides the empty-state text and shows the RecyclerView. */
     private void hideEmptyState() {
         mEmptyText.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);

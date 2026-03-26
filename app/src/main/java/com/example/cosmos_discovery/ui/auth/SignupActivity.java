@@ -14,6 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
 
+/**
+ * Sign-up screen. Collects full name, university email, and password, then creates
+ * a new account via {@link com.example.cosmos_discovery.database.AuthService#signUp}.
+ * Routes to {@link EmailVerifyActivity} on success.
+ */
 public class SignupActivity extends AppCompatActivity {
 
     private EditText mNameField, mEmailField, mPasswordField;
@@ -39,6 +44,10 @@ public class SignupActivity extends AppCompatActivity {
         mSignInLink.setOnClickListener(v -> finish()); // go back to Login
     }
 
+    /**
+     * Validates the input fields client-side then calls
+     * {@link com.example.cosmos_discovery.database.AuthService#signUp} with the entered details.
+     */
     private void attemptSignUp() {
         String name     = mNameField.getText().toString().trim();
         String email    = mEmailField.getText().toString().trim();
@@ -70,6 +79,11 @@ public class SignupActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Shows or hides the progress spinner and disables or enables the sign-up button.
+     *
+     * @param loading {@code true} to show the spinner and disable the button.
+     */
     private void setLoading(boolean loading) {
         mProgressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
         mSignUpButton.setEnabled(!loading);

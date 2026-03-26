@@ -9,6 +9,10 @@ import com.example.cosmos_discovery.ui.shared.MainActivity;
 import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.util.RoleUtil;
 
+/**
+ * Launcher activity — routes the user to {@link LoginActivity} or {@link com.example.cosmos_discovery.ui.shared.MainActivity}
+ * depending on sign-in state. Does not inflate a layout; finishes immediately after routing.
+ */
 public class SplashActivity extends AppCompatActivity {
 
     private AuthService mAuthService;

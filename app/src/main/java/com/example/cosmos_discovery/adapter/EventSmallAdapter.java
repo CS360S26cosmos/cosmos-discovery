@@ -55,6 +55,7 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
         notifyDataSetChanged();
     }
 
+    /** Inflates {@code item_event_card_small.xml} for each list item. */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -63,6 +64,11 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds an {@link Event} to the ViewHolder: loads the image via Glide, sets title/location/
+     * datetime/RSVP count, inflates tag chips, and toggles the RSVP button appearance based
+     * on whether the current user has already RSVPed.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = mEvents.get(position);
@@ -133,6 +139,7 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
         return mEvents == null ? 0 : mEvents.size();
     }
 
+    /** Converts dp to pixels using the current display density. */
     private float dpToPx(float dp) {
         return dp * mContext.getResources().getDisplayMetrics().density;
     }

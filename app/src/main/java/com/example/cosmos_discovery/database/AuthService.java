@@ -49,9 +49,9 @@ public class AuthService {
      * - At least one uppercase letter
      * - At least one lowercase letter
      * - At least one digit
-    * - At least one special character from: !@#$%^&*!?~
+     * - At least one special character from: {@literal !@#$%^&*!?~}
      * - No whitespace characters
-    * - Disallows ._()-+=[]{}:;/\|, and any unsupported symbols
+     * - Disallows {@literal ._()-+=[]{}:;/\|} and any unsupported symbols
      *
      * @param password The password to validate.
      * @return True when the password satisfies all strength requirements.
@@ -196,10 +196,10 @@ public class AuthService {
     /**
      * Reads the user's Firestore document by UID.
      * Used after login to get the role and account status.
-        *
-        * @param uid The Firebase user id.
-        * @param onSuccess Called with the mapped User object.
-        * @param onFailure Called with an error message if lookup fails.
+     *
+     * @param uid The Firebase user id.
+     * @param onSuccess Called with the mapped User object.
+     * @param onFailure Called with an error message if lookup fails.
      */
     public void fetchUserDocument(String uid,
                                   Consumer<User> onSuccess,
