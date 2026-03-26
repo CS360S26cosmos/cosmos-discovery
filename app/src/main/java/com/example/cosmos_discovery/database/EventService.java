@@ -22,10 +22,11 @@ import java.util.function.Consumer;
 public class EventService {
 
     private static final String TAG               = "EventService";
-    private static final String EVENTS_COLLECTION = "events";
+    private static final String EVENTS_COLLECTION = "events"; // Firestore collection name
 
     private final FirebaseFirestore mDb;
 
+    /** Creates a new EventService backed by the default FirebaseFirestore instance. */
     public EventService() {
         mDb = FirebaseFirestore.getInstance();
     }
@@ -85,6 +86,38 @@ public class EventService {
                     if (error != null) {
                         onError.accept(error.getMessage() != null
                                 ? error.getMessage() : "Failed to load events.");
+                        return;
+                    }
+                    List<Event> events = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        Event e = doc.toObject(Event.class);
+                        if (e != null) {
+                            e.setId(doc.getId());
+                            events.add(e);
+                        }
+                    }
+                    onUpdate.accept(events);
+                });
+    }
+
+    /**
+     * Attaches a real-time listener for all events where {@code userId} is in the
+     * {@code attendeeIds} array (i.e. the user has RSVPed). Returns the full list
+     * unsorted — callers should split and sort client-side into upcoming / past.
+     *
+     * Uses a single {@code array-contains} filter, which requires no composite index.
+     *
+     * @return a {@link ListenerRegistration} — call {@code .remove()} in {@code onStop()}
+     */
+    public ListenerRegistration listenMyRsvpedEvents(String userId,
+                                                      Consumer<List<Event>> onUpdate,
+                                                      Consumer<String> onError) {
+        return mDb.collection(EVENTS_COLLECTION)
+                .whereArrayContains("attendeeIds", userId)
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null) {
+                        onError.accept(error.getMessage() != null
+                                ? error.getMessage() : "Failed to load your events.");
                         return;
                     }
                     List<Event> events = new ArrayList<>();

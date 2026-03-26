@@ -1,17 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_surface">
+    android:background="@color/color_surface"
+    android:fillViewport="true">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="My Events"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/color_text_secondary" />
+        android:orientation="vertical"
+        android:paddingTop="24dp"
+        android:paddingBottom="90dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-</FrameLayout>
+        <!-- ── Upcoming section header ──────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_clock"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Upcoming"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/color_text_secondary" />
+        </LinearLayout>
+
+        <!-- Vertical list — nestedScrollingEnabled=false hands scroll to outer NestedScrollView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewUpcoming"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:nestedScrollingEnabled="false"
+            android:clipToPadding="false" />
+
+        <!-- Shown when the user has no upcoming RSVPs; hidden otherwise -->
+        <TextView
+            android:id="@+id/tvEmptyUpcoming"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="No upcoming events. Find something to RSVP to!"
+            android:textSize="14sp"
+            android:textColor="@color/color_text_hint"
+            android:gravity="center"
+            android:visibility="gone" />
+
+        <!-- ── Past events section header ───────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="28dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_clock"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Past Events"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/color_text_secondary" />
+        </LinearLayout>
+
+        <!-- Vertical list — nestedScrollingEnabled=false hands scroll to outer NestedScrollView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewPast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:nestedScrollingEnabled="false"
+            android:clipToPadding="false" />
+
+        <!-- Shown when the user has no past RSVPs; hidden otherwise -->
+        <TextView
+            android:id="@+id/tvEmptyPast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="No past events yet."
+            android:textSize="14sp"
+            android:textColor="@color/color_text_hint"
+            android:gravity="center"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

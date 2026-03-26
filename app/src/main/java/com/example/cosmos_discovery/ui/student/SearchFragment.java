@@ -22,6 +22,7 @@ import com.example.cosmos_discovery.util.RsvpHandler;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -127,12 +128,12 @@ public class SearchFragment extends Fragment {
                 ? filter(mAllEvents, mCurrentQuery)
                 : new ArrayList<>(mAllEvents);
 
-        // Step 2: category — keep events whose tags contain the selected category
-        String selectedCategory = mCurrentFilter.getSelectedCategory();
-        if (selectedCategory != null) {
+        // Step 2: category — keep events whose tags contain at least one selected category
+        List<String> selectedCategories = mCurrentFilter.getSelectedCategories();
+        if (!selectedCategories.isEmpty()) {
             results.removeIf(e -> {
                 List<String> tags = e.getTags();
-                return tags == null || !tags.contains(selectedCategory);
+                return tags == null || Collections.disjoint(tags, selectedCategories);
             });
         }
 
