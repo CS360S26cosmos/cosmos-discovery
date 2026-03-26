@@ -107,6 +107,33 @@ Wednesday, 25th March - 10:00 PM
 - For Sprint 1 we decided to break screens into reusable components (e.g., top bar, search bar, navigation bar)  
 - Planned to create the main UI structure and began connecting these components across screens so they remain consistent
 - Each team member works on a feature in a separate branch, pushes their changes, and submits it for review before it is merged by another team member
+
+### Meeting 5  
+Thursday, 26th March – 5:30 PM
+
+#### Attendance  
+- Hamania Asim  
+- Hafsah Nasir  
+- Ammara Haroon  
+- Elizeh Faisal  
+- Sameen Abid  
+
+#### Key Takeaways  
+- Discussed remaining features to implement, including:  
+  - Access control integration in Firebase database  
+  - Methods for adding and removing event categories  
+  - Multi-category selection support in filtering  
+  - Personalization through a “suggested” recommendation algorithm  
+  - Event cards with interactive details on click  
+  - “My Events” functionality for RSVP tracking  
+
+#### Sprint 2 Planning  
+- Event details page layout and implementation  
+- RSVP functionality that adds events to “My Events”  
+- Forgot password and reset password layout and implementation  
+- Sidebar navigation to user profile and settings page  
+- Friends screen layout and component design  
+
     
 ## CRC Diagrams
 
