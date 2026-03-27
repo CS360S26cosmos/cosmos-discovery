@@ -200,6 +200,14 @@ public class StudentActivity extends AppCompatActivity {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     });
+
+        mSidebarView.findViewById(R.id.profileRow)
+                .setOnClickListener(v -> {
+                    hideSidebar();
+
+                    Intent intent = new Intent(this, EditProfile.class);
+                    startActivity(intent);
+                });
     }
 
     // ── Navigation ───────────────────────────────────────────────────────
