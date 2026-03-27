@@ -1,17 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_surface">
+    android:background="@color/color_surface"
+    android:fillViewport="true">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Friends"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/color_text_secondary" />
+        android:orientation="vertical"
+        android:clipChildren="false"
+        android:paddingBottom="90dp">
 
-</FrameLayout>
+        <!-- ── Friends carousel section ──────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="♥  Friends"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_text_secondary"
+            android:includeFontPadding="false"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Horizontal carousel of friend avatars -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewFriends"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never" />
+
+        <!-- Empty state: shown when friend list is empty -->
+        <TextView
+            android:id="@+id/tvNoFriends"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="Search above to find and add friends"
+            android:textSize="13sp"
+            android:textColor="@color/color_text_hint"
+            android:visibility="gone" />
+
+        <!-- ── Friend events section ──────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Events Your Friends Are Attending"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_text_secondary"
+            android:includeFontPadding="false"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="28dp"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Vertical list of friend event cards -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewFriendEvents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never" />
+
+        <!-- Empty state: shown when no friend events are available -->
+        <TextView
+            android:id="@+id/tvNoFriendEvents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:text="No events from friends yet"
+            android:textSize="13sp"
+            android:textColor="@color/color_text_hint"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

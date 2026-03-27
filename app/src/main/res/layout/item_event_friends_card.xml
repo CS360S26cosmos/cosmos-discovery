@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Friend-events card: same structure as item_event_card_small.xml, but the
+    ChipGroup / RSVP-count row is replaced with a "X, Y and Z have RSVP'd" text.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="112dp"
+    android:layout_marginBottom="20dp"
+    app:cardCornerRadius="17dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/color_card_event"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Image: square, fills full card height, flush to card top-left -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imageViewEvent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            android:src="@color/color_text_hint"
+            app:shapeAppearance="@style/ShapeAppearance.EventImage"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- RSVP button: vertically centered, 10dp from card end -->
+        <Button
+            android:id="@+id/buttonRsvp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RSVP"
+            android:textColor="@color/color_surface_white"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:background="@drawable/bg_btn_rsvp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:layout_marginEnd="10dp"
+            app:backgroundTint="@null"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_text_secondary"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toEndOf="@id/imageViewEvent"
+            app:layout_constraintEnd_toStartOf="@id/buttonRsvp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Date / Time -->
+        <TextView
+            android:id="@+id/textViewDateTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="@color/color_text_secondary"
+            android:includeFontPadding="false"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toEndOf="@id/imageViewEvent"
+            app:layout_constraintTop_toBottomOf="@id/textViewTitle" />
+
+        <!-- Location pin icon -->
+        <ImageView
+            android:id="@+id/iconLocation"
+            android:layout_width="9dp"
+            android:layout_height="9dp"
+            android:src="@drawable/ic_location_pin"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="10dp"
+            app:tint="@color/color_text_secondary"
+            app:layout_constraintStart_toEndOf="@id/imageViewEvent"
+            app:layout_constraintTop_toBottomOf="@id/textViewDateTime"
+            app:layout_constraintBottom_toBottomOf="@id/textViewLocation" />
+
+        <!-- Location text -->
+        <TextView
+            android:id="@+id/textViewLocation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="9sp"
+            android:textColor="@color/color_text_secondary"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toEndOf="@id/iconLocation"
+            app:layout_constraintEnd_toStartOf="@id/buttonRsvp"
+            app:layout_constraintTop_toBottomOf="@id/textViewDateTime" />
+
+        <!-- "Ahmed, Eman and Ali have RSVP'd" — pinned to card bottom -->
+        <TextView
+            android:id="@+id/textViewFriendsAttending"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="9sp"
+            android:textColor="@color/color_text_secondary"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintStart_toEndOf="@id/imageViewEvent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

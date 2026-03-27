@@ -57,13 +57,23 @@ public class StudentActivity extends AppCompatActivity {
     private View         mSearchActiveBar;
     private EditText     mEtSearchInput;
     private boolean      mInSearchMode     = false;
+    private boolean      mInUserSearchMode = false;
     private int          mTabBeforeSearch  = TAB_DISCOVER;
-    private SearchFragment mSearchFragment;
+    private SearchFragment     mSearchFragment;
+    private UserSearchFragment mUserSearchFragment;
 
     private final TextWatcher mSearchTextWatcher = new TextWatcher() {
         @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
         @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (mSearchFragment != null) mSearchFragment.updateQuery(s.toString());
+        }
+        @Override public void afterTextChanged(Editable s) {}
+    };
+
+    private final TextWatcher mUserSearchTextWatcher = new TextWatcher() {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (mUserSearchFragment != null) mUserSearchFragment.updateQuery(s.toString());
         }
         @Override public void afterTextChanged(Editable s) {}
     };
@@ -148,9 +158,12 @@ public class StudentActivity extends AppCompatActivity {
         iconMenu.setOnClickListener(v -> showSidebar());
         // Profile icon (left) — placeholder, no action yet
 
-        // Search bar tap → enter search mode
+        // Search bar tap → enter event search or user search based on active tab
         mSearchBarInclude.findViewById(R.id.searchClickableArea)
-                .setOnClickListener(v -> enterSearchMode());
+                .setOnClickListener(v -> {
+                    if (mCurrentTab == TAB_FRIENDS) enterUserSearchMode();
+                    else enterSearchMode();
+                });
 
         // Filter button tap → enter search mode (if needed) then show filter overlay
         mSearchBarInclude.findViewById(R.id.buttonFilter)
@@ -235,8 +248,15 @@ public class StudentActivity extends AppCompatActivity {
         mTextTitle.setText(title);
         updateNavIcons(tab);
 
-        // Search bar is only relevant on the Discover tab
-        mSearchBarInclude.setVisibility(tab == TAB_DISCOVER ? View.VISIBLE : View.GONE);
+        // Search bar is visible on Discover and Friends tabs; hint text and filter button differ
+        boolean showSearch = (tab == TAB_DISCOVER || tab == TAB_FRIENDS);
+        mSearchBarInclude.setVisibility(showSearch ? View.VISIBLE : View.GONE);
+        if (showSearch) {
+            ((TextView) mSearchBarInclude.findViewById(R.id.textSearchPlaceholder))
+                    .setText(tab == TAB_FRIENDS ? "Search Friends" : "Search Events");
+            mSearchBarInclude.findViewById(R.id.buttonFilter)
+                    .setVisibility(tab == TAB_FRIENDS ? View.GONE : View.VISIBLE);
+        }
 
         getSupportFragmentManager()
                 .beginTransaction()
@@ -296,6 +316,32 @@ public class StudentActivity extends AppCompatActivity {
     }
 
     /**
+     * Opens the search bar in user-search mode (Friends tab).
+     * Loads {@link UserSearchFragment} and wires the user-search text watcher.
+     */
+    private void enterUserSearchMode() {
+        mInSearchMode     = true;
+        mInUserSearchMode = true;
+        mTabBeforeSearch  = mCurrentTab;
+
+        mSearchBarInclude.setVisibility(View.GONE);
+        mSearchActiveBar.setVisibility(View.VISIBLE);
+        mEtSearchInput.setHint("Search Friends");
+        mSearchActiveBar.findViewById(R.id.filterButtonActive).setVisibility(View.GONE);
+
+        mUserSearchFragment = new UserSearchFragment();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.studentFragmentContainer, mUserSearchFragment)
+                .commit();
+
+        mEtSearchInput.addTextChangedListener(mUserSearchTextWatcher);
+        mEtSearchInput.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mEtSearchInput, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    /**
      * Restores the top bar from search mode: closes the filter overlay (if open), clears
      * the search text, hides the keyboard, and restores the tab that was active before
      * search was entered.
@@ -306,7 +352,17 @@ public class StudentActivity extends AppCompatActivity {
         if (mFilterOverlay.getVisibility() == View.VISIBLE) hideFilterOverlay();
         resetPendingFilters();
 
-        mEtSearchInput.removeTextChangedListener(mSearchTextWatcher);
+        if (mInUserSearchMode) {
+            mEtSearchInput.removeTextChangedListener(mUserSearchTextWatcher);
+            mEtSearchInput.setHint("Search Events");
+            mSearchActiveBar.findViewById(R.id.filterButtonActive).setVisibility(View.VISIBLE);
+            mInUserSearchMode   = false;
+            mUserSearchFragment = null;
+        } else {
+            mEtSearchInput.removeTextChangedListener(mSearchTextWatcher);
+            mSearchFragment = null;
+        }
+
         mEtSearchInput.setText("");
 
         mSearchActiveBar.setVisibility(View.GONE);
@@ -315,7 +371,6 @@ public class StudentActivity extends AppCompatActivity {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(mEtSearchInput.getWindowToken(), 0);
 
-        mSearchFragment = null;
         mCurrentTab = -1; // force fragment reload
         selectTab(mTabBeforeSearch);
     }
