@@ -36,7 +36,8 @@ public class DiscoverFragment extends Fragment {
     private EventSmallAdapter    mThisWeekAdapter;
     private final RsvpHandler    mRsvpHandler  = new RsvpHandler();
     private final EventService   mEventService = new EventService();
-    private ListenerRegistration mEventsListener;
+    private ListenerRegistration mUpcomingListener;  // feeds Suggested carousel
+    private ListenerRegistration mThisWeekListener;  // feeds This Week list
 
     @Nullable
     @Override
@@ -70,25 +71,30 @@ public class DiscoverFragment extends Fragment {
         rvThisWeek.setAdapter(mThisWeekAdapter);
     }
 
-    /** Attaches the Firestore real-time listener; feeds both the Suggested and This Week adapters. */
+    /** Attaches two Firestore listeners: all upcoming events for Suggested, this week's for This Week. */
     @Override
     public void onStart() {
         super.onStart();
-        mEventsListener = mEventService.listenUpcomingEvents(
-                events -> {
-                    mSuggestedAdapter.updateData(events);
-                    mThisWeekAdapter.updateData(events);
-                },
+        mUpcomingListener = mEventService.listenUpcomingEvents(
+                events -> mSuggestedAdapter.updateData(events),
+                err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
+
+        mThisWeekListener = mEventService.listenThisWeekEvents(
+                events -> mThisWeekAdapter.updateData(events),
                 err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
     }
 
-    /** Detaches the Firestore listener to prevent memory leaks and unnecessary network traffic. */
+    /** Detaches both Firestore listeners to prevent memory leaks and unnecessary network traffic. */
     @Override
     public void onStop() {
         super.onStop();
-        if (mEventsListener != null) {
-            mEventsListener.remove();
-            mEventsListener = null;
+        if (mUpcomingListener != null) {
+            mUpcomingListener.remove();
+            mUpcomingListener = null;
+        }
+        if (mThisWeekListener != null) {
+            mThisWeekListener.remove();
+            mThisWeekListener = null;
         }
     }
 }

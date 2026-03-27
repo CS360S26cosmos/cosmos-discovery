@@ -26,7 +26,12 @@ import com.example.cosmos_discovery.ui.auth.LoginActivity;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.android.flexbox.FlexboxLayout;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Shell activity for the student role.
@@ -80,13 +85,13 @@ public class StudentActivity extends AppCompatActivity {
     private boolean      mFilterChipsWired = false;
 
     // Pending chip selections while the filter overlay is open
-    private String                   mPendingCategory;
-    private FilterState.DateFilter   mPendingDate;
-    private FilterState.AccessFilter mPendingAccess;
+    private final Set<String>                mPendingCategories   = new HashSet<>();
+    private final Map<String, TextView>      mActiveCategoryChips = new HashMap<>();
+    private FilterState.DateFilter           mPendingDate;
+    private FilterState.AccessFilter         mPendingAccess;
 
-    // Active chip reference in each single-select group (needed to deselect)
+    // Active chip reference for single-select groups (needed to deselect)
     private TextView mActiveDateChip;
-    private TextView mActiveCategoryChip;
     private TextView mActiveAccessChip;
 
     private final AuthService  mAuthService  = new AuthService();
@@ -229,6 +234,9 @@ public class StudentActivity extends AppCompatActivity {
 
         mTextTitle.setText(title);
         updateNavIcons(tab);
+
+        // Search bar is only relevant on the Discover tab
+        mSearchBarInclude.setVisibility(tab == TAB_DISCOVER ? View.VISIBLE : View.GONE);
 
         getSupportFragmentManager()
                 .beginTransaction()
@@ -392,9 +400,9 @@ public class StudentActivity extends AppCompatActivity {
             lp.setMargins(0, 0, marginEnd, marginBot);
             chip.setLayoutParams(lp);
 
-            if (name.equals(mPendingCategory)) {
+            if (mPendingCategories.contains(name)) {
                 selectChip(chip);
-                mActiveCategoryChip = chip;
+                mActiveCategoryChips.put(name, chip);
             } else {
                 deselectChip(chip);
             }
@@ -437,20 +445,24 @@ public class StudentActivity extends AppCompatActivity {
     }
 
     private void onCategoryChipClick(TextView chip, String name) {
-        if (mActiveCategoryChip != null) deselectChip(mActiveCategoryChip);
-        if (name.equals(mPendingCategory)) {
-            mPendingCategory = null; mActiveCategoryChip = null; return;
+        if (mPendingCategories.contains(name)) {
+            // Tap same chip again → deselect it
+            deselectChip(chip);
+            mPendingCategories.remove(name);
+            mActiveCategoryChips.remove(name);
+        } else {
+            // New chip → add to selection
+            selectChip(chip);
+            mPendingCategories.add(name);
+            mActiveCategoryChips.put(name, chip);
         }
-        selectChip(chip);
-        mPendingCategory = name;
-        mActiveCategoryChip = chip;
     }
 
     // ── Filter action buttons ─────────────────────────────────────────────
 
     private void onViewResultsClick() {
         FilterState fs = new FilterState();
-        fs.setSelectedCategory(mPendingCategory);
+        fs.setSelectedCategories(new ArrayList<>(mPendingCategories));
         fs.setSelectedDate(mPendingDate);
         fs.setSelectedAccess(mPendingAccess);
         if (mSearchFragment != null) mSearchFragment.updateFilters(fs);
@@ -458,20 +470,24 @@ public class StudentActivity extends AppCompatActivity {
     }
 
     private void onClearFiltersClick() {
-        if (mActiveDateChip     != null) { deselectChip(mActiveDateChip);     mActiveDateChip     = null; }
-        if (mActiveAccessChip   != null) { deselectChip(mActiveAccessChip);   mActiveAccessChip   = null; }
-        if (mActiveCategoryChip != null) { deselectChip(mActiveCategoryChip); mActiveCategoryChip = null; }
-        mPendingCategory = null; mPendingDate = null; mPendingAccess = null;
+        if (mActiveDateChip   != null) { deselectChip(mActiveDateChip);   mActiveDateChip   = null; }
+        if (mActiveAccessChip != null) { deselectChip(mActiveAccessChip); mActiveAccessChip = null; }
+        for (TextView chip : mActiveCategoryChips.values()) deselectChip(chip);
+        mActiveCategoryChips.clear();
+        mPendingCategories.clear();
+        mPendingDate = null; mPendingAccess = null;
         if (mSearchFragment != null) mSearchFragment.updateFilters(new FilterState());
         hideFilterOverlay();
     }
 
     /** Resets all pending filter state and deselects chips. Called on exitSearchMode(). */
     private void resetPendingFilters() {
-        if (mActiveDateChip     != null) { deselectChip(mActiveDateChip);     mActiveDateChip     = null; }
-        if (mActiveAccessChip   != null) { deselectChip(mActiveAccessChip);   mActiveAccessChip   = null; }
-        if (mActiveCategoryChip != null) { deselectChip(mActiveCategoryChip); mActiveCategoryChip = null; }
-        mPendingCategory = null; mPendingDate = null; mPendingAccess = null;
+        if (mActiveDateChip   != null) { deselectChip(mActiveDateChip);   mActiveDateChip   = null; }
+        if (mActiveAccessChip != null) { deselectChip(mActiveAccessChip); mActiveAccessChip = null; }
+        for (TextView chip : mActiveCategoryChips.values()) deselectChip(chip);
+        mActiveCategoryChips.clear();
+        mPendingCategories.clear();
+        mPendingDate = null; mPendingAccess = null;
     }
 
     // ── Sidebar helpers ──────────────────────────────────────────────────

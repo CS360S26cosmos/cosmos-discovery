@@ -1,30 +1,34 @@
 package com.example.cosmos_discovery.model;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Holds the active filter selections for the event filter overlay.
  *
- * All fields are nullable — null means "no filter applied" for that group.
- * Single-select per group: only one date, one access type, and one category
- * can be active at a time.
+ * All fields are nullable/empty — empty/null means "no filter applied" for that group.
+ * Categories support multi-select; date and access type are single-select.
  *
  * Pass to {@link com.example.cosmos_discovery.ui.student.SearchFragment#updateFilters(FilterState)}
  * when the user taps "View Results" or "Clear Filters".
  */
 public class FilterState {
 
+    /** Predefined date-range options shown as chips in the filter overlay. */
     public enum DateFilter { TODAY, TOMORROW, THIS_WEEK, THIS_WEEKEND, THIS_MONTH }
+
+    /** Event visibility options — who the event is open to. */
     public enum AccessFilter { LUMS_ONLY, OPEN }
 
-    private String       selectedCategory;  // null = no category filter
-    private DateFilter   selectedDate;      // null = no date filter
-    private AccessFilter selectedAccess;    // null = no access filter
+    private List<String> selectedCategories = new ArrayList<>(); // empty = no category filter
+    private DateFilter   selectedDate;                           // null  = no date filter
+    private AccessFilter selectedAccess;                         // null  = no access filter
 
     // ── Getters / Setters ──────────────────────────────────────────────────
 
-    public String getSelectedCategory()                    { return selectedCategory; }
-    public void   setSelectedCategory(String category)     { this.selectedCategory = category; }
+    public List<String> getSelectedCategories()                        { return selectedCategories; }
+    public void         setSelectedCategories(List<String> categories) { this.selectedCategories = categories != null ? categories : new ArrayList<>(); }
 
     public DateFilter getSelectedDate()                    { return selectedDate; }
     public void       setSelectedDate(DateFilter date)     { this.selectedDate = date; }
@@ -36,7 +40,7 @@ public class FilterState {
 
     /** Returns true if any filter criterion is active. */
     public boolean hasActiveFilters() {
-        return selectedCategory != null || selectedDate != null || selectedAccess != null;
+        return !selectedCategories.isEmpty() || selectedDate != null || selectedAccess != null;
     }
 
     /**
@@ -67,8 +71,11 @@ public class FilterState {
                 end.add(Calendar.DAY_OF_YEAR, 1);
                 break;
             case THIS_WEEK:
-                start.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                end.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                // Use arithmetic add() instead of set(DAY_OF_WEEK) — set() is locale-dependent
+                // and can jump forward when today is past the target day, inverting the range.
+                int dayOfWeek = start.get(Calendar.DAY_OF_WEEK); // SUNDAY=1 … SATURDAY=7
+                start.add(Calendar.DAY_OF_YEAR, -(dayOfWeek - Calendar.SUNDAY)); // roll back to Sunday
+                end.add(Calendar.DAY_OF_YEAR, Calendar.SATURDAY - dayOfWeek);    // roll forward to Saturday
                 break;
             case THIS_WEEKEND:
                 // Coming Saturday (or next week's if today is already past Saturday)

@@ -39,14 +39,27 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
         void onRsvpClick(Event event, int position);
     }
 
-    private List<Event>          mEvents;
+    private List<Event>               mEvents;
     private final OnRsvpClickListener mListener;
-    private final Context        mContext;
+    private final Context             mContext;
+    private final boolean             mShowRsvp;
 
+    /** Creates an adapter that shows the RSVP button (default). */
     public EventSmallAdapter(Context context, List<Event> events, OnRsvpClickListener listener) {
-        this.mContext  = context;
-        this.mEvents   = events;
-        this.mListener = listener;
+        this(context, events, listener, true);
+    }
+
+    /**
+     * Creates an adapter with explicit control over RSVP button visibility.
+     *
+     * @param showRsvp {@code false} to hide the RSVP button entirely (e.g. past events).
+     */
+    public EventSmallAdapter(Context context, List<Event> events,
+                             OnRsvpClickListener listener, boolean showRsvp) {
+        this.mContext   = context;
+        this.mEvents    = events;
+        this.mListener  = listener;
+        this.mShowRsvp  = showRsvp;
     }
 
     /** Replaces the data set and refreshes the list. Call after a Firestore fetch completes. */
@@ -84,8 +97,9 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
         holder.textViewTitle.setText(event.getTitle());
         holder.textViewLocation.setText(event.getLocation());
 
-        // DateTime — "Saturday | 5:00pm"
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE | h:mma", Locale.getDefault());
+        // DateTime — upcoming: "Saturday | 5:00pm"  /  past: "Mar 15 | 5:00pm"
+        String pattern = mShowRsvp ? "EEEE | h:mma" : "MMM d, yyyy | h:mma";
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.getDefault());
         holder.textViewDateTime.setText(sdf.format(new Date(event.getDateTime())));
 
         // RSVP count
@@ -115,25 +129,31 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
             }
         }
 
-        // RSVP button — toggle appearance based on current user's RSVP state
-        String uid    = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : "";
-        boolean rsvped = event.isRsvped(uid);
+        // RSVP button — hidden entirely for past events; toggled for upcoming events
+        if (!mShowRsvp) {
+            holder.buttonRsvp.setVisibility(View.GONE);
+        } else {
+            holder.buttonRsvp.setVisibility(View.VISIBLE);
+            String uid    = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : "";
+            boolean rsvped = event.isRsvped(uid);
 
-        holder.buttonRsvp.setBackground(ContextCompat.getDrawable(mContext,
-                rsvped ? R.drawable.bg_btn_going : R.drawable.bg_btn_rsvp));
-        holder.buttonRsvp.setText(rsvped ? "✓ Going" : "RSVP");
-        holder.buttonRsvp.setTextColor(rsvped
-                ? ContextCompat.getColor(mContext, R.color.color_button_going_stroke)
-                : Color.WHITE);
+            holder.buttonRsvp.setBackground(ContextCompat.getDrawable(mContext,
+                    rsvped ? R.drawable.bg_btn_going : R.drawable.bg_btn_rsvp));
+            holder.buttonRsvp.setText(rsvped ? "✓ Going" : "RSVP");
+            holder.buttonRsvp.setTextColor(rsvped
+                    ? ContextCompat.getColor(mContext, R.color.color_button_going_stroke)
+                    : Color.WHITE);
 
-        holder.buttonRsvp.setOnClickListener(v -> {
-            int adapterPosition = holder.getAdapterPosition();
-            if (adapterPosition != RecyclerView.NO_ID) {
-                mListener.onRsvpClick(event, adapterPosition);
-            }
-        });
+            holder.buttonRsvp.setOnClickListener(v -> {
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_ID) {
+                    mListener.onRsvpClick(event, adapterPosition);
+                }
+            });
+        }
     }
 
+    /** Returns the number of events in the current data set. */
     @Override
     public int getItemCount() {
         return mEvents == null ? 0 : mEvents.size();
@@ -146,6 +166,7 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
 
     // ── ViewHolder ────────────────────────────────────────────────────────
 
+    /** Caches view references for a single {@code item_event_card_small} row. */
     static class ViewHolder extends RecyclerView.ViewHolder {
         final ImageView  imageViewEvent;
         final TextView   textViewTitle;
