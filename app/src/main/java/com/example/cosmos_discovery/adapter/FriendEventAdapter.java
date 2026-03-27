@@ -2,6 +2,9 @@ package com.example.cosmos_discovery.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,8 +83,9 @@ public class FriendEventAdapter extends RecyclerView.Adapter<FriendEventAdapter.
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE | h:mma", Locale.getDefault());
         holder.textViewDateTime.setText(sdf.format(new Date(event.getDateTime())));
 
-        // Friends attending text
-        holder.textViewFriendsAttending.setText(buildFriendsText(event));
+        // Friends attending text — progressively shorten if ellipsized
+        CharSequence[] candidates = buildFriendsTexts(event);
+        setFriendsTextWithFallback(holder.textViewFriendsAttending, candidates, 0);
 
         // RSVP button
         String  uid    = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : "";
@@ -98,22 +102,78 @@ public class FriendEventAdapter extends RecyclerView.Adapter<FriendEventAdapter.
         });
     }
 
-    /** Builds "Ahmed, Eman and Ali have RSVP'd" (max 3 names, then "and more"). */
-    private String buildFriendsText(Event event) {
-        if (event.getAttendeeIds() == null || mFriendUidToName == null) return "";
+    /**
+     * Tries candidates[index] first; if it is ellipsized after layout, moves to the next
+     * candidate. The last candidate is always short enough to fit.
+     */
+    private void setFriendsTextWithFallback(TextView tv, CharSequence[] candidates, int index) {
+        tv.setText(candidates[index], TextView.BufferType.SPANNABLE);
+        if (index < candidates.length - 1) {
+            int next = index + 1;
+            tv.post(() -> {
+                android.text.Layout layout = tv.getLayout();
+                if (layout != null && layout.getEllipsisCount(0) > 0) {
+                    setFriendsTextWithFallback(tv, candidates, next);
+                }
+            });
+        }
+    }
+
+    /** Appends boldText in bold followed by normalText in normal weight. */
+    private static SpannableStringBuilder boldThen(String boldText, String normalText) {
+        SpannableStringBuilder sb = new SpannableStringBuilder(boldText);
+        sb.setSpan(new StyleSpan(Typeface.BOLD), 0, boldText.length(), 0);
+        sb.append(normalText);
+        return sb;
+    }
+
+    /**
+     * Builds up to 3 candidate CharSequences in decreasing length (names are bold):
+     *   [0] "Sameen, Hamania and Ahmed have RSVP'd"   (3 names)
+     *   [1] "Sameen, Hamania and more have RSVP'd"    (2 names — fallback)
+     *   [2] "Sameen and N more friends have RSVP'd"   (1 name  — last resort)
+     * For 1–2 friends only one candidate is returned.
+     */
+    private CharSequence[] buildFriendsTexts(Event event) {
+        if (event.getAttendeeIds() == null || mFriendUidToName == null)
+            return new CharSequence[]{""};
 
         List<String> names = new ArrayList<>();
         for (String uid : event.getAttendeeIds()) {
-            String name = mFriendUidToName.get(uid);
-            if (name != null) names.add(name.split(" ")[0]);
+            String raw = mFriendUidToName.get(uid);
+            if (raw != null) {
+                String first = raw.split(" ")[0];
+                names.add(Character.toUpperCase(first.charAt(0)) + first.substring(1));
+            }
         }
 
-        if (names.isEmpty()) return "";
-        if (names.size() == 1) return names.get(0) + " has RSVP'd";
-        if (names.size() == 2) return names.get(0) + " and " + names.get(1) + " have RSVP'd";
-        String base = names.get(0) + ", " + names.get(1) + " and " + names.get(2);
-        if (names.size() == 3) return base + " have RSVP'd";
-        return base + " and more have RSVP'd";
+        if (names.isEmpty()) return new CharSequence[]{""};
+        if (names.size() == 1)
+            return new CharSequence[]{boldThen(names.get(0), " has RSVP'd")};
+        if (names.size() == 2) {
+            SpannableStringBuilder sb = new SpannableStringBuilder();
+            sb.append(boldThen(names.get(0), " and "));
+            sb.append(boldThen(names.get(1), " have RSVP'd"));
+            return new CharSequence[]{sb};
+        }
+
+        int others = names.size() - 1;
+
+        // Candidate 0: three names
+        SpannableStringBuilder c0 = new SpannableStringBuilder();
+        c0.append(boldThen(names.get(0), ", "));
+        c0.append(boldThen(names.get(1), " and "));
+        c0.append(boldThen(names.get(2), " have RSVP'd"));
+
+        // Candidate 1: two names + "and more"
+        SpannableStringBuilder c1 = new SpannableStringBuilder();
+        c1.append(boldThen(names.get(0), ", "));
+        c1.append(boldThen(names.get(1), " and more have RSVP'd"));
+
+        // Candidate 2: one name + count (always fits)
+        CharSequence c2 = boldThen(names.get(0), " and " + others + " more friends have RSVP'd");
+
+        return new CharSequence[]{c0, c1, c2};
     }
 
     @Override
