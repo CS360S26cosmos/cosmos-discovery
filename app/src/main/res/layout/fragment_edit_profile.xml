@@ -117,9 +117,10 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="16dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp"
+                    app:strokeWidth="0dp"
                     app:cardBackgroundColor="@color/color_surface_white">
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -155,6 +156,7 @@
                     android:layout_marginBottom="12dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp"
+                    app:strokeWidth="0dp"
                     app:cardBackgroundColor="@color/color_surface_white">
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -182,9 +184,10 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="16dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp"
+                    app:strokeWidth="0dp"
                     app:cardBackgroundColor="@color/color_surface_white">
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -213,8 +216,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="12dp"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="4dp"
+                    app:strokeWidth="0dp"
                     app:cardBackgroundColor="@color/color_surface_white">
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -231,7 +235,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:gravity="top"
+                            android:textColor="@color/color_text_secondary"
                             android:background="@null"/>
+
 
                     </com.google.android.material.textfield.TextInputLayout>
                 </com.google.android.material.card.MaterialCardView>
