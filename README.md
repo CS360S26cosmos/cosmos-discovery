@@ -132,8 +132,31 @@ Thursday, 26th March – 5:30 PM
 - RSVP functionality that adds events to “My Events”  
 - Forgot password and reset password layout and implementation  
 - Sidebar navigation to user profile and settings page  
-- Friends screen layout and component design  
+- Friends screen layout and component design
 
+### Meeting 6
+Thursday, 29th March – 7:00 PM
+
+#### Attendance  
+- Hamania Asim  
+- Hafsah Nasir  
+- Ammara Haroon  
+- Elizeh Faisal  
+- Sameen Abid  
+
+#### Key Takeaways
+- Reviewed all tasks currently in progress and under review to confirm completion status
+- Cross-checked all implemented features against their acceptance criteria
+- Identified any missing elements or incomplete requirements
+- At this stage for the next phase, the majority of workload is either in progress or in the review stage
+- Assigned work for the next sprint with an internal deadline 
+
+Sprint 3 Planning
+- Past sprint work is complete, 
+- Majority of features are actively being worked on or are pending review
+- Assigned the US-08 and US-09, creating new events and editing event details
+- Designing tests for the User stories in review
+- Assigned US-011 for View and check-in attendee list
     
 ## CRC Diagrams
 
