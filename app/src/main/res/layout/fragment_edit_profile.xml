@@ -78,6 +78,14 @@
 
 
                 <!-- FULL NAME -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="6dp"/>
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -91,15 +99,13 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Full Name"
                         app:boxBackgroundColor="@color/color_surface_white"
                         app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="0dp"
-                        app:hintTextColor="@color/color_text_hint">
+                        app:boxStrokeWidthFocused="0dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etFullName"
@@ -107,80 +113,21 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:textColor="@color/color_text_secondary"
-                            android:textColorHint="@color/color_text_hint" />
+                            android:gravity="center_vertical"
+                            />
 
                     </com.google.android.material.textfield.TextInputLayout>
                 </com.google.android.material.card.MaterialCardView>
-
-
-                <!-- EMAIL -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:strokeWidth="0dp"
-                    app:cardBackgroundColor="@color/color_surface_white">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:hint="Email Address"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:boxBackgroundColor="@color/color_surface_white"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="0dp"
-                        app:hintTextColor="@color/color_text_hint">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etEmail"
-                            android:inputType="textEmailAddress"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/color_text_secondary"
-                            android:background="@null"/>
-
-                    </com.google.android.material.textfield.TextInputLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-
-                <!-- BATCH -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:strokeWidth="0dp"
-                    app:cardBackgroundColor="@color/color_surface_white">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:hint="Batch"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                        app:endIconMode="dropdown_menu"
-                        app:boxBackgroundColor="@color/color_surface_white"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="0dp">
-
-                        <AutoCompleteTextView
-                            android:id="@+id/etBatch"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:inputType="none"/>
-
-                    </com.google.android.material.textfield.TextInputLayout>
-                </com.google.android.material.card.MaterialCardView>
-
 
                 <!-- MAJOR -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Major"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="6dp"/>
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -191,7 +138,6 @@
                     app:cardBackgroundColor="@color/color_surface_white">
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:hint="Major"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
@@ -205,13 +151,25 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@null"
-                            android:inputType="none"/>
+                            android:inputType="none"
+                            android:textColor="@color/color_text_secondary"
+                            android:gravity="center_vertical"
+                            android:paddingTop="0dp"
+                            android:paddingBottom="0dp"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
                 </com.google.android.material.card.MaterialCardView>
 
 
                 <!-- BIO -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="About You"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="6dp"/>
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -222,7 +180,6 @@
                     app:cardBackgroundColor="@color/color_surface_white">
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:hint="About You"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
