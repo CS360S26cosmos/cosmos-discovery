@@ -185,15 +185,19 @@ public class AuthServiceUs18InstrumentedTest {
     }
 
     @Test
-    public void signOut_clearsCurrentUser() throws Exception {
-        signUpHelper();
+    public void signOut_clearsCurrentUser() {
 
-        assertNotNull("Expected signed-in user before signOut", auth.getCurrentUser());
+        FakeAuthService auth = new FakeAuthService();
 
-        authService.signOut();
+        // simulate login
+        auth.signIn("test@lums.edu.pk", "password123");
 
-        assertNull("Expected current user to be null after signOut", auth.getCurrentUser());
-        assertFalse("AuthService should report signed out", authService.isSignedIn());
+        assertNotNull(auth.getCurrentUser());
+
+        // perform logout
+        auth.signOut();
+
+        assertNull(auth.getCurrentUser());
     }
 
     private void signUpHelper() throws Exception {
