@@ -282,7 +282,7 @@
                                     android:layout_marginTop="6dp"
                                     android:contentDescription="Organizer placeholder image"
                                     android:scaleType="fitStart"
-                                    android:src="@drawable/ic_star_placeholder"
+                                    android:src="@drawable/ic_star"
                                     app:tint="@null" />
                             </LinearLayout>
                         </LinearLayout>
@@ -400,7 +400,7 @@
                                         android:layout_height="20dp"
                                         android:layout_gravity="center"
                                         android:src="@drawable/ic_eventdetails_calendar"
-                                        app:tint="@color/color_text" />
+                                        app:tint="@color/color_icon_outline" />
                                 </FrameLayout>
 
                                 <TextView
@@ -449,7 +449,7 @@
                     android:layout_height="0dp"
                     android:contentDescription="Event image placeholder"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_event_image_placeholder"
+                    android:src="@drawable/ic_event_image"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
