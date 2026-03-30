@@ -22,13 +22,15 @@ public class AuthService {
 
     private final FirebaseAuth mAuth;
     private final FirebaseFirestore mDb;
-
     /**
-     * Creates an auth service instance and initializes Firebase clients.
+     * Default constructor used by the Android app.
      */
     public AuthService() {
-        mAuth = FirebaseAuth.getInstance();
-        mDb   = FirebaseFirestore.getInstance();
+        this(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance());
+    }
+    AuthService(FirebaseAuth auth, FirebaseFirestore db) {
+        mAuth = auth;
+        mDb   = db;
     }
 
 
