@@ -39,7 +39,7 @@ public class User {
     /**
      * Default constructor required for serialization/deserialization frameworks.
      */
-    protected User(){}
+    public User(){}
 
     /**
      * Creates a user with default initial values.
