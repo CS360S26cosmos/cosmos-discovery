@@ -9,12 +9,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cosmosdiscovery">
         <activity
+            android:name=".ui.student.ViewProfile"
+            android:exported="false"
+            android:label="@string/title_activity_view_profile"
+            android:theme="@style/Theme.Cosmosdiscovery" />
+        <activity
             android:name=".ui.student.EditProfile"
             android:exported="false"
             android:label="@string/title_activity_edit_profile"
             android:theme="@style/Theme.Cosmosdiscovery" />
         <activity
-            android:name=".ui.student.MainActivity"
+            android:name=".ui.shared.MainActivity"
             android:exported="false"
             android:label="@string/title_activity_main"
             android:theme="@style/Theme.Cosmosdiscovery" />
@@ -38,9 +43,6 @@
             android:exported="false" />
         <activity
             android:name=".ui.auth.ForgotPasswordActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.shared.MainActivity"
             android:exported="false" />
         <activity
             android:name=".ui.admin.AdminActivity"

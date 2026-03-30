@@ -11,15 +11,24 @@
     <string name="title_activity_edit_profile">EditProfile</string>
 
     <string-array name="majors_array">
+        <item>Accounting and Finance</item>
+        <item>Anthropology and Sociology</item>
         <item>Biology</item>
-        <item>Computer Science</item>
-        <item>Electrical Engineering</item>
         <item>Chemical Engineering</item>
-        <item>Political Science</item>
-        <item>History</item>
-        <item>English Literature</item>
+        <item>Chemistry</item>
+        <item>Computer Science</item>
+        <item>CLCA</item>
         <item>Economics</item>
+        <item>Economics and Mathematics</item>
+        <item>Electrical Engineering</item>
+        <item>English</item>
+        <item>History</item>
         <item>Mathematics</item>
+        <item>Management Science</item>
         <item>Physics</item>
+        <item>Political Science</item>
+        <item>Politics and Economics</item>
+        <item>Psychology</item>
     </string-array>
+    <string name="title_activity_view_profile">ViewProfile</string>
 </resources>

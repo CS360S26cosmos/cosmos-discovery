@@ -205,7 +205,7 @@ public class StudentActivity extends AppCompatActivity {
                 .setOnClickListener(v -> {
                     hideSidebar();
 
-                    Intent intent = new Intent(this, EditProfile.class);
+                    Intent intent = new Intent(this, ViewProfile.class);
                     startActivity(intent);
                 });
     }
