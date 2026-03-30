@@ -3,6 +3,9 @@ name: US-18 Auth Tests
 on:
   push:
     branches: [ "*" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
   unit-tests:
     name: Run Unit Tests (Fast)
