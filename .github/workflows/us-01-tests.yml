@@ -1,4 +1,4 @@
-name: US-18 Auth Tests
+name: US-01 Event Feed Tests
 
 on:
   push:
@@ -7,8 +7,9 @@ on:
     branches: [ "main" ]
 
 jobs:
+
   unit-tests:
-    name: Run Unit Tests (Fast)
+    name: Run Unit Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -21,14 +22,15 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Grant execute permission
+      - name: Grant permission
         run: chmod +x gradlew
 
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest
 
+
 #  instrumented-tests:
-#    name: Run Emulator Tests (Auth Integration)
+#    name: Run Emulator Tests
 #    runs-on: macos-latest
 #
 #    steps:
@@ -41,11 +43,7 @@ jobs:
 #          distribution: temurin
 #          java-version: 17
 #
-#      - name: Enable KVM (for emulator speed)
-#        run: |
-#          echo "KVM not needed on macOS runner"
-#
-#      - name: Run instrumented tests
+#      - name: Run emulator tests
 #        uses: reactivecircus/android-emulator-runner@v2
 #        with:
 #          api-level: 30
