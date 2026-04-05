@@ -5,4 +5,30 @@
     <string name="my_events" />
     <string name="filter" />
     <string name="search" />
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_edit_profile">EditProfile</string>
+
+    <string-array name="majors_array">
+        <item>Accounting and Finance</item>
+        <item>Anthropology and Sociology</item>
+        <item>Biology</item>
+        <item>Chemical Engineering</item>
+        <item>Chemistry</item>
+        <item>Computer Science</item>
+        <item>CLCA</item>
+        <item>Economics</item>
+        <item>Economics and Mathematics</item>
+        <item>Electrical Engineering</item>
+        <item>English</item>
+        <item>History</item>
+        <item>Mathematics</item>
+        <item>Management Science</item>
+        <item>Physics</item>
+        <item>Political Science</item>
+        <item>Politics and Economics</item>
+        <item>Psychology</item>
+    </string-array>
+    <string name="title_activity_view_profile">ViewProfile</string>
 </resources>
