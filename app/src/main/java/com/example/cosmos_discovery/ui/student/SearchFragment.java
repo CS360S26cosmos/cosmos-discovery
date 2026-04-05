@@ -18,13 +18,12 @@ import com.example.cosmos_discovery.adapter.EventSmallAdapter;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.model.FilterState;
+import com.example.cosmos_discovery.util.EventFilter;
 import com.example.cosmos_discovery.util.RsvpHandler;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Search screen — displays filtered results as the user types in the header EditText.
@@ -104,7 +103,7 @@ public class SearchFragment extends Fragment {
         applyFilter();
     }
 
-    // ── Search logic ──────────────────────────────────────────────────────
+    // ── Filter logic ──────────────────────────────────────────────────────
 
     /**
      * Applies the current query and filter state client-side against {@code mAllEvents}.
@@ -123,33 +122,10 @@ public class SearchFragment extends Fragment {
             return;
         }
 
-        // Step 1: start with all events; apply text filter first if there's a query
         List<Event> results = hasQuery
-                ? filter(mAllEvents, mCurrentQuery)
+                ? EventFilter.textSearch(mAllEvents, mCurrentQuery)
                 : new ArrayList<>(mAllEvents);
-
-        // Step 2: category — keep events whose tags contain at least one selected category
-        List<String> selectedCategories = mCurrentFilter.getSelectedCategories();
-        if (!selectedCategories.isEmpty()) {
-            results.removeIf(e -> {
-                List<String> tags = e.getTags();
-                return tags == null || Collections.disjoint(tags, selectedCategories);
-            });
-        }
-
-        // Step 3: date range — keep events whose dateTime falls within [start, end]
-        long[] range = mCurrentFilter.getDateRange();
-        if (range != null) {
-            results.removeIf(e -> e.getDateTime() < range[0] || e.getDateTime() > range[1]);
-        }
-
-        // Step 4: access type
-        FilterState.AccessFilter access = mCurrentFilter.getSelectedAccess();
-        if (access == FilterState.AccessFilter.LUMS_ONLY) {
-            results.removeIf(e -> !"lums_only".equals(e.getAccessType()));
-        } else if (access == FilterState.AccessFilter.OPEN) {
-            results.removeIf(e -> e.getAccessType() != null && !"open".equals(e.getAccessType()));
-        }
+        results = EventFilter.applyFilters(results, mCurrentFilter);
 
         mAdapter.updateData(results);
         if (results.isEmpty()) {
@@ -160,43 +136,6 @@ public class SearchFragment extends Fragment {
         } else {
             hideEmptyState();
         }
-    }
-
-    /**
-     * All-tokens-must-appear fuzzy filter across title, location, and tags.
-     *
-     * Each space-separated token in the query must be contained somewhere in
-     * the combined searchable string — enabling partial matches ("mus" → "music")
-     * and cross-field queries ("music auditorium" → title + location).
-     */
-    private List<Event> filter(List<Event> events, String rawQuery) {
-        String query  = rawQuery.toLowerCase(Locale.getDefault()).trim();
-        String[] tokens = query.split("\\s+");
-        List<Event> results = new ArrayList<>();
-
-        for (Event event : events) {
-            String searchable = buildSearchable(event);
-            boolean allMatch = true;
-            for (String token : tokens) {
-                if (!searchable.contains(token)) {
-                    allMatch = false;
-                    break;
-                }
-            }
-            if (allMatch) results.add(event);
-        }
-        return results;
-    }
-
-    /**
-     * Builds a single lowercase searchable string from an event's title, location, and tags.
-     * Used by {@link #filter} to match query tokens across all text fields at once.
-     */
-    private String buildSearchable(Event event) {
-        List<String> tags = event.getTags();
-        String tagText = (tags != null) ? String.join(" ", tags) : "";
-        return (event.getTitle() + " " + event.getLocation() + " " + tagText)
-                .toLowerCase(Locale.getDefault());
     }
 
     // ── Empty state helpers ───────────────────────────────────────────────

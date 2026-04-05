@@ -16,10 +16,13 @@ import java.util.function.Consumer;
  */
 public class RsvpHandler {
 
-    private final EventService mService;
+    private EventService mService; // lazily initialized — keeps RsvpHandler testable without Firebase
 
-    public RsvpHandler() {
-        mService = new EventService();
+    public RsvpHandler() {}
+
+    private EventService service() {
+        if (mService == null) mService = new EventService();
+        return mService;
     }
 
     /**
@@ -65,7 +68,7 @@ public class RsvpHandler {
             applyLocally.run();
             return;
         }
-        mService.rsvpToEvent(event.getId(), uid, applyLocally, onError);
+        service().rsvpToEvent(event.getId(), uid, applyLocally, onError);
     }
 
     private void cancelRsvp(Event event, String uid, Runnable onRefresh, Consumer<String> onError) {
@@ -84,6 +87,6 @@ public class RsvpHandler {
             applyLocally.run();
             return;
         }
-        mService.cancelRsvp(event.getId(), uid, applyLocally, onError);
+        service().cancelRsvp(event.getId(), uid, applyLocally, onError);
     }
 }

@@ -22,6 +22,7 @@ import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.database.FriendService;
 import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.model.FriendEntry;
+import com.example.cosmos_discovery.util.FriendEventFilter;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.example.cosmos_discovery.util.RsvpHandler;
 
@@ -149,7 +150,6 @@ public class FriendsFragment extends Fragment
      * then updates the FriendEventAdapter with the filtered list and name map.
      */
     private void updateFriendEvents() {
-        // Build uid → first-name map from current friends
         Map<String, String> friendUidToName = new HashMap<>();
         Set<String>         friendUids      = new HashSet<>();
         for (FriendEntry entry : mFriendEntries) {
@@ -157,28 +157,19 @@ public class FriendsFragment extends Fragment
             friendUidToName.put(entry.getUid(), entry.getName());
         }
 
-        // Keep only events where at least one attendee is a friend
-        List<Event> filtered = new ArrayList<>();
-        for (Event event : mAllEvents) {
-            if (event.getAttendeeIds() == null) continue;
-            for (String attendeeUid : event.getAttendeeIds()) {
-                if (friendUids.contains(attendeeUid)) {
-                    filtered.add(event);
-                    break;
-                }
-            }
-        }
-
+        List<Event> filtered = FriendEventFilter.filterByFriends(mAllEvents, friendUids);
         mFriendEventAdapter.updateData(filtered, friendUidToName);
         updateEventEmptyState(filtered.isEmpty());
     }
 
+    /** Toggles the friends carousel and its empty-state view based on {@code mFriendEntries}. */
     private void updateFriendEmptyState() {
         boolean empty = mFriendEntries.isEmpty();
         mRvFriends.setVisibility(empty ? View.GONE : View.VISIBLE);
         mTvNoFriends.setVisibility(empty ? View.VISIBLE : View.GONE);
     }
 
+    /** Toggles the friend-events list and its empty-state view. */
     private void updateEventEmptyState(boolean empty) {
         mRvFriendEvents.setVisibility(empty ? View.GONE : View.VISIBLE);
         mTvNoFriendEvents.setVisibility(empty ? View.VISIBLE : View.GONE);
