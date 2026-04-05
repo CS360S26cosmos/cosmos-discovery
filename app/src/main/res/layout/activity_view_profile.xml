@@ -77,7 +77,18 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="4dp"/>
 
-                <!-- MAJOR + BATCH -->
+                <!-- BATCH -->
+                <TextView
+                    android:id="@+id/tvBatch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:textColor="@color/color_text_hint"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="4dp"/>
+
+                <!-- MAJOR -->
                 <TextView
                     android:id="@+id/tvMajor"
                     android:layout_width="wrap_content"
