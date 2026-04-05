@@ -113,7 +113,10 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEdtProfile"
-                    android:layout_height="48dp"
+                    android:layout_height="40dp"
+                    android:textSize="13sp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
                     android:layout_width="wrap_content"
                     android:text="Edit Profile"
                     android:textStyle="bold"
@@ -125,6 +128,65 @@
                     android:backgroundTint="@android:color/transparent"
                     android:layout_gravity="center_horizontal" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp">
+
+                    <!-- Friends block -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvFriendsLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Friends"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/color_text_secondary"/>
+
+                        <TextView
+                            android:id="@+id/tvFriendsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="15sp"
+                            android:textColor="@color/color_text_secondary"/>
+                    </LinearLayout>
+
+                    <!-- Events block -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvEventsLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Events"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/color_text_secondary"/>
+
+                        <TextView
+                            android:id="@+id/tvEventsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="15sp"
+                            android:textColor="@color/color_text_secondary"/>
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
