@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,10 +17,12 @@ import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.adapter.EventBigAdapter;
 import com.example.cosmos_discovery.adapter.EventSmallAdapter;
 import com.example.cosmos_discovery.database.EventService;
+import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.util.RsvpHandler;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Discover screen for the student role.
@@ -28,16 +31,21 @@ import java.util.ArrayList;
  *   • "Suggested"  — horizontal carousel of big cards ({@code recyclerViewSuggested})
  *   • "This Week"  — vertical list of small cards  ({@code recyclerViewThisWeek})
  *
- * Both sections are driven by the same upcoming-events Firestore listener for now.
+ * Each section shows an empty-state message when Firestore returns no events.
  */
 public class DiscoverFragment extends Fragment {
 
-    private EventBigAdapter      mSuggestedAdapter;
-    private EventSmallAdapter    mThisWeekAdapter;
-    private final RsvpHandler    mRsvpHandler  = new RsvpHandler();
-    private final EventService   mEventService = new EventService();
-    private ListenerRegistration mUpcomingListener;  // feeds Suggested carousel
-    private ListenerRegistration mThisWeekListener;  // feeds This Week list
+    private EventBigAdapter   mSuggestedAdapter;
+    private EventSmallAdapter mThisWeekAdapter;
+    private RecyclerView      mRvSuggested;
+    private RecyclerView      mRvThisWeek;
+    private TextView          mTvEmptySuggested;
+    private TextView          mTvEmptyThisWeek;
+
+    private final RsvpHandler  mRsvpHandler  = new RsvpHandler();
+    private final EventService mEventService = new EventService();
+    private ListenerRegistration mUpcomingListener;
+    private ListenerRegistration mThisWeekListener;
 
     @Nullable
     @Override
@@ -49,42 +57,41 @@ public class DiscoverFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // ── Suggested — horizontal carousel ──────────────────────────────
-        RecyclerView rvSuggested = view.findViewById(R.id.recyclerViewSuggested);
-        rvSuggested.setLayoutManager(
-                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        mRvSuggested      = view.findViewById(R.id.recyclerViewSuggested);
+        mRvThisWeek       = view.findViewById(R.id.recyclerViewThisWeek);
+        mTvEmptySuggested = view.findViewById(R.id.tvEmptySuggested);
+        mTvEmptyThisWeek  = view.findViewById(R.id.tvEmptyThisWeek);
 
+        // ── Suggested — horizontal carousel ──────────────────────────────
+        mRvSuggested.setLayoutManager(
+                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         mSuggestedAdapter = new EventBigAdapter(requireContext(), new ArrayList<>(), (event, pos) ->
                 mRsvpHandler.toggle(event,
                         () -> mSuggestedAdapter.notifyItemChanged(pos),
                         err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()));
-        rvSuggested.setAdapter(mSuggestedAdapter);
+        mRvSuggested.setAdapter(mSuggestedAdapter);
 
         // ── This Week — vertical list ─────────────────────────────────────
-        RecyclerView rvThisWeek = view.findViewById(R.id.recyclerViewThisWeek);
-        rvThisWeek.setLayoutManager(new LinearLayoutManager(requireContext()));
-
+        mRvThisWeek.setLayoutManager(new LinearLayoutManager(requireContext()));
         mThisWeekAdapter = new EventSmallAdapter(requireContext(), new ArrayList<>(), (event, pos) ->
                 mRsvpHandler.toggle(event,
                         () -> mThisWeekAdapter.notifyItemChanged(pos),
                         err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()));
-        rvThisWeek.setAdapter(mThisWeekAdapter);
+        mRvThisWeek.setAdapter(mThisWeekAdapter);
     }
 
-    /** Attaches two Firestore listeners: all upcoming events for Suggested, this week's for This Week. */
     @Override
     public void onStart() {
         super.onStart();
         mUpcomingListener = mEventService.listenUpcomingEvents(
-                events -> mSuggestedAdapter.updateData(events),
+                events -> updateSuggested(events),
                 err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
 
         mThisWeekListener = mEventService.listenThisWeekEvents(
-                events -> mThisWeekAdapter.updateData(events),
+                events -> updateThisWeek(events),
                 err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
     }
 
-    /** Detaches both Firestore listeners to prevent memory leaks and unnecessary network traffic. */
     @Override
     public void onStop() {
         super.onStop();
@@ -96,5 +103,21 @@ public class DiscoverFragment extends Fragment {
             mThisWeekListener.remove();
             mThisWeekListener = null;
         }
+    }
+
+    /** Updates the Suggested carousel and toggles its empty-state view. */
+    private void updateSuggested(List<Event> events) {
+        mSuggestedAdapter.updateData(events);
+        boolean empty = events.isEmpty();
+        mRvSuggested.setVisibility(empty ? View.GONE : View.VISIBLE);
+        mTvEmptySuggested.setVisibility(empty ? View.VISIBLE : View.GONE);
+    }
+
+    /** Updates the This Week list and toggles its empty-state view. */
+    private void updateThisWeek(List<Event> events) {
+        mThisWeekAdapter.updateData(events);
+        boolean empty = events.isEmpty();
+        mRvThisWeek.setVisibility(empty ? View.GONE : View.VISIBLE);
+        mTvEmptyThisWeek.setVisibility(empty ? View.VISIBLE : View.GONE);
     }
 }

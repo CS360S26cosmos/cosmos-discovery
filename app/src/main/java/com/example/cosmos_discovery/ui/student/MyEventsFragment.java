@@ -16,6 +16,7 @@ import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.adapter.EventSmallAdapter;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
+import com.example.cosmos_discovery.util.EventSorter;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.example.cosmos_discovery.util.RsvpHandler;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -120,21 +121,9 @@ public class MyEventsFragment extends Fragment
         long now = System.currentTimeMillis();
 
         mUpcomingEvents.clear();
+        mUpcomingEvents.addAll(EventSorter.upcoming(allRsvped, now));
         mPastEvents.clear();
-
-        for (Event e : allRsvped) {
-            if (!Event.STATUS_APPROVED.equals(e.getStatus())) continue;
-            if (e.getDateTime() >= now) {
-                mUpcomingEvents.add(e);
-            } else {
-                mPastEvents.add(e);
-            }
-        }
-
-        // Upcoming: soonest first
-        mUpcomingEvents.sort((a, b) -> Long.compare(a.getDateTime(), b.getDateTime()));
-        // Past: most recent first
-        mPastEvents.sort((a, b) -> Long.compare(b.getDateTime(), a.getDateTime()));
+        mPastEvents.addAll(EventSorter.past(allRsvped, now));
 
         mUpcomingAdapter.updateData(mUpcomingEvents);
         mPastAdapter.updateData(mPastEvents);
