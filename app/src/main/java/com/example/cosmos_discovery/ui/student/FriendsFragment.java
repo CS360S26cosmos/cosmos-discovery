@@ -1,6 +1,8 @@
 package com.example.cosmos_discovery.ui.student;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +24,6 @@ import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.model.FriendEntry;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.example.cosmos_discovery.util.RsvpHandler;
-import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,33 +36,32 @@ import java.util.Set;
  * Friends tab: horizontal carousel of accepted friends + vertical feed of events
  * that at least one friend has RSVP'd to.
  *
- * Two Firestore listeners run in parallel:
- *   1. {@code users/{uid}/friends} subcollection — friend list
- *   2. All upcoming approved events — filtered client-side by friend attendeeIds
- *
- * Both listeners are detached in {@link #onDestroyView()}.
+ * Data is refreshed by polling Firestore every {@link #POLL_INTERVAL_MS} milliseconds.
+ * Polling starts in {@link #onStart()} and stops in {@link #onStop()}.
  */
 public class FriendsFragment extends Fragment
         implements FriendEventAdapter.OnRsvpClickListener {
 
-    private RecyclerView      mRvFriends;
-    private RecyclerView      mRvFriendEvents;
-    private TextView          mTvNoFriends;
-    private TextView          mTvNoFriendEvents;
+    private static final long POLL_INTERVAL_MS = 30_000L;
 
-    private FriendAdapter     mFriendAdapter;
+    private RecyclerView       mRvFriends;
+    private RecyclerView       mRvFriendEvents;
+    private TextView           mTvNoFriends;
+    private TextView           mTvNoFriendEvents;
+
+    private FriendAdapter      mFriendAdapter;
     private FriendEventAdapter mFriendEventAdapter;
 
     private final FriendService mFriendService = new FriendService();
     private final EventService  mEventService  = new EventService();
     private final RsvpHandler   mRsvpHandler   = new RsvpHandler();
 
-    private ListenerRegistration mFriendsListener;
-    private ListenerRegistration mEventsListener;
+    private final Handler mPollHandler = new Handler(Looper.getMainLooper());
+    private Runnable      mPollRunnable;
 
-    // Latest data from each listener — recombined whenever either updates
-    private List<FriendEntry>   mFriendEntries = new ArrayList<>();
-    private List<Event>         mAllEvents     = new ArrayList<>();
+    // Latest data from each fetch — recombined whenever either updates
+    private List<FriendEntry> mFriendEntries = new ArrayList<>();
+    private List<Event>       mAllEvents     = new ArrayList<>();
 
     @Nullable
     @Override
@@ -91,28 +91,57 @@ public class FriendsFragment extends Fragment
                 requireContext(), new ArrayList<>(), new HashMap<>(), this);
         mRvFriendEvents.setLayoutManager(new LinearLayoutManager(requireContext()));
         mRvFriendEvents.setAdapter(mFriendEventAdapter);
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
         String uid = RoleUtil.getCurrentUser() != null
                 ? RoleUtil.getCurrentUser().getUid() : null;
         if (uid == null) return;
 
-        // Listener 1: friends subcollection
-        mFriendsListener = mFriendService.listenFriends(uid,
+        mPollRunnable = new Runnable() {
+            @Override
+            public void run() {
+                fetchAndUpdate(uid);
+                mPollHandler.postDelayed(this, POLL_INTERVAL_MS);
+            }
+        };
+        mPollHandler.post(mPollRunnable); // fire immediately, then every 30 s
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mPollRunnable != null) {
+            mPollHandler.removeCallbacks(mPollRunnable);
+            mPollRunnable = null;
+        }
+    }
+
+    /** Fetches friends and upcoming events in parallel, then redraws the feed. */
+    private void fetchAndUpdate(String uid) {
+        mFriendService.fetchFriends(uid,
                 entries -> {
                     mFriendEntries = entries;
                     mFriendAdapter.updateData(entries);
                     updateFriendEmptyState();
                     updateFriendEvents();
                 },
-                err -> Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show());
+                err -> {
+                    if (getContext() != null)
+                        Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show();
+                });
 
-        // Listener 2: all upcoming approved events
-        mEventsListener = mEventService.listenUpcomingEvents(
+        mEventService.fetchUpcomingEvents(
                 events -> {
                     mAllEvents = events;
                     updateFriendEvents();
                 },
-                err -> Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show());
+                err -> {
+                    if (getContext() != null)
+                        Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show();
+                });
     }
 
     /**
@@ -165,12 +194,5 @@ public class FriendsFragment extends Fragment
                     if (getContext() != null)
                         Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show();
                 });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mFriendsListener != null) { mFriendsListener.remove(); mFriendsListener = null; }
-        if (mEventsListener  != null) { mEventsListener.remove();  mEventsListener  = null; }
     }
 }
