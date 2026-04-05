@@ -46,7 +46,7 @@ public class AuthService {
      * Returns true if the password is strong.
      * Requirements:
      * - At least 8 characters
-     * - At least one uppercase letter
+     * - At least one up    percase letter
      * - At least one lowercase letter
      * - At least one digit
      * - At least one special character from: {@literal !@#$%^&*!?~}
