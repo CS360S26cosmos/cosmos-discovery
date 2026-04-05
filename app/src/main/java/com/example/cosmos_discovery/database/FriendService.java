@@ -85,6 +85,28 @@ public class FriendService {
     }
 
     /**
+     * One-shot fetch of the friends subcollection for the given user.
+     * Use this for polling — call on a fixed interval instead of keeping a listener open.
+     */
+    public void fetchFriends(String uid,
+                             Consumer<List<FriendEntry>> onSuccess,
+                             Consumer<String> onFailure) {
+        mDb.collection(USERS_COLLECTION)
+                .document(uid)
+                .collection(FRIENDS_SUB)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    List<FriendEntry> entries = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        FriendEntry entry = doc.toObject(FriendEntry.class);
+                        if (entry != null) entries.add(entry);
+                    }
+                    onSuccess.accept(entries);
+                })
+                .addOnFailureListener(e -> onFailure.accept("Failed to load friends."));
+    }
+
+    /**
      * One-shot fetch of all user documents (for the user search feature).
      * The caller is responsible for excluding the current user client-side.
      */

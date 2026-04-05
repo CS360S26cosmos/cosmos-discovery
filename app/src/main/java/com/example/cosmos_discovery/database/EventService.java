@@ -202,6 +202,33 @@ public class EventService {
     }
 
     /**
+     * One-shot fetch of all approved upcoming events ordered chronologically.
+     * Use this for polling — call on a fixed interval instead of keeping a listener open.
+     */
+    public void fetchUpcomingEvents(Consumer<List<Event>> onSuccess,
+                                    Consumer<String> onFailure) {
+        long now = System.currentTimeMillis();
+        mDb.collection(EVENTS_COLLECTION)
+                .whereEqualTo("status", Event.STATUS_APPROVED)
+                .whereGreaterThanOrEqualTo("dateTime", now)
+                .orderBy("dateTime")
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    List<Event> events = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        Event e = doc.toObject(Event.class);
+                        if (e != null) {
+                            e.setId(doc.getId());
+                            events.add(e);
+                        }
+                    }
+                    onSuccess.accept(events);
+                })
+                .addOnFailureListener(ex -> onFailure.accept(
+                        ex.getMessage() != null ? ex.getMessage() : "Failed to load events."));
+    }
+
+    /**
      * Fetches a single event by its document ID. One-shot read.
      */
     public void fetchEventById(String eventId,
