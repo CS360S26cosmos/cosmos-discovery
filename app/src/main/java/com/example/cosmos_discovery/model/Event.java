@@ -30,6 +30,12 @@ public class Event {
     private List<String> attendeeIds;
     private long         createdAt;
     private String       accessType;  // "lums_only" | "open" | null (null treated as open)
+    private String       description;
+    private String       category;
+    private String       dateOfEvent; // raw form value (display), e.g. "2026-04-06"
+    private String       startTime;   // raw form value, e.g. "5:00pm"
+    private String       endTime;     // raw form value, e.g. "7:00pm"
+    private String       registerBy;  // raw form value (display)
 
     /** Required by Firestore for deserialization. Do not use in application code. */
     protected Event() {}
@@ -93,4 +99,22 @@ public class Event {
 
     public String getAccessType()                    { return accessType; }
     public void   setAccessType(String accessType)   { this.accessType = accessType; }
+
+    public String getDescription()                   { return description; }
+    public void   setDescription(String description) { this.description = description; }
+
+    public String getCategory()                      { return category; }
+    public void   setCategory(String category)       { this.category = category; }
+
+    public String getDateOfEvent()                   { return dateOfEvent; }
+    public void   setDateOfEvent(String dateOfEvent) { this.dateOfEvent = dateOfEvent; }
+
+    public String getStartTime()                     { return startTime; }
+    public void   setStartTime(String startTime)     { this.startTime = startTime; }
+
+    public String getEndTime()                       { return endTime; }
+    public void   setEndTime(String endTime)         { this.endTime = endTime; }
+
+    public String getRegisterBy()                    { return registerBy; }
+    public void   setRegisterBy(String registerBy)   { this.registerBy = registerBy; }
 }

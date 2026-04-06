@@ -114,6 +114,12 @@ public class EventTest {
         e.setAttendeeIds(Arrays.asList("u1", "u2"));
         e.setCreatedAt(1_000L);
         e.setAccessType("lums_only");
+        e.setDescription("desc");
+        e.setCategory("cat");
+        e.setDateOfEvent("2026-04-06");
+        e.setStartTime("5:00pm");
+        e.setEndTime("7:00pm");
+        e.setRegisterBy("2026-04-01");
 
         assertEquals("doc-id",            e.getId());
         assertEquals("Seminar",           e.getTitle());
@@ -127,5 +133,11 @@ public class EventTest {
         assertEquals(Arrays.asList("u1", "u2"), e.getAttendeeIds());
         assertEquals(1_000L,              e.getCreatedAt());
         assertEquals("lums_only",         e.getAccessType());
+        assertEquals("desc",              e.getDescription());
+        assertEquals("cat",               e.getCategory());
+        assertEquals("2026-04-06",        e.getDateOfEvent());
+        assertEquals("5:00pm",            e.getStartTime());
+        assertEquals("7:00pm",            e.getEndTime());
+        assertEquals("2026-04-01",        e.getRegisterBy());
     }
 }

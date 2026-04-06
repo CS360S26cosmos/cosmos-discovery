@@ -55,6 +55,18 @@
             android:name=".ui.organizer.OrganizerActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.organizer.EventDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.organizer.AddEventActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.organizer.EditEventActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.organizer.EventStatsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.student.StudentActivity"
             android:exported="false" />
     </application>
