@@ -1,5 +1,6 @@
 package com.example.cosmos_discovery.ui.student;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,7 +64,8 @@ public class UserSearchFragment extends Fragment {
 
         mAdapter = new UserSearchAdapter(
                 requireContext(), currentUid, mAllUsers, mFriendUids,
-                this::onAddFriendClick);
+                this::onAddFriendClick,
+                this::onUserRowClick);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         mRecyclerView.setAdapter(mAdapter);
@@ -95,6 +97,12 @@ public class UserSearchFragment extends Fragment {
             mAdapter.setQuery(query);
             updateEmptyState();
         }
+    }
+
+    private void onUserRowClick(User user) {
+        Intent intent = new Intent(requireActivity(), UserProfileActivity.class);
+        intent.putExtra(UserProfileActivity.EXTRA_USER_ID, user.getUid());
+        startActivity(intent);
     }
 
     private void onAddFriendClick(User target, int position) {

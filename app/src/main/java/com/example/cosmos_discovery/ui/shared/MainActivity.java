@@ -5,10 +5,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.cosmos_discovery.R;
-import com.example.cosmos_discovery.ui.student.DiscoverFragment;
 import com.example.cosmos_discovery.ui.student.StudentActivity;
-import com.example.cosmos_discovery.util.RoleUtil;
 
 /**
  * Post-login router. Immediately delegates to the role-specific shell activity.
@@ -21,20 +18,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Students get the full shell (top bar + nav bar + sidebar) in StudentActivity.
-        if (RoleUtil.isStudent()) {
-            startActivity(new Intent(this, StudentActivity.class));
-            finish();
-            return;
-        }
-
-        // Organizer / Admin shell not yet built — placeholder.
-        setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, new DiscoverFragment())
-                    .commit();
-        }
+        // Route all roles to StudentActivity for now.
+        // Organizer and Admin shells are not yet implemented — they fall back to the
+        // student shell so the full chrome (top bar, nav bar, sidebar) is always shown.
+        startActivity(new Intent(this, StudentActivity.class));
+        finish();
     }
 }

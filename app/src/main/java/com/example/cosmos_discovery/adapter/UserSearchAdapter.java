@@ -32,6 +32,10 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         void onAddFriend(User user, int position);
     }
 
+    public interface OnUserClickListener {
+        void onUserClick(User user);
+    }
+
     private List<User>              mAllUsers;
     private List<User>              mFiltered;
     private Set<String>             mFriendUids;
@@ -39,16 +43,19 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     private String                  mQuery      = "";
     private final Context           mContext;
     private final OnAddFriendListener mListener;
+    private final OnUserClickListener mUserClickListener;
 
     public UserSearchAdapter(Context context, String currentUid,
                              List<User> allUsers, Set<String> friendUids,
-                             OnAddFriendListener listener) {
-        this.mContext    = context;
-        this.mCurrentUid = currentUid;
-        this.mAllUsers   = allUsers;
-        this.mFriendUids = friendUids;
-        this.mListener   = listener;
-        this.mFiltered   = new ArrayList<>();
+                             OnAddFriendListener listener,
+                             OnUserClickListener userClickListener) {
+        this.mContext            = context;
+        this.mCurrentUid         = currentUid;
+        this.mAllUsers           = allUsers;
+        this.mFriendUids         = friendUids;
+        this.mListener           = listener;
+        this.mUserClickListener  = userClickListener;
+        this.mFiltered           = new ArrayList<>();
     }
 
     /** Updates both the user list and current friend UIDs, then re-filters. */
@@ -112,6 +119,11 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         } else {
             holder.ivUserPhoto.setImageResource(R.drawable.ic_topbar_person_icon);
         }
+
+        // Whole-row click → open user profile
+        holder.itemView.setOnClickListener(v -> {
+            if (mUserClickListener != null) mUserClickListener.onUserClick(user);
+        });
 
         // Add Friend / Friends state
         boolean isFriend = mFriendUids != null && mFriendUids.contains(user.getUid());

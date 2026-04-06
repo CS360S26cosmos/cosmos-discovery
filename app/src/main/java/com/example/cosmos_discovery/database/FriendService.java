@@ -107,6 +107,42 @@ public class FriendService {
     }
 
     /**
+     * One-shot fetch of a single user document by UID.
+     */
+    public void fetchUserById(String uid,
+                              Consumer<User> onSuccess,
+                              Consumer<String> onFailure) {
+        mDb.collection(USERS_COLLECTION)
+                .document(uid)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    User u = doc.toObject(User.class);
+                    if (u != null) {
+                        u.setUid(doc.getId());
+                        onSuccess.accept(u);
+                    } else {
+                        onFailure.accept("User not found.");
+                    }
+                })
+                .addOnFailureListener(e -> onFailure.accept("Could not load user."));
+    }
+
+    /**
+     * Atomically removes a mutual friendship by deleting both subcollection entries.
+     */
+    public void removeFriend(String currentUid, String targetUid,
+                             Runnable onSuccess, Consumer<String> onFailure) {
+        WriteBatch batch = mDb.batch();
+        batch.delete(mDb.collection(USERS_COLLECTION).document(currentUid)
+                .collection(FRIENDS_SUB).document(targetUid));
+        batch.delete(mDb.collection(USERS_COLLECTION).document(targetUid)
+                .collection(FRIENDS_SUB).document(currentUid));
+        batch.commit()
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(e -> onFailure.accept("Could not remove friend."));
+    }
+
+    /**
      * One-shot fetch of all user documents (for the user search feature).
      * The caller is responsible for excluding the current user client-side.
      */
