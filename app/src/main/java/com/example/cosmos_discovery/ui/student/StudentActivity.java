@@ -23,6 +23,8 @@ import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.FilterState;
 import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.ui.auth.LoginActivity;
+import com.example.cosmos_discovery.ui.organizer.AddEventActivity;
+import com.example.cosmos_discovery.ui.organizer.OrganizerActivity;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -42,10 +44,11 @@ import java.util.Set;
  */
 public class StudentActivity extends AppCompatActivity {
 
-    private static final int TAB_DISCOVER   = 0;
-    private static final int TAB_MY_EVENTS  = 1;
-    private static final int TAB_FRIENDS    = 2;
+    public static final int TAB_DISCOVER   = 0;
+    public static final int TAB_MY_EVENTS  = 1;
+    public static final int TAB_FRIENDS    = 2;
     private static final String KEY_TAB     = "current_tab";
+    public static final String EXTRA_START_TAB = "extra_start_tab";
 
     private int mCurrentTab = -1; // -1 forces the first selectTab() call to load
 
@@ -119,9 +122,12 @@ public class StudentActivity extends AppCompatActivity {
         setupNavBar();
         setupSidebar();
 
-        int tab = savedInstanceState != null
-                ? savedInstanceState.getInt(KEY_TAB, TAB_DISCOVER)
-                : TAB_DISCOVER;
+        int tab;
+        if (savedInstanceState != null) {
+            tab = savedInstanceState.getInt(KEY_TAB, TAB_DISCOVER);
+        } else {
+            tab = getIntent().getIntExtra(EXTRA_START_TAB, TAB_DISCOVER);
+        }
         selectTab(tab);
     }
 
@@ -196,6 +202,25 @@ public class StudentActivity extends AppCompatActivity {
             TextView email = mSidebarView.findViewById(R.id.sidebarUserEmail);
             name.setText(user.getName());
             email.setText(user.getEmail());
+        }
+
+        // Organizer-only section
+        View organizerSection = mSidebarView.findViewById(R.id.organizerSection);
+        if (organizerSection != null) {
+            organizerSection.setVisibility(RoleUtil.isOrganizer() ? View.VISIBLE : View.GONE);
+        }
+        if (RoleUtil.isOrganizer()) {
+            View posted = mSidebarView.findViewById(R.id.organizerPostedEventsRow);
+            View create = mSidebarView.findViewById(R.id.organizerCreateEventRow);
+
+            if (posted != null) posted.setOnClickListener(v -> {
+                hideSidebar();
+                startActivity(new Intent(this, OrganizerActivity.class));
+            });
+            if (create != null) create.setOnClickListener(v -> {
+                hideSidebar();
+                startActivity(new Intent(this, AddEventActivity.class));
+            });
         }
 
         // Dim overlay and X button both close the sidebar

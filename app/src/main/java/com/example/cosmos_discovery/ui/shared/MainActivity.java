@@ -20,21 +20,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Students get the full shell (top bar + nav bar + sidebar) in StudentActivity.
-        if (RoleUtil.isStudent()) {
-            startActivity(new Intent(this, StudentActivity.class));
-            finish();
-            return;
-        }
-
-        // Organizer / Admin shell not yet built — placeholder.
-        setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, new DiscoverFragment())
-                    .commit();
-        }
+        startActivity(new Intent(this, StudentActivity.class));
+        finish();
     }
 }
