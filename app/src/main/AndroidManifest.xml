@@ -19,6 +19,10 @@
             android:label="@string/title_activity_edit_profile"
             android:theme="@style/Theme.Cosmosdiscovery" />
         <activity
+            android:name=".ui.student.UserProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cosmosdiscovery" />
+        <activity
             android:name=".ui.shared.MainActivity"
             android:exported="false"
             android:label="@string/title_activity_main"
