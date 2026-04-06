@@ -5,11 +5,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -133,6 +135,40 @@ public class EventService {
     }
 
     /**
+     * Attaches a real-time listener for all events created by the given organizer,
+     * ordered by {@code createdAt} descending.
+     *
+     * NOTE: May require a composite Firestore index on (organizerId ASC, createdAt DESC).
+     *
+     * @return a {@link ListenerRegistration} — call {@code .remove()} in {@code onStop()}.
+     */
+    public ListenerRegistration listenOrganizerEvents(String organizerId,
+                                                      Consumer<List<Event>> onUpdate,
+                                                      Consumer<String> onError) {
+        return mDb.collection(EVENTS_COLLECTION)
+                .whereEqualTo("organizerId", organizerId)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null) {
+                        onError.accept(error.getMessage() != null
+                                ? error.getMessage() : "Failed to load your events.");
+                        return;
+                    }
+                    List<Event> events = new ArrayList<>();
+                    if (snapshot != null) {
+                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                            Event e = doc.toObject(Event.class);
+                            if (e != null) {
+                                e.setId(doc.getId());
+                                events.add(e);
+                            }
+                        }
+                    }
+                    onUpdate.accept(events);
+                });
+    }
+
+    /**
      * Fetches the {@code limit} most recently created approved events,
      * ordered by {@code createdAt} descending. Used for "Suggested" cards.
      */
@@ -199,6 +235,20 @@ public class EventService {
                 .update("status", status)
                 .addOnSuccessListener(unused -> onSuccess.run())
                 .addOnFailureListener(ex -> onFailure.accept("Could not update event status."));
+    }
+
+    /**
+     * Updates arbitrary fields on an event document.
+     */
+    public void updateEvent(String eventId,
+                            Map<String, Object> fields,
+                            Runnable onSuccess,
+                            Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .update(fields)
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> onFailure.accept("Could not update event."));
     }
 
     /**

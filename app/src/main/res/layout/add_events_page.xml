@@ -525,6 +525,7 @@
                 app:strokeWidth="1dp">
 
                 <TextView
+                    android:id="@+id/tvCancel"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fontFamily="@font/inter_variable"
@@ -547,6 +548,7 @@
                 app:strokeWidth="0dp">
 
                 <TextView
+                    android:id="@+id/tvSubmit"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fontFamily="@font/inter_variable"
