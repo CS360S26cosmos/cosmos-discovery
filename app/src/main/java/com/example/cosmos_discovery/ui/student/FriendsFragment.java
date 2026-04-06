@@ -1,5 +1,6 @@
 package com.example.cosmos_discovery.ui.student;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -82,7 +83,11 @@ public class FriendsFragment extends Fragment
         mTvNoFriendEvents = view.findViewById(R.id.tvNoFriendEvents);
 
         // Friends carousel (horizontal)
-        mFriendAdapter = new FriendAdapter(new ArrayList<>());
+        mFriendAdapter = new FriendAdapter(new ArrayList<>(), entry -> {
+            Intent intent = new Intent(requireActivity(), UserProfileActivity.class);
+            intent.putExtra(UserProfileActivity.EXTRA_USER_ID, entry.getUid());
+            startActivity(intent);
+        });
         mRvFriends.setLayoutManager(
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         mRvFriends.setAdapter(mFriendAdapter);

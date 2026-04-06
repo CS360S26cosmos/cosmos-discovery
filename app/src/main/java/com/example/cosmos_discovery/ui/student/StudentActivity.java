@@ -162,7 +162,10 @@ public class StudentActivity extends AppCompatActivity {
         // Menu icon (right) opens the sidebar
         ImageView iconMenu = findViewById(R.id.iconMenu);
         iconMenu.setOnClickListener(v -> showSidebar());
-        // Profile icon (left) — placeholder, no action yet
+
+        // Profile icon (left) opens the current user's profile
+        findViewById(R.id.iconProfile).setOnClickListener(v ->
+                startActivity(new Intent(this, ViewProfile.class)));
 
         // Search bar tap → enter event search or user search based on active tab
         mSearchBarInclude.findViewById(R.id.searchClickableArea)

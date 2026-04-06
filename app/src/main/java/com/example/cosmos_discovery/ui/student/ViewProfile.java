@@ -1,8 +1,10 @@
 package com.example.cosmos_discovery.ui.student;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
@@ -11,21 +13,25 @@ import android.widget.Toast;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.database.FriendService;
+import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.util.EventSorter;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.example.cosmos_discovery.model.Event;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ViewProfile extends AppCompatActivity {
 
-    private TextView tvName, tvMajor, tvBio, tvBatch, tvFriendsCount;
+    private TextView     tvName, tvMajor, tvBio, tvBatch, tvFriendsCount, tvEventsCount;
+    private TextView     tvNoUpcomingEvents;
+    private LinearLayout llUpcomingEvents, bioContainer;
 
     private final FriendService friendService = new FriendService();
-    private TextView tvEventsCount;
-    private final EventService eventService = new EventService();
+    private final EventService  eventService  = new EventService();
     private ListenerRegistration eventListener;
 
     @Override
@@ -34,12 +40,15 @@ public class ViewProfile extends AppCompatActivity {
         setContentView(R.layout.activity_view_profile); // your XML
 
         // Bind views
-        tvName  = findViewById(R.id.tvName);
-        tvMajor = findViewById(R.id.tvMajor);
-        tvBio   = findViewById(R.id.tvBio);
-        tvBatch = findViewById(R.id.tvBatch);
-        tvFriendsCount = findViewById(R.id.tvFriendsCount);
-        tvEventsCount = findViewById(R.id.tvEventsCount);
+        tvName             = findViewById(R.id.tvName);
+        tvMajor            = findViewById(R.id.tvMajor);
+        tvBio              = findViewById(R.id.tvBio);
+        tvBatch            = findViewById(R.id.tvBatch);
+        tvFriendsCount     = findViewById(R.id.tvFriendsCount);
+        tvEventsCount      = findViewById(R.id.tvEventsCount);
+        tvNoUpcomingEvents = findViewById(R.id.tvNoUpcomingEvents);
+        llUpcomingEvents   = findViewById(R.id.llUpcomingEvents);
+        bioContainer       = findViewById(R.id.bioContainer);
 
         // Back button
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
@@ -51,7 +60,13 @@ public class ViewProfile extends AppCompatActivity {
         if (user != null) {
             tvName.setText(user.getName() != null ? user.getName() : "");
             tvMajor.setText(user.getMajor() != null ? user.getMajor() : "");
-            tvBio.setText(user.getBio() != null ? user.getBio() : "");
+            String bio = user.getBio();
+            if (bio != null && !bio.trim().isEmpty()) {
+                tvBio.setText(bio);
+                bioContainer.setVisibility(View.VISIBLE);
+            } else {
+                bioContainer.setVisibility(View.GONE);
+            }
             String email = user.getEmail();
 
             String batchText = "";
@@ -77,11 +92,10 @@ public class ViewProfile extends AppCompatActivity {
             eventListener = eventService.listenMyRsvpedEvents(uid,
                     events -> {
                         long now = System.currentTimeMillis();
-
-                        // same logic as MyEventsFragment
-                        List<Event> pastEvents = EventSorter.past(events, now);
-
+                        List<Event> pastEvents     = EventSorter.past(events, now);
+                        List<Event> upcomingEvents = EventSorter.upcoming(events, now);
                         tvEventsCount.setText(String.valueOf(pastEvents.size()));
+                        populateUpcomingEvents(upcomingEvents);
                     },
                     err -> {}
             );
@@ -91,6 +105,27 @@ public class ViewProfile extends AppCompatActivity {
             Intent intent = new Intent(ViewProfile.this, EditProfile.class);
             startActivity(intent);
         });
+    }
+
+    private void populateUpcomingEvents(List<Event> events) {
+        llUpcomingEvents.removeAllViews();
+
+        if (events.isEmpty()) {
+            tvNoUpcomingEvents.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        tvNoUpcomingEvents.setVisibility(View.GONE);
+        SimpleDateFormat fmt = new SimpleDateFormat("EEE, MMM d · h:mm a", Locale.getDefault());
+
+        for (Event event : events) {
+            View row = LayoutInflater.from(this)
+                    .inflate(R.layout.component_upcoming_event_row, llUpcomingEvents, false);
+            ((TextView) row.findViewById(R.id.tvEventTitle)).setText(event.getTitle());
+            ((TextView) row.findViewById(R.id.tvEventDate)).setText(
+                    fmt.format(new Date(event.getDateTime())));
+            llUpcomingEvents.addView(row);
+        }
     }
 
     @Override

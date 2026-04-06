@@ -2,4 +2,5 @@
 <resources>
     <!-- Width of the sidebar panel — must match component_sidebar.xml sidebarPanel width -->
     <dimen name="sidebar_width">220dp</dimen>
+    <dimen name="btn_stroke_width">1dp</dimen>
 </resources>
