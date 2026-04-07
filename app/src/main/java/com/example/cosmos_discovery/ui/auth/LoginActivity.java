@@ -45,8 +45,12 @@ public class LoginActivity extends AppCompatActivity {
 
         mSignInButton.setOnClickListener(v -> attemptLogin());
 
-        mForgotPassword.setOnClickListener(v ->
-                startActivity(new Intent(this, ForgotPasswordActivity.class)));
+        mForgotPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ForgotPasswordActivity.class);
+            intent.putExtra(ForgotPasswordActivity.EXTRA_EMAIL,
+                    mEmailField.getText().toString().trim());
+            startActivity(intent);
+        });
 
         mSignUpLink.setOnClickListener(v ->
                 startActivity(new Intent(this, SignupActivity.class)));
