@@ -28,6 +28,7 @@ public class Event {
     private String       organizerId;
     private String       status;
     private List<String> attendeeIds;
+    private List<String> checkedInIds;
     private long         createdAt;
     private String       accessType;  // "lums_only" | "open" | null (null treated as open)
     private String       description;
@@ -93,6 +94,9 @@ public class Event {
 
     public List<String> getAttendeeIds()     { return attendeeIds; }
     public void setAttendeeIds(List<String> ids) { this.attendeeIds = ids; }
+
+    public List<String> getCheckedInIds()    { return checkedInIds; }
+    public void setCheckedInIds(List<String> ids) { this.checkedInIds = ids; }
 
     public long getCreatedAt()               { return createdAt; }
     public void setCreatedAt(long ts)        { this.createdAt = ts; }

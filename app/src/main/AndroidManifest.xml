@@ -67,6 +67,9 @@
             android:name=".ui.organizer.EventStatsActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.organizer.AttendeeListActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.student.StudentActivity"
             android:exported="false" />
         <activity

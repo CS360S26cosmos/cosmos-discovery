@@ -122,11 +122,23 @@ public class EventDetailsActivity extends AppCompatActivity {
     private void showOverflowMenu(ImageButton anchor) {
         PopupMenu popup = new PopupMenu(this, anchor);
         popup.getMenuInflater().inflate(R.menu.menu_event_details, popup.getMenu());
+
+        // Attendee List is organizer-only.
+        boolean isOrganizer = mEvent != null
+                && RoleUtil.getCurrentUser() != null
+                && mEvent.getOrganizerId() != null
+                && mEvent.getOrganizerId().equals(RoleUtil.getCurrentUser().getUid());
+        popup.getMenu().findItem(R.id.action_attendee_list).setVisible(isOrganizer);
+
         popup.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == R.id.action_edit) {
                 Intent intent = new Intent(this, EditEventActivity.class);
                 intent.putExtra(EditEventActivity.EXTRA_EVENT_ID, mEventId);
+                startActivity(intent);
+            } else if (id == R.id.action_attendee_list) {
+                Intent intent = new Intent(this, AttendeeListActivity.class);
+                intent.putExtra(AttendeeListActivity.EXTRA_EVENT_ID, mEventId);
                 startActivity(intent);
             } else if (id == R.id.action_stats) {
                 Intent intent = new Intent(this, EventStatsActivity.class);
