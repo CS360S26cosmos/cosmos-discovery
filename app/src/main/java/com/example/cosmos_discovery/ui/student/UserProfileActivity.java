@@ -2,7 +2,6 @@ package com.example.cosmos_discovery.ui.student;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -105,17 +104,7 @@ public class UserProfileActivity extends AppCompatActivity {
         tvUpcomingEventsLabel = findViewById(R.id.tvUpcomingEventsLabel);
         nestedScrollView      = findViewById(R.id.nestedScrollView);
 
-        // Events card → scroll to Upcoming Events section
-        findViewById(R.id.cardEvents).setOnClickListener(v ->
-            nestedScrollView.post(() -> {
-                Rect rect = new Rect();
-                tvUpcomingEventsLabel.getDrawingRect(rect);
-                nestedScrollView.offsetDescendantRectToMyCoords(tvUpcomingEventsLabel, rect);
-                nestedScrollView.smoothScrollTo(0, rect.top);
-            })
-        );
-
-        // Friends card → open friends list screen
+// Friends card → open friends list screen
         findViewById(R.id.cardFriends).setOnClickListener(v -> {
             Intent intent = new Intent(UserProfileActivity.this, FriendsListActivity.class);
             intent.putExtra(FriendsListActivity.EXTRA_USER_ID, targetUid);

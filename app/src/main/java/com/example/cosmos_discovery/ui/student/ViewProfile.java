@@ -1,7 +1,6 @@
 package com.example.cosmos_discovery.ui.student;
 
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -93,17 +92,7 @@ public class ViewProfile extends AppCompatActivity {
                 startActivity(intent);
             });
 
-            // Events card → scroll to Upcoming Events section
-            findViewById(R.id.cardEvents).setOnClickListener(v ->
-                nestedScrollView.post(() -> {
-                    Rect rect = new Rect();
-                    tvUpcomingEventsLabel.getDrawingRect(rect);
-                    nestedScrollView.offsetDescendantRectToMyCoords(tvUpcomingEventsLabel, rect);
-                    nestedScrollView.smoothScrollTo(0, rect.top);
-                })
-            );
-
-            eventListener = eventService.listenMyRsvpedEvents(uid,
+eventListener = eventService.listenMyRsvpedEvents(uid,
                     events -> {
                         long now = System.currentTimeMillis();
                         List<Event> upcomingEvents = EventSorter.upcoming(events, now);

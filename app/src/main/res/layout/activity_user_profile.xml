@@ -229,14 +229,13 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
+                        android:clickable="false"
+                        android:focusable="false"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="0dp"
-                        app:cardBackgroundColor="@color/color_card_event"
+                        app:cardBackgroundColor="@android:color/transparent"
                         app:strokeWidth="1dp"
-                        app:strokeColor="@color/color_chip_stroke"
-                        app:rippleColor="@color/color_primary">
+                        app:strokeColor="@color/color_chip_stroke">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -280,36 +279,49 @@
                         app:cardElevation="0dp"
                         app:cardBackgroundColor="@color/color_card_event"
                         app:strokeWidth="1dp"
-                        app:strokeColor="@color/color_chip_stroke"
-                        app:rippleColor="@color/color_primary">
+                        app:strokeColor="@color/color_chip_stroke">
 
-                        <LinearLayout
+                        <FrameLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:paddingTop="12dp"
-                            android:paddingBottom="12dp">
+                            android:layout_height="wrap_content">
 
-                            <TextView
-                                android:id="@+id/tvFriendsCount"
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/color_primary"
-                                android:fontFamily="@font/inter_variable" />
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:paddingTop="12dp"
+                                android:paddingBottom="12dp">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Friends"
-                                android:textSize="12sp"
-                                android:textColor="@color/color_text_hint"
-                                android:fontFamily="@font/inter_variable" />
+                                <TextView
+                                    android:id="@+id/tvFriendsCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/color_primary"
+                                    android:fontFamily="@font/inter_variable" />
 
-                        </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Friends"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/color_text_hint"
+                                    android:fontFamily="@font/inter_variable" />
+
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center_vertical|end"
+                                android:layout_marginEnd="10dp"
+                                android:src="@drawable/ic_sidebar_arrow_icon"
+                                android:alpha="0.45" />
+
+                        </FrameLayout>
 
                     </com.google.android.material.card.MaterialCardView>
 
@@ -352,6 +364,11 @@
                     android:textColor="@color/color_text_hint"
                     android:textSize="13sp"
                     android:visibility="gone" />
+
+                <!-- Spacer so Upcoming Events can always be scrolled to the top -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="600dp" />
 
             </LinearLayout>
 
