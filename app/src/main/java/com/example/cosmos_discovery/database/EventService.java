@@ -282,6 +282,33 @@ public class EventService {
     }
 
     /**
+     * Attaches a real-time listener on a single event document.
+     * Fires immediately and on every subsequent change (RSVP, check-in, etc.).
+     *
+     * @return a {@link ListenerRegistration} — call {@code .remove()} in {@code onDestroy()}.
+     */
+    public ListenerRegistration listenEvent(String eventId,
+                                            Consumer<Event> onUpdate,
+                                            Consumer<String> onError) {
+        return mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null) {
+                        onError.accept(error.getMessage() != null
+                                ? error.getMessage() : "Failed to listen for event updates.");
+                        return;
+                    }
+                    if (snapshot != null && snapshot.exists()) {
+                        Event e = snapshot.toObject(Event.class);
+                        if (e != null) {
+                            e.setId(snapshot.getId());
+                            onUpdate.accept(e);
+                        }
+                    }
+                });
+    }
+
+    /**
      * Fetches a single event by its document ID. One-shot read.
      */
     public void fetchEventById(String eventId,
@@ -335,6 +362,34 @@ public class EventService {
                 )
                 .addOnSuccessListener(unused -> onSuccess.run())
                 .addOnFailureListener(ex -> onFailure.accept("Could not cancel RSVP. Try again."));
+    }
+
+    // ── Check-in ──────────────────────────────────────────────────────────
+
+    /**
+     * Adds {@code userId} to the event's {@code checkedInIds} array.
+     * Uses {@code FieldValue.arrayUnion} for atomic, idempotent writes.
+     */
+    public void checkInAttendee(String eventId, String userId,
+                                Runnable onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .update("checkedInIds", FieldValue.arrayUnion(userId))
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> onFailure.accept("Could not check in attendee."));
+    }
+
+    /**
+     * Removes {@code userId} from the event's {@code checkedInIds} array.
+     * Uses {@code FieldValue.arrayRemove} for atomic writes.
+     */
+    public void removeCheckIn(String eventId, String userId,
+                              Runnable onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .update("checkedInIds", FieldValue.arrayRemove(userId))
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> onFailure.accept("Could not remove check-in."));
     }
 
     // ── Categories ────────────────────────────────────────────────────────
