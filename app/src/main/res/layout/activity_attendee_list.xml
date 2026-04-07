@@ -183,10 +183,10 @@
             android:paddingVertical="4dp">
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:src="@drawable/ic_search_icon"
-                app:tint="@color/color_text_hint"
+                app:tint="@color/color_icon_outline"
                 android:contentDescription="Search" />
 
             <EditText

@@ -552,8 +552,8 @@
 
                                 <ImageView
                                     android:id="@+id/imgCalendar"
-                                    android:layout_width="16dp"
-                                    android:layout_height="20dp"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/ic_eventdetails_calendar"
                                     app:tint="@color/color_icon_outline" />

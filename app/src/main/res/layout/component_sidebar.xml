@@ -111,7 +111,7 @@
 
             <ImageView
                 android:layout_width="16dp"
-                android:layout_height="20dp"
+                android:layout_height="16dp"
                 android:src="@drawable/ic_sidebar_settings_icon"
                 android:contentDescription="Settings" />
 
@@ -154,7 +154,7 @@
 
             <ImageView
                 android:layout_width="16dp"
-                android:layout_height="20dp"
+                android:layout_height="16dp"
                 android:src="@drawable/ic_sidebar_profile_icon"
                 android:contentDescription="View profile" />
 
@@ -217,7 +217,7 @@
 
                 <ImageView
                     android:layout_width="16dp"
-                    android:layout_height="20dp"
+                    android:layout_height="16dp"
                     android:src="@drawable/ic_bookmark_outline"
                     android:contentDescription="My Posted Events" />
 
@@ -259,7 +259,7 @@
 
                 <ImageView
                     android:layout_width="16dp"
-                    android:layout_height="20dp"
+                    android:layout_height="16dp"
                     android:src="@drawable/ic_addevent_upload"
                     android:contentDescription="Create Event" />
 
@@ -310,7 +310,7 @@
 
             <ImageView
                 android:layout_width="16dp"
-                android:layout_height="20dp"
+                android:layout_height="16dp"
                 android:src="@drawable/ic_sidebar_logout"
                 android:contentDescription="Log out" />
 

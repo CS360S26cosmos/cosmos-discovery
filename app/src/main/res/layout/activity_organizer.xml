@@ -81,8 +81,8 @@
                                 android:layout_marginBottom="14dp">
 
                                 <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
                                     android:src="@drawable/ic_schedule"
                                     app:tint="@color/color_text_secondary"
                                     android:contentDescription="Pending" />
@@ -167,8 +167,8 @@
                                 android:layout_marginBottom="14dp">
 
                                 <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
                                     android:src="@drawable/ic_check_circle"
                                     app:tint="@color/color_text_secondary"
                                     android:contentDescription="Approved" />
@@ -258,8 +258,8 @@
                                 android:foreground="?attr/selectableItemBackgroundBorderless">
 
                                 <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
                                     android:src="@drawable/ic_cancel"
                                     app:tint="@color/color_text_secondary"
                                     android:contentDescription="Rejected" />
