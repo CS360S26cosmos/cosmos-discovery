@@ -53,6 +53,11 @@ public class RsvpHandler {
     // ── Private helpers ───────────────────────────────────────────────────
 
     private void addRsvp(Event event, String uid, Runnable onRefresh, Consumer<String> onError) {
+        if (event.isFull()) {
+            onError.accept("This event is full.");
+            return;
+        }
+
         Runnable applyLocally = () -> {
             ArrayList<String> ids = event.getAttendeeIds() != null
                     ? new ArrayList<>(event.getAttendeeIds())

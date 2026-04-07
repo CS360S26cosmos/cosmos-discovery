@@ -513,6 +513,34 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Capacity (optional) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="11dp"
+                    app:cardBackgroundColor="@color/color_surface_white"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="3dp"
+                    app:strokeWidth="0dp">
+
+                    <EditText
+                        android:id="@+id/etCapacity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:background="@android:color/transparent"
+                        android:fontFamily="@font/inter"
+                        android:gravity="center_vertical"
+                        android:hint="Capacity (leave empty for unlimited)"
+                        android:inputType="number"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:singleLine="true"
+                        android:textColor="@color/color_icon_outline"
+                        android:textColorHint="@color/color_text_tertiary"
+                        android:textSize="16sp" />
+                </com.google.android.material.card.MaterialCardView>
+
                 <!-- Open to -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"

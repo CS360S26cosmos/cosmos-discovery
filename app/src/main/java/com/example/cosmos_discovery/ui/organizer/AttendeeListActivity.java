@@ -56,6 +56,7 @@ public class AttendeeListActivity extends AppCompatActivity
 
     private int    mActiveFilter = FILTER_ALL;
     private String mSearchQuery  = "";
+    private int    mCapacity     = 0;
 
     // Views
     private TextView         tvRsvpCount;
@@ -150,6 +151,7 @@ public class AttendeeListActivity extends AppCompatActivity
     }
 
     private void onEventUpdate(Event event) {
+        mCapacity = event.getCapacity();
         List<String> attendeeIds = event.getAttendeeIds();
         if (attendeeIds == null) attendeeIds = new ArrayList<>();
 
@@ -212,7 +214,7 @@ public class AttendeeListActivity extends AppCompatActivity
         int pending   = total - checkedIn;
         if (pending < 0) pending = 0;
 
-        tvRsvpCount.setText(String.valueOf(total));
+        tvRsvpCount.setText(mCapacity > 0 ? total + "/" + mCapacity : String.valueOf(total));
         tvCheckedInCount.setText(String.valueOf(checkedIn));
         tvPendingCount.setText(String.valueOf(pending));
     }

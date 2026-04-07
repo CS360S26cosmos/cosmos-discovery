@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.cosmos_discovery.model.Event;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
@@ -333,19 +334,42 @@ public class EventService {
 
     /**
      * Adds {@code userId} to the event's {@code attendeeIds} array and increments
-     * {@code rsvpCount} by 1. Both updates are applied atomically via a single
-     * Firestore document update.
+     * {@code rsvpCount} by 1, enforcing the event's capacity limit.
+     *
+     * Uses a Firestore transaction to atomically read-then-write, preventing
+     * overbooking when multiple users RSVP concurrently.
      */
     public void rsvpToEvent(String eventId, String userId,
                             Runnable onSuccess, Consumer<String> onFailure) {
-        mDb.collection(EVENTS_COLLECTION)
-                .document(eventId)
-                .update(
-                        "attendeeIds", FieldValue.arrayUnion(userId),
-                        "rsvpCount",   FieldValue.increment(1)
-                )
-                .addOnSuccessListener(unused -> onSuccess.run())
-                .addOnFailureListener(ex -> onFailure.accept("Could not RSVP. Try again."));
+        mDb.runTransaction(transaction -> {
+            DocumentSnapshot snapshot = transaction.get(
+                    mDb.collection(EVENTS_COLLECTION).document(eventId));
+
+            List<String> attendeeIds = (List<String>) snapshot.get("attendeeIds");
+            if (attendeeIds != null && attendeeIds.contains(userId)) {
+                return null; // already RSVPed — idempotent success
+            }
+
+            Long capLong  = snapshot.getLong("capacity");
+            Long countLong = snapshot.getLong("rsvpCount");
+            long capacity  = capLong  != null ? capLong  : 0;
+            long rsvpCount = countLong != null ? countLong : 0;
+
+            if (capacity > 0 && rsvpCount >= capacity) {
+                throw new FirebaseFirestoreException(
+                        "This event is full.",
+                        FirebaseFirestoreException.Code.ABORTED);
+            }
+
+            transaction.update(
+                    mDb.collection(EVENTS_COLLECTION).document(eventId),
+                    "attendeeIds", FieldValue.arrayUnion(userId),
+                    "rsvpCount",   FieldValue.increment(1));
+            return null;
+        })
+        .addOnSuccessListener(unused -> onSuccess.run())
+        .addOnFailureListener(ex -> onFailure.accept(
+                ex.getMessage() != null ? ex.getMessage() : "Could not RSVP. Try again."));
     }
 
     /**
