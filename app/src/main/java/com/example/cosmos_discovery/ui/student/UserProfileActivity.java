@@ -77,7 +77,9 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
 
         targetUid  = getIntent().getStringExtra(EXTRA_USER_ID);
-        currentUid = RoleUtil.getCurrentUser().getUid();
+        User me = RoleUtil.getCurrentUser();
+        if (me == null) { finish(); return; }
+        currentUid = me.getUid();
 
         bindViews();
 

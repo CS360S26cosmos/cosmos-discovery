@@ -76,6 +76,7 @@
             android:name=".ui.student.FriendsListActivity"
             android:exported="false"
             android:theme="@style/Theme.Cosmosdiscovery" />
+        <activity
             android:name=".ui.shared.SettingsActivity"
             android:exported="false" />
         <activity
