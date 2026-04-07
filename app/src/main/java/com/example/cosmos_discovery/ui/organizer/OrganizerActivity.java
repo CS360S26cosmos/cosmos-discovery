@@ -7,6 +7,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrganizerActivity extends AppCompatActivity {
+
+    private static final String TAG = "OrganizerActivity";
 
     private final AuthService  mAuthService  = new AuthService();
     private final EventService mEventService = new EventService();
@@ -86,7 +89,14 @@ public class OrganizerActivity extends AppCompatActivity {
         mEventsListener = mEventService.listenOrganizerEvents(
                 uid,
                 this::onEventsUpdate,
-                err -> Toast.makeText(this, err, Toast.LENGTH_LONG).show()
+                err -> {
+                    if (err.contains("FAILED_PRECONDITION")) {
+                        Log.w(TAG, err);
+                        Toast.makeText(this, "Events are loading. Please try again shortly.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+                    }
+                }
         );
     }
 

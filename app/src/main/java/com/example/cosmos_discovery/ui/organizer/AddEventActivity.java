@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -22,9 +23,16 @@ import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class AddEventActivity extends AppCompatActivity {
 
@@ -42,6 +50,7 @@ public class AddEventActivity extends AppCompatActivity {
     private EditText mEtOpenTo;
 
     private List<String> mCategories;
+    private String       mBannerUrl       = "";
     private boolean      mBannerUploading = false;
 
     private ActivityResultLauncher<String> mPickBannerLauncher;
@@ -53,6 +62,7 @@ public class AddEventActivity extends AppCompatActivity {
 
         bindViews();
         setupDropdowns();
+        setupDateTimePickers();
         setupBannerUpload();
 
         ImageView btnBack = findViewById(R.id.btnBack);
@@ -88,6 +98,64 @@ public class AddEventActivity extends AppCompatActivity {
         mEtOpenTo.setKeyListener(null);
         mEtOpenTo.setOnClickListener(v -> showOpenToPicker());
         findViewById(R.id.iconOpenTo).setOnClickListener(v -> showOpenToPicker());
+    }
+
+    private void setupDateTimePickers() {
+        mEtDate.setInputType(InputType.TYPE_NULL);
+        mEtDate.setKeyListener(null);
+        mEtDate.setFocusable(false);
+        mEtStartTime.setInputType(InputType.TYPE_NULL);
+        mEtStartTime.setKeyListener(null);
+        mEtStartTime.setFocusable(false);
+        mEtEndTime.setInputType(InputType.TYPE_NULL);
+        mEtEndTime.setKeyListener(null);
+        mEtEndTime.setFocusable(false);
+        mEtRegisterBy.setInputType(InputType.TYPE_NULL);
+        mEtRegisterBy.setKeyListener(null);
+        mEtRegisterBy.setFocusable(false);
+
+        View.OnClickListener datePicker = v -> showDatePicker(mEtDate);
+        mEtDate.setOnClickListener(datePicker);
+        findViewById(R.id.iconDateOfEvent).setOnClickListener(datePicker);
+
+        View.OnClickListener regByPicker = v -> showDatePicker(mEtRegisterBy);
+        mEtRegisterBy.setOnClickListener(regByPicker);
+        findViewById(R.id.iconRegisterBy).setOnClickListener(regByPicker);
+
+        View.OnClickListener startPicker = v -> showTimePicker(mEtStartTime);
+        mEtStartTime.setOnClickListener(startPicker);
+        findViewById(R.id.iconStartTime).setOnClickListener(startPicker);
+
+        View.OnClickListener endPicker = v -> showTimePicker(mEtEndTime);
+        mEtEndTime.setOnClickListener(endPicker);
+        findViewById(R.id.iconEndTime).setOnClickListener(endPicker);
+    }
+
+    private void showDatePicker(EditText target) {
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date")
+                .build();
+        picker.addOnPositiveButtonClickListener(selection -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            target.setText(sdf.format(new Date(selection)));
+        });
+        picker.show(getSupportFragmentManager(), "date_picker");
+    }
+
+    private void showTimePicker(EditText target) {
+        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setTitleText("Select time")
+                .build();
+        picker.addOnPositiveButtonClickListener(v -> {
+            int h = picker.getHour();
+            int m = picker.getMinute();
+            String amPm = h < 12 ? "am" : "pm";
+            int h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h);
+            target.setText(String.format(Locale.US, "%d:%02d%s", h12, m, amPm));
+        });
+        picker.show(getSupportFragmentManager(), "time_picker");
     }
 
     private void showCategoryPicker() {
@@ -152,7 +220,8 @@ public class AddEventActivity extends AppCompatActivity {
                 .addOnSuccessListener(task -> ref.getDownloadUrl()
                         .addOnSuccessListener(downloadUri -> {
                             mBannerUploading = false;
-                            mEtBannerUrl.setText(downloadUri.toString());
+                            mBannerUrl = downloadUri.toString();
+                            mEtBannerUrl.setText("banner_image.jpg");
                             Toast.makeText(this, "Banner uploaded.", Toast.LENGTH_SHORT).show();
                         })
                         .addOnFailureListener(e -> {
@@ -206,7 +275,7 @@ public class AddEventActivity extends AppCompatActivity {
                 dateTimeMs,
                 venue,
                 tags,
-                mEtBannerUrl.getText().toString().trim(),
+                mBannerUrl.isEmpty() ? mEtBannerUrl.getText().toString().trim() : mBannerUrl,
                 RoleUtil.getCurrentUser().getUid()
         );
 

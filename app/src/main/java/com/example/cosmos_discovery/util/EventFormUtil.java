@@ -1,6 +1,6 @@
 package com.example.cosmos_discovery.util;
 
-import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -57,12 +57,13 @@ public final class EventFormUtil {
     private static long tryParse(String datePattern, String timePattern, String dateText, String timeText) {
         SimpleDateFormat sdf = new SimpleDateFormat(datePattern + " " + timePattern, Locale.getDefault());
         sdf.setLenient(false);
-        try {
-            Date parsed = sdf.parse(dateText + " " + timeText);
-            return parsed != null ? parsed.getTime() : -1L;
-        } catch (ParseException ignored) {
-            return -1L;
+        String combined = dateText + " " + timeText;
+        ParsePosition pos = new ParsePosition(0);
+        Date parsed = sdf.parse(combined, pos);
+        if (parsed != null && pos.getIndex() == combined.length()) {
+            return parsed.getTime();
         }
+        return -1L;
     }
 
     /**
