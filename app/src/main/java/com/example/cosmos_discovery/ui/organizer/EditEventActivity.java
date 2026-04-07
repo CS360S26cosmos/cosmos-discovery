@@ -169,9 +169,20 @@ public class EditEventActivity extends AppCompatActivity {
     }
 
     private void showDatePicker(EditText target) {
-        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
-                .build();
+        MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date");
+        String currentText = target.getText().toString().trim();
+        if (!currentText.isEmpty()) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Date parsed = sdf.parse(currentText);
+                if (parsed != null) {
+                    builder.setSelection(parsed.getTime());
+                }
+            } catch (Exception ignored) {}
+        }
+        MaterialDatePicker<Long> picker = builder.build();
         picker.addOnPositiveButtonClickListener(selection -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
