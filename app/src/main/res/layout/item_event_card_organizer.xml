@@ -27,32 +27,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/statusBadgeCard"
-            android:layout_width="92dp"
-            android:layout_height="35dp"
-            android:layout_marginEnd="10dp"
-            app:cardBackgroundColor="@color/color_pending"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <TextView
-                android:id="@+id/tvStatusBadge"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fontFamily="@font/inter_variable"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:text="Pending"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-        </com.google.android.material.card.MaterialCardView>
-
         <TextView
             android:id="@+id/textViewTitle"
             android:layout_width="0dp"
@@ -68,7 +42,7 @@
             android:textSize="17sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/imageViewEvent"
-            app:layout_constraintEnd_toStartOf="@id/statusBadgeCard"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -110,7 +84,7 @@
             android:textColor="@color/color_text_secondary"
             android:textSize="9sp"
             app:layout_constraintStart_toEndOf="@id/iconLocation"
-            app:layout_constraintEnd_toStartOf="@id/statusBadgeCard"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewDateTime" />
 
         <com.google.android.material.chip.ChipGroup

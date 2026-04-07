@@ -14,8 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.model.Event;
-import com.example.cosmos_discovery.util.EventStatusUtil;
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.ChipGroup;
 
 import java.text.SimpleDateFormat;
@@ -76,11 +74,6 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
 
         holder.textViewRsvpCount.setText(event.getRsvpCount() + " RSVPs");
 
-        String status = event.getStatus();
-        holder.tvStatusBadge.setText(EventStatusUtil.toDisplayText(status));
-        holder.statusBadgeCard.setCardBackgroundColor(
-                ContextCompat.getColor(mContext, EventStatusUtil.toColorRes(status)));
-
         holder.chipGroupTags.removeAllViews();
         if (event.getTags() != null) {
             for (String tag : event.getTags()) {
@@ -122,8 +115,6 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
         final TextView         textViewLocation;
         final ChipGroup        chipGroupTags;
         final TextView         textViewRsvpCount;
-        final MaterialCardView statusBadgeCard;
-        final TextView         tvStatusBadge;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -133,8 +124,6 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
             textViewLocation  = itemView.findViewById(R.id.textViewLocation);
             chipGroupTags     = itemView.findViewById(R.id.chipGroupTags);
             textViewRsvpCount = itemView.findViewById(R.id.textViewRsvpCount);
-            statusBadgeCard   = itemView.findViewById(R.id.statusBadgeCard);
-            tvStatusBadge     = itemView.findViewById(R.id.tvStatusBadge);
         }
     }
 }
