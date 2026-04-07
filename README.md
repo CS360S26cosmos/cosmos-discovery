@@ -179,6 +179,8 @@ View full backlog and Kanban board here:
 ### Kanban Board (Screenshot)
 <img width="2454" height="1792" alt="08 03 2026 at 02 54 53 PM" src="https://github.com/user-attachments/assets/40ad2948-6698-4ab0-aa5d-f8b5d3cb0467" />
 <img width="3024" height="1790" alt="08 03 2026 at 02 58 36 PM" src="https://github.com/user-attachments/assets/1d6791ae-cf2d-49aa-8407-6f5b93595556" />
+<img width="1920" height="1798" alt="07 04 2026 at 11 59 30 PM" src="https://github.com/user-attachments/assets/a6469db6-698b-4031-a027-acdc9263e442" />
+
 
 
 ---
