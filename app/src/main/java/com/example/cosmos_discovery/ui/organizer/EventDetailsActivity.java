@@ -109,8 +109,8 @@ public class EventDetailsActivity extends AppCompatActivity {
         if (RoleUtil.getCurrentUser() != null && event.getOrganizerId() != null
                 && event.getOrganizerId().equals(RoleUtil.getCurrentUser().getUid())) {
             orgName = "You";
-        } else if (event.getOrganizerId() != null && !event.getOrganizerId().trim().isEmpty()) {
-            orgName = event.getOrganizerId();
+        } else if (event.getOrganizerName() != null && !event.getOrganizerName().trim().isEmpty()) {
+            orgName = event.getOrganizerName();
         }
         organizer.setText(orgName);
 

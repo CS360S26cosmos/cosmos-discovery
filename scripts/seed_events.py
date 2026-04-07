@@ -112,6 +112,16 @@ CATEGORIES = [
 
 NOW = now_ms()
 
+# Maps seed organizer IDs to display names for the organizerName field.
+ORGANIZER_NAMES = {
+    "seed_organizer_001": "Dr. Ahmed Raza",
+    "seed_organizer_002": "Sara Malik",
+    "seed_organizer_003": "Hassan Ali",
+    "seed_organizer_004": "Fatima Sheikh",
+    "seed_organizer_005": "Bilal Qureshi",
+    "seed_organizer_006": "Zara Iqbal",
+}
+
 EVENTS = [
     # ── Upcoming, approved, lums_only ────────────────────────────────────────
     {
@@ -469,6 +479,7 @@ def main():
     for event in EVENTS:
         doc = dict(event)
         doc["createdAt"] = now
+        doc["organizerName"] = ORGANIZER_NAMES.get(doc.get("organizerId", ""), "Unknown Organizer")
         dt = datetime.fromtimestamp(doc["dateTime"] / 1000)
         if "registerBy" not in doc:
             doc["registerBy"] = (dt - timedelta(days=1)).strftime("%Y-%m-%d")

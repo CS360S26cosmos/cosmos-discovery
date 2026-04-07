@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -48,11 +49,13 @@
                 android:layout_marginBottom="20dp"
                 android:gravity="center_vertical">
 
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/sidebarProfileIcon"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:src="@drawable/ic_sidebar_main_profileimage"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/CircleImage"
                     android:contentDescription="Profile" />
 
                 <LinearLayout
