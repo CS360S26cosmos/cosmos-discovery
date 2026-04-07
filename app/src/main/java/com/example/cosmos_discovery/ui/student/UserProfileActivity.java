@@ -2,6 +2,7 @@ package com.example.cosmos_discovery.ui.student;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 
 import com.bumptech.glide.Glide;
 import com.example.cosmos_discovery.R;
@@ -49,12 +51,13 @@ public class UserProfileActivity extends AppCompatActivity {
     private final EventService  eventService  = new EventService();
     private ListenerRegistration eventListener;
 
-    private TextView   tvName, tvBatch, tvMajor, tvBio;
-    private TextView   tvFriendsCount, tvEventsCount;
-    private TextView   tvMutualCount, tvNoUpcomingEvents;
-    private View       layoutMutualFriends;
-    private LinearLayout llUpcomingEvents;
-    private LinearLayout bioContainer;
+    private TextView        tvName, tvBatch, tvMajor, tvBio;
+    private TextView        tvFriendsCount, tvEventsCount;
+    private TextView        tvMutualCount, tvNoUpcomingEvents, tvUpcomingEventsLabel;
+    private View            layoutMutualFriends;
+    private LinearLayout    llUpcomingEvents;
+    private LinearLayout    bioContainer;
+    private NestedScrollView nestedScrollView;
     private ShapeableImageView ivMutual1, ivMutual2, ivMutual3;
     private ImageView ivProfileImage;
     private MaterialButton btnAction;
@@ -97,9 +100,22 @@ public class UserProfileActivity extends AppCompatActivity {
         ivMutual1           = findViewById(R.id.ivMutual1);
         ivMutual2           = findViewById(R.id.ivMutual2);
         ivMutual3           = findViewById(R.id.ivMutual3);
-        ivProfileImage      = findViewById(R.id.ivProfileImage);
-        btnAction           = findViewById(R.id.btnAction);
+        ivProfileImage        = findViewById(R.id.ivProfileImage);
+        btnAction             = findViewById(R.id.btnAction);
+        tvUpcomingEventsLabel = findViewById(R.id.tvUpcomingEventsLabel);
+        nestedScrollView      = findViewById(R.id.nestedScrollView);
 
+        // Events card → scroll to Upcoming Events section
+        findViewById(R.id.cardEvents).setOnClickListener(v ->
+            nestedScrollView.post(() -> {
+                Rect rect = new Rect();
+                tvUpcomingEventsLabel.getDrawingRect(rect);
+                nestedScrollView.offsetDescendantRectToMyCoords(tvUpcomingEventsLabel, rect);
+                nestedScrollView.smoothScrollTo(0, rect.top);
+            })
+        );
+
+        // Friends card → open friends list screen
         findViewById(R.id.cardFriends).setOnClickListener(v -> {
             Intent intent = new Intent(UserProfileActivity.this, FriendsListActivity.class);
             intent.putExtra(FriendsListActivity.EXTRA_USER_ID, targetUid);
@@ -139,7 +155,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 events -> {
                     long now = System.currentTimeMillis();
                     List<Event> upcomingEvents = EventSorter.upcoming(events, now);
-                    tvEventsCount.setText(events.size() + " Events Attended");
+                    tvEventsCount.setText(String.valueOf(events.size()));
                     populateUpcomingEvents(upcomingEvents);
                 },
                 err -> {});
