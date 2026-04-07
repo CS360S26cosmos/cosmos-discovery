@@ -15,8 +15,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.bumptech.glide.Glide;
+import android.content.Intent;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.EventService;
+import com.example.cosmos_discovery.ui.organizer.EventDetailsActivity;
 import com.example.cosmos_discovery.database.FriendService;
 import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.model.FriendEntry;
@@ -285,6 +287,12 @@ public class UserProfileActivity extends AppCompatActivity {
             ((TextView) row.findViewById(R.id.tvEventTitle)).setText(event.getTitle());
             ((TextView) row.findViewById(R.id.tvEventDate)).setText(
                     fmt.format(new Date(event.getDateTime())));
+            row.setOnClickListener(v -> {
+                if (event.getId() == null) return;
+                Intent intent = new Intent(this, EventDetailsActivity.class);
+                intent.putExtra(EventDetailsActivity.EXTRA_EVENT_ID, event.getId());
+                startActivity(intent);
+            });
             llUpcomingEvents.addView(row);
         }
     }
