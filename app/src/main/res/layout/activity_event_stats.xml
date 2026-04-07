@@ -101,7 +101,7 @@
                             android:fontFamily="@font/inter_variable"
                             android:includeFontPadding="false"
                             android:text="Pending"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/color_surface_white"
                             android:textSize="12sp"
                             android:textStyle="bold" />
                     </com.google.android.material.card.MaterialCardView>

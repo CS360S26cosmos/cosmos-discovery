@@ -1,5 +1,6 @@
 package com.example.cosmos_discovery.ui.student;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.adapter.EventBigAdapter;
 import com.example.cosmos_discovery.adapter.EventSmallAdapter;
+import com.example.cosmos_discovery.ui.organizer.EventDetailsActivity;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.util.RsvpHandler;
@@ -65,18 +67,20 @@ public class DiscoverFragment extends Fragment {
         // ── Suggested — horizontal carousel ──────────────────────────────
         mRvSuggested.setLayoutManager(
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-        mSuggestedAdapter = new EventBigAdapter(requireContext(), new ArrayList<>(), (event, pos) ->
-                mRsvpHandler.toggle(event,
+        mSuggestedAdapter = new EventBigAdapter(requireContext(), new ArrayList<>(),
+                (event, pos) -> mRsvpHandler.toggle(event,
                         () -> mSuggestedAdapter.notifyItemChanged(pos),
-                        err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()));
+                        err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()),
+                this::onEventClick);
         mRvSuggested.setAdapter(mSuggestedAdapter);
 
         // ── This Week — vertical list ─────────────────────────────────────
         mRvThisWeek.setLayoutManager(new LinearLayoutManager(requireContext()));
-        mThisWeekAdapter = new EventSmallAdapter(requireContext(), new ArrayList<>(), (event, pos) ->
-                mRsvpHandler.toggle(event,
+        mThisWeekAdapter = new EventSmallAdapter(requireContext(), new ArrayList<>(),
+                (event, pos) -> mRsvpHandler.toggle(event,
                         () -> mThisWeekAdapter.notifyItemChanged(pos),
-                        err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()));
+                        err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()),
+                this::onEventClick);
         mRvThisWeek.setAdapter(mThisWeekAdapter);
     }
 
@@ -111,6 +115,13 @@ public class DiscoverFragment extends Fragment {
         boolean empty = events.isEmpty();
         mRvSuggested.setVisibility(empty ? View.GONE : View.VISIBLE);
         mTvEmptySuggested.setVisibility(empty ? View.VISIBLE : View.GONE);
+    }
+
+    private void onEventClick(Event event) {
+        if (event.getId() == null) return;
+        Intent intent = new Intent(requireActivity(), EventDetailsActivity.class);
+        intent.putExtra(EventDetailsActivity.EXTRA_EVENT_ID, event.getId());
+        startActivity(intent);
     }
 
     /** Updates the This Week list and toggles its empty-state view. */

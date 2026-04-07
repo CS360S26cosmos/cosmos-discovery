@@ -230,10 +230,21 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- Date of Event -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="Date of Event"
+                    android:textColor="@color/color_icon_outline"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="11dp"
+                    android:layout_marginTop="4dp"
                     app:cardBackgroundColor="@color/color_surface_white"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="3dp"
@@ -274,10 +285,21 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- Start time -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="Start Time"
+                    android:textColor="@color/color_icon_outline"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="11dp"
+                    android:layout_marginTop="4dp"
                     app:cardBackgroundColor="@color/color_surface_white"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="3dp"
@@ -318,10 +340,21 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- End Time -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="End Time"
+                    android:textColor="@color/color_icon_outline"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="11dp"
+                    android:layout_marginTop="4dp"
                     app:cardBackgroundColor="@color/color_surface_white"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="3dp"
@@ -362,10 +395,21 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- Register By -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="Register By"
+                    android:textColor="@color/color_icon_outline"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="11dp"
+                    android:layout_marginTop="4dp"
                     app:cardBackgroundColor="@color/color_surface_white"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="3dp"
