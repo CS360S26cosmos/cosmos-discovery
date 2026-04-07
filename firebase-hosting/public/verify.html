@@ -347,10 +347,6 @@
                 document.querySelectorAll(".input-group").forEach(el => el.style.display = "none");
                 document.querySelector(".password-hint").style.display = "none";
                 showSuccess("✅ Password reset successful! You can now sign in with your new password.");
-
-                setTimeout(() => {
-                    window.location.href = "/";
-                }, 2000);
             })
             .catch((error) => {
                 console.error("Reset password error:", error);
