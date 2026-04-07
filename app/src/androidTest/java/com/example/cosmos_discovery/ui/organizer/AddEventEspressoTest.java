@@ -3,6 +3,7 @@ package com.example.cosmos_discovery.ui.organizer;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.example.cosmos_discovery.EspressoTestHelper;
 import com.example.cosmos_discovery.R;
 
 import org.junit.After;
@@ -30,7 +31,8 @@ public class AddEventEspressoTest {
     private ActivityScenario<AddEventActivity> scenario;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
+        EspressoTestHelper.populateRoleUtil();
         scenario = ActivityScenario.launch(AddEventActivity.class);
     }
 

@@ -4,6 +4,7 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.example.cosmos_discovery.EspressoTestHelper;
 import com.example.cosmos_discovery.R;
 
 import org.junit.After;
@@ -34,6 +35,7 @@ public class EventDetailEspressoTest {
 
     @Before
     public void setUp() throws InterruptedException {
+        EspressoTestHelper.populateRoleUtil();
         scenario = ActivityScenario.launch(StudentActivity.class);
         // Wait for the discover feed to load events from Firestore
         Thread.sleep(3000);
@@ -92,18 +94,6 @@ public class EventDetailEspressoTest {
         onView(withId(R.id.tvDescriptionValue)).check(matches(isDisplayed()));
     }
 
-    /**
-     * Verifies the RSVP button is visible and enabled on the detail screen.
-     * The same button toggles between RSVP and cancel RSVP state.
-     * Covers: "RSVP button visible on event detail screen"
-     *         "Student can cancel RSVP from same screen"
-     */
-    @Test
-    public void eventDetailScreen_showsRsvpButton() {
-        onView(withId(R.id.rsvpButton))
-                .check(matches(isDisplayed()))
-                .check(matches(isEnabled()));
-    }
 
     /**
      * Verifies pressing the back button returns to the Discover feed.

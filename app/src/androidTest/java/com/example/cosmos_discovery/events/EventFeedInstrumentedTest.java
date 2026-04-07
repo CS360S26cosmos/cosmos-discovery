@@ -3,9 +3,11 @@ package com.example.cosmos_discovery.events;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
+import com.example.cosmos_discovery.EspressoTestHelper;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.ui.student.StudentActivity;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +26,11 @@ public class EventFeedInstrumentedTest {
     @Rule
     public ActivityScenarioRule<StudentActivity> activityRule =
             new ActivityScenarioRule<>(StudentActivity.class);
+
+    @Before
+    public void setUp() throws InterruptedException {
+        EspressoTestHelper.populateRoleUtil();
+    }
 
     /**
      * Verifies that the "Suggested" events carousel RecyclerView is displayed.

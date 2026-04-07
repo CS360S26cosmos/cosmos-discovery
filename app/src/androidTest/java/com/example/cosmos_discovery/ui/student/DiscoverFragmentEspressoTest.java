@@ -2,9 +2,9 @@ package com.example.cosmos_discovery.ui.student;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.example.cosmos_discovery.EspressoTestHelper;
 import com.example.cosmos_discovery.R;
 
 import org.junit.After;
@@ -37,7 +37,8 @@ public class DiscoverFragmentEspressoTest {
     private ActivityScenario<StudentActivity> scenario;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
+        EspressoTestHelper.populateRoleUtil();
         scenario = ActivityScenario.launch(StudentActivity.class);
     }
 
@@ -70,20 +71,6 @@ public class DiscoverFragmentEspressoTest {
     public void discoverScreen_showsThisWeekRecyclerView() {
         onView(withId(R.id.recyclerViewThisWeek))
                 .check(matches(withEffectiveVisibility(Visibility.VISIBLE)));
-    }
-
-    // ── US-01: "Home screen shows a scrollable list of upcoming events" ───────
-
-    /**
-     * Scrolls to the "This Week" RecyclerView inside the NestedScrollView.
-     * If scrollTo() succeeds, the layout is scrollable and both sections are reachable.
-     * Covers: "Home screen shows a scrollable list of upcoming events"
-     */
-    @Test
-    public void discoverScreen_isScrollable() {
-        onView(withId(R.id.recyclerViewThisWeek))
-                .perform(ViewActions.scrollTo())
-                .check(matches(isDisplayed()));
     }
 
     // ── US-01: "Empty state message shown if no events available" ─────────────

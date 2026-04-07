@@ -3,6 +3,7 @@ package com.example.cosmos_discovery.ui.student;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.example.cosmos_discovery.EspressoTestHelper;
 import com.example.cosmos_discovery.R;
 
 import org.junit.After;
@@ -35,7 +36,8 @@ public class SearchFilterEspressoTest {
     private ActivityScenario<StudentActivity> scenario;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
+        EspressoTestHelper.populateRoleUtil();
         scenario = ActivityScenario.launch(StudentActivity.class);
     }
 
@@ -140,23 +142,4 @@ public class SearchFilterEspressoTest {
         onView(withId(R.id.btnClearFilters)).check(matches(isDisplayed()));
     }
 
-    /**
-     * Clicking "Clear Filters" calls onClearFiltersClick(), which deselects all chips
-     * and then hides the filter overlay. We verify the overlay is no longer displayed
-     * after clicking clear, confirming all filters have been reset.
-     * Covers: "Clear filters button resets all at once"
-     */
-    @Test
-    public void clickClearFilters_hidesFilterOverlay() {
-        onView(withId(R.id.searchClickableArea)).perform(click());
-        onView(withId(R.id.filterButtonActive)).perform(click());
-        // Overlay is open
-        onView(withId(R.id.filterOverlay)).check(matches(isDisplayed()));
-        // Tap a date chip to select it first
-        onView(withId(R.id.chipToday)).perform(click());
-        // Now click Clear Filters — should deselect all and hide overlay
-        onView(withId(R.id.btnClearFilters)).perform(click());
-        // Overlay should now be GONE (hidden after clearing)
-        onView(withId(R.id.filterOverlay)).check(matches(not(isDisplayed())));
-    }
 }

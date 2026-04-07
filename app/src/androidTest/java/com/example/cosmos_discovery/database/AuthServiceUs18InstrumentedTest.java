@@ -17,10 +17,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +37,11 @@ public class AuthServiceUs18InstrumentedTest {
     private static final String TEST_PASSWORD = "ValidPass1!";
     private static final String TEST_NAME = "US18 Test User";
 
+    // Tracks every [email, uid] pair created during this class so @AfterClass can clean them up.
+    // Using a static list means cleanup is deferred until after ALL test methods finish,
+    // so no sign-out events disrupt other tests that run between individual test methods.
+    private static final List<String[]> sCreatedUsers = new ArrayList<>();
+
     private AuthService authService;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -46,41 +54,58 @@ public class AuthServiceUs18InstrumentedTest {
         authService = new AuthService();
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        auth.signOut();
 
         createdEmail = "us18_" + UUID.randomUUID().toString().replace("-", "")
                 + "@lums.edu.pk";
         createdUid = null;
     }
 
+    /** Records this test's created user for deferred cleanup. Does NOT delete or sign out. */
     @After
-    public void tearDown() throws Exception {
-        FirebaseUser currentUser = auth.getCurrentUser();
+    public void tearDown() {
+        if (createdEmail != null) {
+            sCreatedUsers.add(new String[]{createdEmail, createdUid});
+        }
+    }
 
-        if (currentUser == null && createdEmail != null) {
+    /**
+     * Runs once after ALL test methods in this class complete.
+     * Deletes every Firebase Auth account and Firestore document that was created
+     * during this test class, then signs out.
+     *
+     * Deferring cleanup here (rather than in @After) means no sign-out events happen
+     * between individual test methods, so other test classes that depend on a signed-in
+     * user are not disrupted mid-run.
+     */
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        for (String[] entry : sCreatedUsers) {
+            String email = entry[0];
+            String uid   = entry[1];
+
+            // Delete the Firestore user document.
+            if (uid != null) {
+                try {
+                    awaitTask(db.collection("users").document(uid).delete());
+                } catch (Exception ignored) {}
+            }
+
+            // Sign in as the test user in order to delete the Auth account.
             try {
-                awaitTask(auth.signInWithEmailAndPassword(createdEmail, TEST_PASSWORD));
-                currentUser = auth.getCurrentUser();
+                awaitTask(auth.signInWithEmailAndPassword(email, TEST_PASSWORD));
+                FirebaseUser user = auth.getCurrentUser();
+                if (user != null && email.equals(user.getEmail())) {
+                    awaitTask(user.delete()); // auto-signs-out on delete
+                }
             } catch (Exception ignored) {
-                // If sign-in fails, cleanup may not be possible; keep teardown resilient.
+                // Account may already be gone; keep going.
             }
         }
 
-        if (createdUid != null) {
-            try {
-                awaitTask(db.collection("users").document(createdUid).delete());
-            } catch (Exception ignored) {
-            }
-        }
-
-        if (currentUser != null) {
-            try {
-                awaitTask(currentUser.delete());
-            } catch (Exception ignored) {
-            }
-        }
-
-        auth.signOut();
+        sCreatedUsers.clear();
     }
 
     @Test

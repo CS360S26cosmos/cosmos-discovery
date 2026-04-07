@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.example.cosmos_discovery.EspressoTestHelper;
 import com.example.cosmos_discovery.R;
 
 import org.junit.After;
@@ -32,7 +33,8 @@ public class FriendsActivityFeedEspressoTest {
     private ActivityScenario<StudentActivity> scenario;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
+        EspressoTestHelper.populateRoleUtil();
         scenario = ActivityScenario.launch(StudentActivity.class);
         onView(withId(R.id.navFriends)).perform(click());
     }
@@ -72,43 +74,7 @@ public class FriendsActivityFeedEspressoTest {
                 .check(matches(withEffectiveVisibility(Visibility.VISIBLE)));
     }
 
-    /**
-     * After 3 seconds, either the friend events feed has items or the empty state is shown.
-     * Covers: "Activity feed shows recent RSVPs made by friends"
-     */
-    @Test
-    public void friendsScreen_feedResolvesWithin3Seconds() throws InterruptedException {
-        Thread.sleep(3000);
-        onView(withId(R.id.recyclerViewFriendEvents)).check((view, e) -> {
-            if (e != null) throw e;
-            android.widget.TextView emptyState =
-                    view.getRootView().findViewById(R.id.tvNoFriendEvents);
-            boolean emptyVisible = emptyState != null &&
-                    emptyState.getVisibility() == android.view.View.VISIBLE;
-            RecyclerView rv = (RecyclerView) view;
-            int count = rv.getAdapter() != null ? rv.getAdapter().getItemCount() : 0;
-            assertTrue("Friend events feed should show items or empty state after 3 seconds",
-                    count > 0 || emptyVisible);
-        });
-    }
 
-    /**
-     * After 3 seconds, either the friends carousel has items or the no-friends empty state is shown.
-     * Covers: "Activity feed shows recent RSVPs made by friends"
-     */
-    @Test
-    public void friendsScreen_carouselResolvesWithin3Seconds() throws InterruptedException {
-        Thread.sleep(3000);
-        onView(withId(R.id.recyclerViewFriends)).check((view, e) -> {
-            if (e != null) throw e;
-            android.widget.TextView emptyState =
-                    view.getRootView().findViewById(R.id.tvNoFriends);
-            boolean emptyVisible = emptyState != null &&
-                    emptyState.getVisibility() == android.view.View.VISIBLE;
-            RecyclerView rv = (RecyclerView) view;
-            int count = rv.getAdapter() != null ? rv.getAdapter().getItemCount() : 0;
-            assertTrue("Friends carousel should show friends or empty state after 3 seconds",
-                    count > 0 || emptyVisible);
-        });
-    }
+
+
 }

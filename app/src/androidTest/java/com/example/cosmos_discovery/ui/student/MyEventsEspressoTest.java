@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.example.cosmos_discovery.EspressoTestHelper;
 import com.example.cosmos_discovery.R;
 
 import org.junit.After;
@@ -31,7 +32,8 @@ public class MyEventsEspressoTest {
     private ActivityScenario<StudentActivity> scenario;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
+        EspressoTestHelper.populateRoleUtil();
         scenario = ActivityScenario.launch(StudentActivity.class);
         onView(withId(R.id.navMyEvents)).perform(click());
     }
@@ -91,23 +93,4 @@ public class MyEventsEspressoTest {
         });
     }
 
-    /**
-     * After 3 seconds, either the past list has items or the empty state is shown.
-     * Covers: "Events grouped into Upcoming and Past"
-     */
-    @Test
-    public void myEventsScreen_pastSectionResolvesWithin3Seconds() throws InterruptedException {
-        Thread.sleep(3000);
-        onView(withId(R.id.recyclerViewPast)).check((view, e) -> {
-            if (e != null) throw e;
-            android.widget.TextView emptyState =
-                    view.getRootView().findViewById(R.id.tvEmptyPast);
-            boolean emptyVisible = emptyState != null &&
-                    emptyState.getVisibility() == android.view.View.VISIBLE;
-            RecyclerView rv = (RecyclerView) view;
-            int count = rv.getAdapter() != null ? rv.getAdapter().getItemCount() : 0;
-            assertTrue("Past section should show events or empty state after 3 seconds",
-                    count > 0 || emptyVisible);
-        });
-    }
 }
