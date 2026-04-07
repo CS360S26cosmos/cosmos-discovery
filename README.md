@@ -22,6 +22,7 @@ A centralized campus event platform that allows students to discover, browse, an
 
 - [Team Information](#team-information)
 - [Meeting Minutes](#meeting-minutes)
+- [UML Diagram](#uml-diagram)
 - [CRC Diagrams](#crc-diagrams)
 - [Product Backlog](#product-backlog)
 - [Wireframes](#wireframes)
@@ -157,7 +158,11 @@ Sprint 3 Planning
 - Assigned the US-08 and US-09, creating new events and editing event details
 - Designing tests for the User stories in review
 - Assigned US-011 for View and check-in attendee list
-    
+
+## UML Diagram
+<img width="3381" height="929" alt="nLTjRzis4FwkNq5q7-OiJjSXQ50OGL37LX1XJXp8TejX60f6kiXSPT8bAMTU4M0_OhzmlsH7lTYKpDXE1yo64Ikyvrvul7kEUgyqbJgRfQGlPfHnCg1Ba9wdFZC-fvBEI9HIfRfQItQVQGWYmKViJo1lcf0hmNKk-UcqARe66eEyfD7dH8gCnpsH2ac-kphpBw_UDi6NGYAuXBnxStfwTcP1g9JYyJdX73tG1BPRK1ea2BsS" src="https://github.com/user-attachments/assets/72aed3ca-c89d-4096-8099-f7076712fc69" />
+
+
 ## CRC Diagrams
 
 <!--_Add CRC screenshots below._-->
