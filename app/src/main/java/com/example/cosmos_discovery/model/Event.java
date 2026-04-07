@@ -24,6 +24,7 @@ public class Event {
     private String       location;
     private List<String> tags;
     private int          rsvpCount;
+    private int          capacity;    // 0 = unlimited
     private String       imageUrl;
     private String       organizerId;
     private String       status;
@@ -63,6 +64,23 @@ public class Event {
         return attendeeIds != null && attendeeIds.contains(userId);
     }
 
+    /** Returns true if this event has a finite capacity set. */
+    public boolean hasCapacity() { return capacity > 0; }
+
+    /** Returns true if RSVPs have reached or exceeded the capacity limit. */
+    public boolean isFull() { return hasCapacity() && rsvpCount >= capacity; }
+
+    /**
+     * Returns a display string for RSVP/capacity info.
+     * "23/100 spots taken" when capacity is set, "23 RSVPs" when unlimited.
+     */
+    public String getSpotsText() {
+        if (hasCapacity()) {
+            return rsvpCount + "/" + capacity + " spots taken";
+        }
+        return rsvpCount + " RSVPs";
+    }
+
     // ── Getters & Setters ─────────────────────────────────────────────────
 
     public String getId()                    { return id; }
@@ -82,6 +100,9 @@ public class Event {
 
     public int  getRsvpCount()               { return rsvpCount; }
     public void setRsvpCount(int count)      { this.rsvpCount = count; }
+
+    public int  getCapacity()                { return capacity; }
+    public void setCapacity(int capacity)    { this.capacity = capacity; }
 
     public String getImageUrl()              { return imageUrl; }
     public void   setImageUrl(String url)    { this.imageUrl = url; }

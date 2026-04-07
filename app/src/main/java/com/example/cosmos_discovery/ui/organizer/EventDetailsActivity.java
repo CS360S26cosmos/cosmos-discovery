@@ -2,6 +2,7 @@ package com.example.cosmos_discovery.ui.organizer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -117,6 +118,15 @@ public class EventDetailsActivity extends AppCompatActivity {
         desc.setText(description != null && !description.trim().isEmpty()
                 ? description
                 : "No description provided.");
+
+        View capacityRow = findViewById(R.id.capacityRow);
+        TextView capacityInfo = findViewById(R.id.tvCapacityInfo);
+        if (event.hasCapacity()) {
+            capacityRow.setVisibility(View.VISIBLE);
+            capacityInfo.setText(event.getSpotsText());
+        } else {
+            capacityRow.setVisibility(View.GONE);
+        }
     }
 
     private void showOverflowMenu(ImageButton anchor) {

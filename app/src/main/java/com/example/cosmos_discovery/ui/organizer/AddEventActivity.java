@@ -54,6 +54,7 @@ public class AddEventActivity extends AppCompatActivity {
     private EditText mEtEndTime;
     private EditText mEtRegisterBy;
     private EditText mEtVenue;
+    private EditText mEtCapacity;
     private EditText mEtOpenTo;
 
     private List<String> mCategories;
@@ -93,6 +94,7 @@ public class AddEventActivity extends AppCompatActivity {
         mEtEndTime     = findViewById(R.id.etEndTime);
         mEtRegisterBy  = findViewById(R.id.etRegisterBy);
         mEtVenue       = findViewById(R.id.etVenue);
+        mEtCapacity    = findViewById(R.id.etCapacity);
         mEtOpenTo      = findViewById(R.id.etOpenTo);
     }
 
@@ -305,6 +307,14 @@ public class AddEventActivity extends AppCompatActivity {
         event.setEndTime(mEtEndTime.getText().toString().trim());
         event.setRegisterBy(mEtRegisterBy.getText().toString().trim());
         event.setAccessType(EventFormUtil.normalizeAccessType(mEtOpenTo.getText().toString()));
+
+        String capacityStr = mEtCapacity.getText().toString().trim();
+        if (!capacityStr.isEmpty()) {
+            try {
+                int cap = Integer.parseInt(capacityStr);
+                if (cap > 0) event.setCapacity(cap);
+            } catch (NumberFormatException ignored) {}
+        }
 
         mEventService.addEvent(
                 event,

@@ -401,6 +401,43 @@
                             </LinearLayout>
                         </LinearLayout>
 
+                        <!-- Capacity / spots info row -->
+                        <LinearLayout
+                            android:id="@+id/capacityRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="22dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="Capacity"
+                                android:src="@drawable/ic_eventdetails_organizer"
+                                app:tint="@color/color_icon_outline" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:fontFamily="@font/inter_variable"
+                                android:text="Capacity:"
+                                android:textColor="@color/color_icon_outline"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvCapacityInfo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:fontFamily="@font/inter_variable"
+                                android:textColor="@color/color_icon_outline"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
                         <TextView
                             android:id="@+id/tvDescriptionLabel"
                             android:layout_width="wrap_content"

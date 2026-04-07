@@ -57,6 +57,7 @@ public class EditEventActivity extends AppCompatActivity {
     private EditText mEtEndTime;
     private EditText mEtRegisterBy;
     private EditText mEtVenue;
+    private EditText mEtCapacity;
     private EditText mEtOpenTo;
 
     private TextView mTvTitle;
@@ -112,6 +113,7 @@ public class EditEventActivity extends AppCompatActivity {
         mEtEndTime     = findViewById(R.id.etEndTime);
         mEtRegisterBy  = findViewById(R.id.etRegisterBy);
         mEtVenue       = findViewById(R.id.etVenue);
+        mEtCapacity    = findViewById(R.id.etCapacity);
         mEtOpenTo      = findViewById(R.id.etOpenTo);
     }
 
@@ -335,6 +337,9 @@ public class EditEventActivity extends AppCompatActivity {
         mEtRegisterBy.setText(nullToEmpty(event.getRegisterBy()));
         mEtVenue.setText(nullToEmpty(event.getLocation()));
         mEtOpenTo.setText(EventFormUtil.accessTypeToDisplay(event.getAccessType()));
+        if (event.getCapacity() > 0) {
+            mEtCapacity.setText(String.valueOf(event.getCapacity()));
+        }
     }
 
     private void onSave() {
@@ -385,6 +390,13 @@ public class EditEventActivity extends AppCompatActivity {
         fields.put("registerBy", mEtRegisterBy.getText().toString().trim());
         fields.put("accessType", EventFormUtil.normalizeAccessType(mEtOpenTo.getText().toString()));
         fields.put("tags", tags);
+
+        String capacityStr = mEtCapacity.getText().toString().trim();
+        int cap = 0;
+        if (!capacityStr.isEmpty()) {
+            try { cap = Integer.parseInt(capacityStr); } catch (NumberFormatException ignored) {}
+        }
+        fields.put("capacity", cap);
 
         mEventService.updateEvent(
                 mEventId,
