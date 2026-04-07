@@ -36,8 +36,8 @@ public class EventServiceIntegrationTest {
 
     private static final String IMAGE_URL    =
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKWmPsj1eNi4KLT5gVaTIHCxbRZbiJFHtaFA&s";
-    private static final String TEST_EMAIL    = "27100052@lums.edu.pk";
-    private static final String TEST_PASSWORD = "Test@1234";
+    private static final String TEST_EMAIL    = "27100026@lums.edu.pk";
+    private static final String TEST_PASSWORD = "Test@321";
     private static final int    TIMEOUT_SECS  = 15;
 
     private EventService      mService;
@@ -53,20 +53,31 @@ public class EventServiceIntegrationTest {
         mService = new EventService();
         mDb      = FirebaseFirestore.getInstance();
 
-        // Sign in so Firestore security rules allow writes
-        CountDownLatch latch = new CountDownLatch(1);
-        FirebaseAuth.getInstance()
-                .signInWithEmailAndPassword(TEST_EMAIL, TEST_PASSWORD)
-                .addOnCompleteListener(task -> latch.countDown());
-        assertTrue("Sign-in timed out", latch.await(TIMEOUT_SECS, TimeUnit.SECONDS));
-        assertNotNull("Test account missing — create it first via AuthServiceIntegrationTest",
+        // Sign in if not already signed in (previous test class may have signed out).
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            CountDownLatch latch = new CountDownLatch(1);
+            FirebaseAuth.getInstance()
+                    .signInWithEmailAndPassword(TEST_EMAIL, TEST_PASSWORD)
+                    .addOnCompleteListener(task -> latch.countDown());
+            assertTrue("Sign-in timed out", latch.await(TIMEOUT_SECS, TimeUnit.SECONDS));
+        }
+        assertNotNull("Sign-in failed — check TEST_EMAIL/TEST_PASSWORD credentials",
                 FirebaseAuth.getInstance().getCurrentUser());
     }
 
     @After
-    public void tearDown() {
-        // Documents created during tests are intentionally left in Firestore
-        // so they can be inspected in the Firebase Console after the run.
+    public void tearDown() throws InterruptedException {
+        // Delete only the events that were created during this test.
+        // mCreatedIds is populated solely by addEventAndTrack(), so pre-existing
+        // events in Firestore are never tracked here and will never be touched.
+        for (String id : new ArrayList<>(mCreatedIds)) {
+            CountDownLatch latch = new CountDownLatch(1);
+            mDb.collection("events").document(id)
+                    .delete()
+                    .addOnCompleteListener(task -> latch.countDown());
+            latch.await(TIMEOUT_SECS, TimeUnit.SECONDS);
+        }
+        mCreatedIds.clear();
     }
 
     // ── Test 1: Add a single event ────────────────────────────────────────

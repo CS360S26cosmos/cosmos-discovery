@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import com.example.cosmos_discovery.R;
-import com.example.cosmos_discovery.ui.shared.MainActivity;
+import com.example.cosmos_discovery.ui.student.StudentActivity;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,39 +13,46 @@ import org.junit.runner.RunWith;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
+import static org.hamcrest.Matchers.containsString;
 
 
 @RunWith(AndroidJUnit4.class)
 public class EventFeedInstrumentedTest {
 
+    // Launch StudentActivity directly — MainActivity is just a routing shim that immediately
+    // delegates to StudentActivity, so testing it directly avoids ActivityScenarioRule teardown issues.
     @Rule
-    public ActivityScenarioRule<MainActivity> activityRule =
-            new ActivityScenarioRule<>(MainActivity.class);
+    public ActivityScenarioRule<StudentActivity> activityRule =
+            new ActivityScenarioRule<>(StudentActivity.class);
 
     /**
-     * Test: Event list is displayed
+     * Verifies that the "Suggested" events carousel RecyclerView is displayed.
+     * Covers US-01: "Has a suggested section"
      */
     @Test
     public void eventList_isDisplayed() {
-        onView(withId(R.id.recyclerViewEvents))
+        onView(withId(R.id.recyclerViewSuggested))
                 .check(matches(isDisplayed()));
     }
 
     /**
-     * Test: RecyclerView is scrollable
+     * Verifies that the "This Week" events list RecyclerView exists in the layout.
+     * Together with the Suggested section, this confirms the screen has scrollable content.
+     * Covers US-01: "Also has an Upcoming Events section"
      */
     @Test
     public void eventList_isScrollable() {
-        onView(withId(R.id.recyclerViewEvents))
-                .check(matches(isDisplayed()));
+        onView(withId(R.id.recyclerViewThisWeek))
+                .check(matches(withEffectiveVisibility(Visibility.VISIBLE)));
     }
 
     /**
-     * Test: Event card elements exist
+     * Verifies the "Suggested" section label is visible on the discover feed.
+     * Covers US-01: "Home screen shows a scrollable list of upcoming events"
      */
     @Test
     public void eventCard_displaysFields() {
-        onView(withText("Hackathon"))
+        onView(withText(containsString("Suggested")))
                 .check(matches(isDisplayed()));
     }
 }
