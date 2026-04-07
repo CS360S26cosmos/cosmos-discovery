@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,6 +49,7 @@ public class EditEventActivity extends AppCompatActivity {
 
     private EditText mEtName;
     private EditText mEtDescription;
+    private TextView mTvDescriptionCounter;
     private EditText mEtCategory;
     private EditText mEtBannerUrl;
     private EditText mEtDate;
@@ -77,6 +80,7 @@ public class EditEventActivity extends AppCompatActivity {
         }
 
         bindViews();
+        setupDescriptionCounter();
         setupDropdowns();
         setupDateTimePickers();
         setupBannerUpload();
@@ -98,9 +102,10 @@ public class EditEventActivity extends AppCompatActivity {
         mTvTitle  = findViewById(R.id.tvAddEventTitle);
         mTvSubmit = findViewById(R.id.tvSubmit);
 
-        mEtName        = findViewById(R.id.etEventName);
-        mEtDescription = findViewById(R.id.etDescription);
-        mEtCategory    = findViewById(R.id.etCategory);
+        mEtName               = findViewById(R.id.etEventName);
+        mEtDescription        = findViewById(R.id.etDescription);
+        mTvDescriptionCounter = findViewById(R.id.tvDescriptionCounter);
+        mEtCategory           = findViewById(R.id.etCategory);
         mEtBannerUrl   = findViewById(R.id.etBannerUpload);
         mEtDate        = findViewById(R.id.etDateOfEvent);
         mEtStartTime   = findViewById(R.id.etStartTime);
@@ -108,6 +113,16 @@ public class EditEventActivity extends AppCompatActivity {
         mEtRegisterBy  = findViewById(R.id.etRegisterBy);
         mEtVenue       = findViewById(R.id.etVenue);
         mEtOpenTo      = findViewById(R.id.etOpenTo);
+    }
+
+    private void setupDescriptionCounter() {
+        mEtDescription.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
+                mTvDescriptionCounter.setText(s.length() + " / 150");
+            }
+        });
     }
 
     private void setupDropdowns() {
@@ -154,9 +169,20 @@ public class EditEventActivity extends AppCompatActivity {
     }
 
     private void showDatePicker(EditText target) {
-        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
-                .build();
+        MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date");
+        String currentText = target.getText().toString().trim();
+        if (!currentText.isEmpty()) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Date parsed = sdf.parse(currentText);
+                if (parsed != null) {
+                    builder.setSelection(parsed.getTime());
+                }
+            } catch (Exception ignored) {}
+        }
+        MaterialDatePicker<Long> picker = builder.build();
         picker.addOnPositiveButtonClickListener(selection -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -166,8 +192,24 @@ public class EditEventActivity extends AppCompatActivity {
     }
 
     private void showTimePicker(EditText target) {
+        int initHour = 12;
+        int initMinute = 0;
+        String currentText = target.getText().toString().trim();
+        if (!currentText.isEmpty()) {
+            try {
+                boolean isPm = currentText.endsWith("pm");
+                String timePart = currentText.substring(0, currentText.length() - 2);
+                String[] parts = timePart.split(":");
+                int h12 = Integer.parseInt(parts[0]);
+                int mins = Integer.parseInt(parts[1]);
+                initHour   = isPm ? (h12 == 12 ? 12 : h12 + 12) : (h12 == 12 ? 0 : h12);
+                initMinute = mins;
+            } catch (Exception ignored) {}
+        }
         MaterialTimePicker picker = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(initHour)
+                .setMinute(initMinute)
                 .setTitleText("Select time")
                 .build();
         picker.addOnPositiveButtonClickListener(v -> {
@@ -269,6 +311,7 @@ public class EditEventActivity extends AppCompatActivity {
     private void prefill(Event event) {
         mEtName.setText(nullToEmpty(event.getTitle()));
         mEtDescription.setText(nullToEmpty(event.getDescription()));
+        mTvDescriptionCounter.setText(mEtDescription.getText().length() + " / 150");
 
         String category = event.getCategory();
         if (category == null || category.trim().isEmpty()) {

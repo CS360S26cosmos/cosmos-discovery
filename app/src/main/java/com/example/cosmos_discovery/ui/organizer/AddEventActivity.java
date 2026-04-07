@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -43,6 +46,7 @@ public class AddEventActivity extends AppCompatActivity {
 
     private EditText mEtName;
     private EditText mEtDescription;
+    private TextView mTvDescriptionCounter;
     private EditText mEtCategory;
     private EditText mEtBannerUrl;
     private EditText mEtDate;
@@ -64,6 +68,7 @@ public class AddEventActivity extends AppCompatActivity {
         setContentView(R.layout.add_events_page);
 
         bindViews();
+        setupDescriptionCounter();
         setupDropdowns();
         setupDateTimePickers();
         setupBannerUpload();
@@ -78,9 +83,10 @@ public class AddEventActivity extends AppCompatActivity {
     }
 
     private void bindViews() {
-        mEtName        = findViewById(R.id.etEventName);
-        mEtDescription = findViewById(R.id.etDescription);
-        mEtCategory    = findViewById(R.id.etCategory);
+        mEtName               = findViewById(R.id.etEventName);
+        mEtDescription        = findViewById(R.id.etDescription);
+        mTvDescriptionCounter = findViewById(R.id.tvDescriptionCounter);
+        mEtCategory           = findViewById(R.id.etCategory);
         mEtBannerUrl   = findViewById(R.id.etBannerUpload);
         mEtDate        = findViewById(R.id.etDateOfEvent);
         mEtStartTime   = findViewById(R.id.etStartTime);
@@ -88,6 +94,16 @@ public class AddEventActivity extends AppCompatActivity {
         mEtRegisterBy  = findViewById(R.id.etRegisterBy);
         mEtVenue       = findViewById(R.id.etVenue);
         mEtOpenTo      = findViewById(R.id.etOpenTo);
+    }
+
+    private void setupDescriptionCounter() {
+        mEtDescription.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
+                mTvDescriptionCounter.setText(s.length() + " / 150");
+            }
+        });
     }
 
     private void setupDropdowns() {
