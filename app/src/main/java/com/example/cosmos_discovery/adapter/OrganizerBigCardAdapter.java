@@ -23,41 +23,29 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * RecyclerView adapter for organizer "Posted Events" cards.
+ * RecyclerView adapter for organizer big event cards in horizontal carousels.
+ * Used for Pending and Approved sections on the "My Posted Events" page.
  *
- * Uses {@code item_event_card_organizer.xml} (a variant of the small event card)
- * and shows a status badge instead of an RSVP button.
+ * Similar to {@link EventBigAdapter} but without an RSVP button and with
+ * a colored left-border accent to indicate event status.
  */
-public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAdapter.ViewHolder> {
+public class OrganizerBigCardAdapter extends RecyclerView.Adapter<OrganizerBigCardAdapter.ViewHolder> {
 
     public interface OnEventClickListener {
         void onEventClick(Event event);
     }
 
     private final Context              mContext;
-    private final OnEventClickListener mListener;
     private List<Event>                mEvents;
     private final @DrawableRes int     mAccentDrawable;
-    private final boolean              mHorizontal;
+    private final OnEventClickListener mListener;
 
-    public OrganizerEventAdapter(Context context, List<Event> events, OnEventClickListener listener) {
-        this(context, events, 0, false, listener);
-    }
-
-    public OrganizerEventAdapter(Context context, List<Event> events,
-                                 @DrawableRes int accentDrawable,
-                                 OnEventClickListener listener) {
-        this(context, events, accentDrawable, false, listener);
-    }
-
-    public OrganizerEventAdapter(Context context, List<Event> events,
-                                 @DrawableRes int accentDrawable,
-                                 boolean horizontal,
-                                 OnEventClickListener listener) {
+    public OrganizerBigCardAdapter(Context context, List<Event> events,
+                                   @DrawableRes int accentDrawable,
+                                   OnEventClickListener listener) {
         mContext         = context;
         mEvents          = events;
         mAccentDrawable  = accentDrawable;
-        mHorizontal      = horizontal;
         mListener        = listener;
     }
 
@@ -70,12 +58,10 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_event_card_organizer, parent, false);
-        if (mHorizontal) {
-            int cardWidth = (int) (parent.getContext().getResources()
-                    .getDisplayMetrics().widthPixels * 0.82f);
-            view.getLayoutParams().width = cardWidth;
-        }
+                .inflate(R.layout.item_event_card_organizer_big, parent, false);
+        int cardWidth = (int) (parent.getContext().getResources()
+                .getDisplayMetrics().widthPixels * 0.82f);
+        view.getLayoutParams().width = cardWidth;
         return new ViewHolder(view);
     }
 
@@ -84,40 +70,40 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
         Event event = mEvents.get(position);
 
         // Accent border
-        if (mAccentDrawable != 0) {
-            holder.accentBorder.setBackgroundResource(mAccentDrawable);
-            holder.accentBorder.setVisibility(View.VISIBLE);
-        } else {
-            holder.accentBorder.setVisibility(View.GONE);
-        }
+        holder.accentBorder.setBackgroundResource(mAccentDrawable);
 
+        // Image
         Glide.with(holder.imageViewEvent.getContext())
                 .load(event.getImageUrl())
                 .placeholder(R.color.color_text_hint)
                 .centerCrop()
                 .into(holder.imageViewEvent);
 
+        // Title & location
         holder.textViewTitle.setText(event.getTitle());
         holder.textViewLocation.setText(event.getLocation());
 
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d | h:mma", Locale.getDefault());
+        // DateTime
+        SimpleDateFormat sdf = new SimpleDateFormat("d MMMM yyyy | h:mma", Locale.getDefault());
         holder.textViewDateTime.setText(sdf.format(new Date(event.getDateTime())));
 
+        // RSVP count
         holder.textViewRsvpCount.setText(event.getRsvpCount() + " RSVPs");
 
+        // Chips
         holder.chipGroupTags.removeAllViews();
         if (event.getTags() != null) {
             for (String tag : event.getTags()) {
                 TextView chip = new TextView(mContext);
                 chip.setText(tag);
-                chip.setTextSize(9f);
+                chip.setTextSize(10f);
                 chip.setTextColor(ContextCompat.getColor(mContext, R.color.color_chip_text));
                 chip.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bg_chip_outline));
                 chip.setPadding(
-                        (int) dpToPx(7.85f),
-                        (int) dpToPx(2.94f),
-                        (int) dpToPx(7.85f),
-                        (int) dpToPx(2.94f));
+                        (int) dpToPx(9f),
+                        (int) dpToPx(4f),
+                        (int) dpToPx(9f),
+                        (int) dpToPx(4f));
                 chip.setIncludeFontPadding(false);
                 ChipGroup.LayoutParams lp = new ChipGroup.LayoutParams(
                         ChipGroup.LayoutParams.WRAP_CONTENT,
@@ -140,13 +126,13 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        final View             accentBorder;
-        final ImageView        imageViewEvent;
-        final TextView         textViewTitle;
-        final TextView         textViewDateTime;
-        final TextView         textViewLocation;
-        final ChipGroup        chipGroupTags;
-        final TextView         textViewRsvpCount;
+        final View      accentBorder;
+        final ImageView imageViewEvent;
+        final TextView  textViewTitle;
+        final TextView  textViewDateTime;
+        final TextView  textViewLocation;
+        final ChipGroup chipGroupTags;
+        final TextView  textViewRsvpCount;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -160,4 +146,3 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
         }
     }
 }
-

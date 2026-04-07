@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cosmos_discovery.R;
@@ -36,9 +37,34 @@ public class OrganizerActivity extends AppCompatActivity {
 
     private ListenerRegistration mEventsListener;
 
-    private OrganizerEventAdapter mAdapter;
-    private TextView              mTvEmpty;
-    private View                  mSidebarView;
+    // Pending section
+    private View                  mSectionPending;
+    private RecyclerView          mRvPending;
+    private OrganizerEventAdapter mPendingAdapter;
+    private TextView              mTvEmptyPending;
+    private TextView              mBadgePendingCount;
+
+    // Approved section
+    private View                  mSectionApproved;
+    private RecyclerView          mRvApproved;
+    private OrganizerEventAdapter mApprovedAdapter;
+    private TextView              mTvEmptyApproved;
+    private TextView              mBadgeApprovedCount;
+
+    // Rejected section
+    private View                  mSectionRejected;
+    private View                  mRejectedHeader;
+    private View                  mRejectedContent;
+    private ImageView             mIconRejectedChevron;
+    private RecyclerView          mRvRejected;
+    private OrganizerEventAdapter mRejectedAdapter;
+    private TextView              mBadgeRejectedCount;
+    private boolean               mRejectedExpanded = false;
+
+    // Global empty state
+    private TextView mTvEmpty;
+
+    private View mSidebarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,19 +77,13 @@ public class OrganizerActivity extends AppCompatActivity {
             return;
         }
 
-        RecyclerView rv = findViewById(R.id.rvPostedEvents);
-        mTvEmpty = findViewById(R.id.tvEmptyPostedEvents);
-
-        mAdapter = new OrganizerEventAdapter(this, new ArrayList<>(), this::onEventClick);
-        rv.setAdapter(mAdapter);
-
-        findViewById(R.id.btnCreateEventCard).setOnClickListener(v -> {
-            startActivity(new Intent(this, AddEventActivity.class));
-        });
-
+        bindViews();
+        setupAdapters();
         setupTopBar();
         setupSidebar();
         wireBottomNav();
+        wireRejectedToggle();
+        wireFab();
     }
 
     @Override
@@ -81,10 +101,81 @@ public class OrganizerActivity extends AppCompatActivity {
         }
     }
 
+    // ── Setup ─────────────────────────────────────────────────────────────
+
+    private void bindViews() {
+        // Pending
+        mSectionPending    = findViewById(R.id.sectionPending);
+        mRvPending         = findViewById(R.id.rvPendingEvents);
+        mTvEmptyPending    = findViewById(R.id.tvEmptyPending);
+        mBadgePendingCount = findViewById(R.id.badgePendingCount);
+
+        // Approved
+        mSectionApproved    = findViewById(R.id.sectionApproved);
+        mRvApproved         = findViewById(R.id.rvApprovedEvents);
+        mTvEmptyApproved    = findViewById(R.id.tvEmptyApproved);
+        mBadgeApprovedCount = findViewById(R.id.badgeApprovedCount);
+
+        // Rejected
+        mSectionRejected     = findViewById(R.id.sectionRejected);
+        mRejectedHeader      = findViewById(R.id.rejectedHeader);
+        mRejectedContent     = findViewById(R.id.rejectedContent);
+        mIconRejectedChevron = findViewById(R.id.iconRejectedChevron);
+        mRvRejected          = findViewById(R.id.rvRejectedEvents);
+        mBadgeRejectedCount  = findViewById(R.id.badgeRejectedCount);
+
+        // Global empty
+        mTvEmpty     = findViewById(R.id.tvEmptyPostedEvents);
+        mSidebarView = findViewById(R.id.sidebarView);
+    }
+
+    private void setupAdapters() {
+        // Pending — small cards in horizontal scroll, blue accent
+        mPendingAdapter = new OrganizerEventAdapter(
+                this, new ArrayList<>(),
+                R.drawable.bg_accent_border_pending,
+                true, this::onEventClick);
+        mRvPending.setAdapter(mPendingAdapter);
+
+        // Approved — small cards in horizontal scroll, green accent
+        mApprovedAdapter = new OrganizerEventAdapter(
+                this, new ArrayList<>(),
+                R.drawable.bg_accent_border_approved,
+                true, this::onEventClick);
+        mRvApproved.setAdapter(mApprovedAdapter);
+
+        // Rejected — small cards vertical, dark orange-red accent
+        mRejectedAdapter = new OrganizerEventAdapter(
+                this, new ArrayList<>(),
+                R.drawable.bg_accent_border_rejected,
+                this::onEventClick);
+        mRvRejected.setAdapter(mRejectedAdapter);
+    }
+
+    private void wireRejectedToggle() {
+        mRejectedHeader.setOnClickListener(v -> {
+            mRejectedExpanded = !mRejectedExpanded;
+            mRejectedContent.setVisibility(mRejectedExpanded ? View.VISIBLE : View.GONE);
+            mIconRejectedChevron.animate()
+                    .rotation(mRejectedExpanded ? 180f : 0f)
+                    .setDuration(200)
+                    .start();
+        });
+    }
+
+    private void wireFab() {
+        findViewById(R.id.fabCreateEvent).setOnClickListener(v ->
+                startActivity(new Intent(this, AddEventActivity.class)));
+    }
+
+    // ── Data ──────────────────────────────────────────────────────────────
+
     private void attachListener() {
         if (mEventsListener != null) return;
         String uid = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : null;
         if (uid == null || uid.trim().isEmpty()) return;
+
+        Log.d(TAG, "attachListener: querying organizerId=" + uid);
 
         mEventsListener = mEventService.listenOrganizerEvents(
                 uid,
@@ -92,7 +183,8 @@ public class OrganizerActivity extends AppCompatActivity {
                 err -> {
                     if (err.contains("FAILED_PRECONDITION")) {
                         Log.w(TAG, err);
-                        Toast.makeText(this, "Events are loading. Please try again shortly.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Events are loading. Please try again shortly.",
+                                Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(this, err, Toast.LENGTH_LONG).show();
                     }
@@ -101,8 +193,73 @@ public class OrganizerActivity extends AppCompatActivity {
     }
 
     private void onEventsUpdate(List<Event> events) {
-        mAdapter.updateData(events);
-        mTvEmpty.setVisibility(events == null || events.isEmpty() ? View.VISIBLE : View.GONE);
+        Log.d(TAG, "onEventsUpdate: received " + (events == null ? "null" : events.size()) + " events");
+        if (events != null) {
+            for (Event e : events) {
+                Log.d(TAG, "  event: title=" + e.getTitle()
+                        + " status=" + e.getStatus()
+                        + " organizerId=" + e.getOrganizerId()
+                        + " id=" + e.getId());
+            }
+        }
+
+        List<Event> pending  = new ArrayList<>();
+        List<Event> approved = new ArrayList<>();
+        List<Event> rejected = new ArrayList<>();
+
+        if (events != null) {
+            for (Event e : events) {
+                String status = e.getStatus();
+                if (Event.STATUS_APPROVED.equals(status)) {
+                    approved.add(e);
+                } else if (Event.STATUS_REJECTED.equals(status)) {
+                    rejected.add(e);
+                } else {
+                    // Default: treat null/unknown as pending
+                    pending.add(e);
+                }
+            }
+        }
+
+        Log.d(TAG, "Split: " + pending.size() + " pending, "
+                + approved.size() + " approved, " + rejected.size() + " rejected");
+
+        // Sort: pending & approved by dateTime ASC (soonest first)
+        pending.sort((a, b) -> Long.compare(a.getDateTime(), b.getDateTime()));
+        approved.sort((a, b) -> Long.compare(a.getDateTime(), b.getDateTime()));
+        // Rejected by createdAt DESC (most recent first)
+        rejected.sort((a, b) -> Long.compare(b.getCreatedAt(), a.getCreatedAt()));
+
+        // Update adapters
+        mPendingAdapter.updateData(pending);
+        mApprovedAdapter.updateData(approved);
+        mRejectedAdapter.updateData(rejected);
+
+        // Pending section visibility
+        boolean hasPending = !pending.isEmpty();
+        mRvPending.setVisibility(hasPending ? View.VISIBLE : View.GONE);
+        mTvEmptyPending.setVisibility(hasPending ? View.GONE : View.VISIBLE);
+        mBadgePendingCount.setText(String.valueOf(pending.size()));
+
+        // Approved section visibility
+        boolean hasApproved = !approved.isEmpty();
+        mRvApproved.setVisibility(hasApproved ? View.VISIBLE : View.GONE);
+        mTvEmptyApproved.setVisibility(hasApproved ? View.GONE : View.VISIBLE);
+        mBadgeApprovedCount.setText(String.valueOf(approved.size()));
+
+        // Rejected section — always visible, show count (including 0)
+        mSectionRejected.setVisibility(View.VISIBLE);
+        mBadgeRejectedCount.setText(String.valueOf(rejected.size()));
+        // Show empty text inside rejected content when expanded but no events
+        TextView tvEmptyRejected = findViewById(R.id.tvEmptyRejected);
+        if (tvEmptyRejected != null) {
+            tvEmptyRejected.setVisibility(rejected.isEmpty() ? View.VISIBLE : View.GONE);
+        }
+        mRvRejected.setVisibility(rejected.isEmpty() ? View.GONE : View.VISIBLE);
+
+        // Global empty state — only when ALL three are empty
+        boolean allEmpty = pending.isEmpty() && approved.isEmpty() && rejected.isEmpty();
+        mTvEmpty.setVisibility(allEmpty ? View.VISIBLE : View.GONE);
     }
 
     private void onEventClick(Event event) {
@@ -112,19 +269,20 @@ public class OrganizerActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // ── Top bar & sidebar (unchanged) ─────────────────────────────────────
+
     private void setupTopBar() {
         View back = findViewById(R.id.btnBack);
         if (back != null) back.setOnClickListener(v -> finish());
 
         TextView title = findViewById(R.id.textTitle);
-        if (title != null) title.setText("Organizer");
+        if (title != null) title.setText("My Posted Events");
 
         View iconMenu = findViewById(R.id.iconMenu);
         if (iconMenu != null) iconMenu.setOnClickListener(v -> showSidebar());
     }
 
     private void setupSidebar() {
-        mSidebarView = findViewById(R.id.sidebarView);
         if (mSidebarView == null) return;
 
         if (RoleUtil.getCurrentUser() != null) {
@@ -187,6 +345,8 @@ public class OrganizerActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+
+    // ── Sidebar animation ────────────────────────────────────────────────
 
     private void showSidebar() {
         if (mSidebarView == null) return;

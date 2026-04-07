@@ -1,5 +1,7 @@
 package com.example.cosmos_discovery.database;
 
+import android.util.Log;
+
 import com.example.cosmos_discovery.model.Event;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -135,25 +137,26 @@ public class EventService {
     }
 
     /**
-     * Attaches a real-time listener for all events created by the given organizer,
-     * ordered by {@code createdAt} descending.
-     *
-     * NOTE: May require a composite Firestore index on (organizerId ASC, createdAt DESC).
+     * Attaches a real-time listener for all events created by the given organizer.
+     * No server-side ordering — callers sort client-side after splitting by status.
      *
      * @return a {@link ListenerRegistration} — call {@code .remove()} in {@code onStop()}.
      */
     public ListenerRegistration listenOrganizerEvents(String organizerId,
                                                       Consumer<List<Event>> onUpdate,
                                                       Consumer<String> onError) {
+        Log.d("EventService", "listenOrganizerEvents: organizerId=" + organizerId);
         return mDb.collection(EVENTS_COLLECTION)
                 .whereEqualTo("organizerId", organizerId)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {
+                        Log.e("EventService", "listenOrganizerEvents ERROR: " + error.getMessage(), error);
                         onError.accept(error.getMessage() != null
                                 ? error.getMessage() : "Failed to load your events.");
                         return;
                     }
+                    Log.d("EventService", "listenOrganizerEvents: snapshot has "
+                            + (snapshot != null ? snapshot.size() : "null") + " docs");
                     List<Event> events = new ArrayList<>();
                     if (snapshot != null) {
                         for (DocumentSnapshot doc : snapshot.getDocuments()) {
