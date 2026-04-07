@@ -139,7 +139,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 events -> {
                     long now = System.currentTimeMillis();
                     List<Event> upcomingEvents = EventSorter.upcoming(events, now);
-                    tvEventsCount.setText(String.valueOf(events.size()));
+                    tvEventsCount.setText(events.size() + " Events Attended");
                     populateUpcomingEvents(upcomingEvents);
                 },
                 err -> {});

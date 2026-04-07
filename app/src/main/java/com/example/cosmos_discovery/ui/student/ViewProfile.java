@@ -100,9 +100,8 @@ public class ViewProfile extends AppCompatActivity {
             eventListener = eventService.listenMyRsvpedEvents(uid,
                     events -> {
                         long now = System.currentTimeMillis();
-                        List<Event> pastEvents     = EventSorter.past(events, now);
                         List<Event> upcomingEvents = EventSorter.upcoming(events, now);
-                        tvEventsCount.setText(String.valueOf(pastEvents.size()));
+                        tvEventsCount.setText(events.size() + " Events Attended");
                         populateUpcomingEvents(upcomingEvents);
                     },
                     err -> {}
