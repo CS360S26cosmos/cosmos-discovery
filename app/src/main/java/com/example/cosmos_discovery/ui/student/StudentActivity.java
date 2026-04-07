@@ -249,6 +249,12 @@ public class StudentActivity extends AppCompatActivity {
                     Intent intent = new Intent(this, ViewProfile.class);
                     startActivity(intent);
                 });
+
+        mSidebarView.findViewById(R.id.settingsRow)
+                .setOnClickListener(v -> {
+                    hideSidebar();
+                    startActivity(new Intent(this, com.example.cosmos_discovery.ui.shared.SettingsActivity.class));
+                });
     }
 
     // ── Navigation ───────────────────────────────────────────────────────

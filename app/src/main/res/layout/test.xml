@@ -95,9 +95,37 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <!-- Change Email -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="8dp">
+
+                    <TextView
+                        android:id="@+id/tvChangeEmail"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Change Email"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/ivArrowChangeEmail"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <ImageView
+                        android:id="@+id/ivArrowChangeEmail"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_sidebar_arrow_icon"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
                 <!-- Event Reminders -->
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/rowReminders"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -126,7 +154,6 @@
 
                 <!-- Request Organizer -->
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/rowRequestOrganizer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -172,7 +199,6 @@
 
                 <!-- Help Center -->
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/rowHelpCenter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingVertical="8dp">
@@ -201,7 +227,6 @@
 
                 <!-- Contact Us -->
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/rowContactUs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -231,7 +256,6 @@
 
                 <!-- Terms -->
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/rowTerms"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
