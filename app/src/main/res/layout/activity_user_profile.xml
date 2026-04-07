@@ -7,6 +7,7 @@
     android:background="@color/color_primary">
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -216,61 +217,23 @@
                     android:layout_marginBottom="16dp"
                     android:background="#CAC4D0" />
 
-                <!-- Stats row — pill cards -->
+                <!-- Stats row — two tappable pill cards side by side -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardEvents"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
+                        android:clickable="false"
+                        android:focusable="false"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="0dp"
-                        app:cardBackgroundColor="@color/color_card_event"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="@color/color_chip_stroke">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:paddingTop="12dp"
-                            android:paddingBottom="12dp">
-
-                            <TextView
-                                android:id="@+id/tvFriendsCount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/color_primary"
-                                android:fontFamily="@font/inter_variable" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Friends"
-                                android:textSize="12sp"
-                                android:textColor="@color/color_text_hint"
-                                android:fontFamily="@font/inter_variable" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp"
-                        app:cardBackgroundColor="@color/color_card_event"
+                        app:cardBackgroundColor="@android:color/transparent"
                         app:strokeWidth="1dp"
                         app:strokeColor="@color/color_chip_stroke">
 
@@ -304,6 +267,64 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardFriends"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="@color/color_card_event"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/color_chip_stroke">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:paddingTop="12dp"
+                                android:paddingBottom="12dp">
+
+                                <TextView
+                                    android:id="@+id/tvFriendsCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/color_primary"
+                                    android:fontFamily="@font/inter_variable" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Friends"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/color_text_hint"
+                                    android:fontFamily="@font/inter_variable" />
+
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center_vertical|end"
+                                android:layout_marginEnd="10dp"
+                                android:src="@drawable/ic_sidebar_arrow_icon"
+                                android:alpha="0.45" />
+
+                        </FrameLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
                 </LinearLayout>
 
                 <!-- Divider before Upcoming Events -->
@@ -315,6 +336,7 @@
 
                 <!-- Upcoming Events section -->
                 <TextView
+                    android:id="@+id/tvUpcomingEventsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -342,6 +364,11 @@
                     android:textColor="@color/color_text_hint"
                     android:textSize="13sp"
                     android:visibility="gone" />
+
+                <!-- Spacer so Upcoming Events can always be scrolled to the top -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="600dp" />
 
             </LinearLayout>
 
