@@ -39,14 +39,26 @@ public class EventBigAdapter extends RecyclerView.Adapter<EventBigAdapter.ViewHo
         void onRsvpClick(Event event, int position);
     }
 
-    private List<Event>               mEvents;
-    private final OnRsvpClickListener mListener;
-    private final Context             mContext;
+    public interface OnEventClickListener {
+        void onEventClick(Event event);
+    }
+
+    private List<Event>                mEvents;
+    private final OnRsvpClickListener  mListener;
+    private final OnEventClickListener mCardListener;
+    private final Context              mContext;
 
     public EventBigAdapter(Context context, List<Event> events, OnRsvpClickListener listener) {
-        this.mContext  = context;
-        this.mEvents   = events;
-        this.mListener = listener;
+        this(context, events, listener, null);
+    }
+
+    public EventBigAdapter(Context context, List<Event> events,
+                           OnRsvpClickListener rsvpListener,
+                           OnEventClickListener cardListener) {
+        this.mContext      = context;
+        this.mEvents       = events;
+        this.mListener     = rsvpListener;
+        this.mCardListener = cardListener;
     }
 
     /** Replaces the data set and refreshes the list. Call after a Firestore fetch completes. */
@@ -138,6 +150,10 @@ public class EventBigAdapter extends RecyclerView.Adapter<EventBigAdapter.ViewHo
                 mListener.onRsvpClick(event, adapterPosition);
             }
         });
+
+        if (mCardListener != null) {
+            holder.itemView.setOnClickListener(v -> mCardListener.onEventClick(event));
+        }
     }
 
     @Override

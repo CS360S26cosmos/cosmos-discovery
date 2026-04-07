@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.adapter.FriendAdapter;
 import com.example.cosmos_discovery.adapter.FriendEventAdapter;
+import com.example.cosmos_discovery.ui.organizer.EventDetailsActivity;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.database.FriendService;
 import com.example.cosmos_discovery.model.Event;
@@ -94,7 +95,7 @@ public class FriendsFragment extends Fragment
 
         // Friend events list (vertical)
         mFriendEventAdapter = new FriendEventAdapter(
-                requireContext(), new ArrayList<>(), new HashMap<>(), this);
+                requireContext(), new ArrayList<>(), new HashMap<>(), this, this::onEventClick);
         mRvFriendEvents.setLayoutManager(new LinearLayoutManager(requireContext()));
         mRvFriendEvents.setAdapter(mFriendEventAdapter);
     }
@@ -178,6 +179,13 @@ public class FriendsFragment extends Fragment
     private void updateEventEmptyState(boolean empty) {
         mRvFriendEvents.setVisibility(empty ? View.GONE : View.VISIBLE);
         mTvNoFriendEvents.setVisibility(empty ? View.VISIBLE : View.GONE);
+    }
+
+    private void onEventClick(Event event) {
+        if (event.getId() == null) return;
+        Intent intent = new Intent(requireActivity(), EventDetailsActivity.class);
+        intent.putExtra(EventDetailsActivity.EXTRA_EVENT_ID, event.getId());
+        startActivity(intent);
     }
 
     // ── FriendEventAdapter.OnRsvpClickListener ───────────────────────────
