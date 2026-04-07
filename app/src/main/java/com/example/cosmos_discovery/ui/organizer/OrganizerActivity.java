@@ -159,6 +159,11 @@ public class OrganizerActivity extends AppCompatActivity {
             hideSidebar();
             startActivity(new Intent(this, ViewProfile.class));
         });
+
+        mSidebarView.findViewById(R.id.settingsRow).setOnClickListener(v -> {
+            hideSidebar();
+            startActivity(new Intent(this, com.example.cosmos_discovery.ui.shared.SettingsActivity.class));
+        });
     }
 
     private void wireBottomNav() {

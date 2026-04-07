@@ -69,6 +69,9 @@
         <activity
             android:name=".ui.student.StudentActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.shared.SettingsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
