@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.database.FriendService;
+import com.example.cosmos_discovery.ui.student.FriendsListActivity;
 import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.util.EventSorter;
@@ -88,6 +89,13 @@ public class ViewProfile extends AppCompatActivity {
                         Toast.makeText(ViewProfile.this, err, Toast.LENGTH_SHORT).show();
                     }
             );
+
+            findViewById(R.id.cardFriends).setOnClickListener(v -> {
+                Intent intent = new Intent(ViewProfile.this, FriendsListActivity.class);
+                intent.putExtra(FriendsListActivity.EXTRA_USER_ID, uid);
+                intent.putExtra(FriendsListActivity.EXTRA_TITLE, "My Friends");
+                startActivity(intent);
+            });
 
             eventListener = eventService.listenMyRsvpedEvents(uid,
                     events -> {

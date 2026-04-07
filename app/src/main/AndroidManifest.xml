@@ -69,6 +69,10 @@
         <activity
             android:name=".ui.student.StudentActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.student.FriendsListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cosmosdiscovery" />
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.example.cosmos_discovery.ui.student;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -98,6 +99,15 @@ public class UserProfileActivity extends AppCompatActivity {
         ivMutual3           = findViewById(R.id.ivMutual3);
         ivProfileImage      = findViewById(R.id.ivProfileImage);
         btnAction           = findViewById(R.id.btnAction);
+
+        findViewById(R.id.cardFriends).setOnClickListener(v -> {
+            Intent intent = new Intent(UserProfileActivity.this, FriendsListActivity.class);
+            intent.putExtra(FriendsListActivity.EXTRA_USER_ID, targetUid);
+            String name = tvName.getText().toString();
+            String title = name.isEmpty() ? "Friends" : name.split(" ")[0] + "'s Friends";
+            intent.putExtra(FriendsListActivity.EXTRA_TITLE, title);
+            startActivity(intent);
+        });
     }
 
     private void loadData() {
