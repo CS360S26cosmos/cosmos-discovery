@@ -32,9 +32,9 @@
     <!-- Status -->
     <color name="color_arrived">#2E7D32</color>         <!-- green -->
     <color name="color_not_arrived">#9E9E9E</color>     <!-- grey -->
-    <color name="color_pending">#F57F17</color>         <!-- amber -->
-    <color name="color_rejected">#B71C1C</color>        <!-- red -->
-    <color name="color_approved">#1565C0</color>        <!-- blue -->
+    <color name="color_pending">#1565C0</color>         <!-- blue -->
+    <color name="color_rejected">#BF360C</color>        <!-- dark orange-red -->
+    <color name="color_approved">#2E7D32</color>        <!-- green -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 </resources>
