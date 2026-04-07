@@ -17,6 +17,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.database.EventService;
@@ -205,6 +206,7 @@ public class StudentActivity extends AppCompatActivity {
             TextView email = mSidebarView.findViewById(R.id.sidebarUserEmail);
             name.setText(user.getName());
             email.setText(user.getEmail());
+            loadSidebarPhoto(user);
         }
 
         // Organizer-only section
@@ -255,6 +257,28 @@ public class StudentActivity extends AppCompatActivity {
                     hideSidebar();
                     startActivity(new Intent(this, com.example.cosmos_discovery.ui.shared.SettingsActivity.class));
                 });
+    }
+
+    private void loadSidebarPhoto(User user) {
+        if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
+            ImageView icon = mSidebarView.findViewById(R.id.sidebarProfileIcon);
+            Glide.with(this)
+                    .load(user.getPhotoUrl())
+                    .placeholder(R.drawable.ic_sidebar_main_profileimage)
+                    .centerCrop()
+                    .into(icon);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        User user = RoleUtil.getCurrentUser();
+        if (user != null && mSidebarView != null) {
+            TextView name = mSidebarView.findViewById(R.id.sidebarUserName);
+            name.setText(user.getName());
+            loadSidebarPhoto(user);
+        }
     }
 
     // ── Navigation ───────────────────────────────────────────────────────

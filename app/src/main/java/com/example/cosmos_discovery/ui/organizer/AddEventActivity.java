@@ -26,6 +26,8 @@ import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
@@ -153,8 +155,12 @@ public class AddEventActivity extends AppCompatActivity {
     }
 
     private void showDatePicker(EditText target) {
+        CalendarConstraints constraints = new CalendarConstraints.Builder()
+                .setValidator(DateValidatorPointForward.now())
+                .build();
         MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select date")
+                .setCalendarConstraints(constraints)
                 .build();
         picker.addOnPositiveButtonClickListener(selection -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -267,24 +273,62 @@ public class AddEventActivity extends AppCompatActivity {
 
         String title = mEtName.getText().toString().trim();
         String venue = mEtVenue.getText().toString().trim();
+        String dateText  = mEtDate.getText().toString().trim();
+        String startText = mEtStartTime.getText().toString().trim();
+
+        boolean hasError = false;
 
         if (title.isEmpty()) {
-            mEtName.setError("Name is required.");
-            return;
+            mEtName.setError("Event name is required.");
+            hasError = true;
         }
         if (venue.isEmpty()) {
             mEtVenue.setError("Venue is required.");
-            return;
+            hasError = true;
+        }
+        if (dateText.isEmpty()) {
+            mEtDate.setError("Date is required.");
+            hasError = true;
+        }
+        if (startText.isEmpty()) {
+            mEtStartTime.setError("Start time is required.");
+            hasError = true;
         }
 
-        String dateText  = mEtDate.getText().toString().trim();
-        String startText = mEtStartTime.getText().toString().trim();
-        long dateTimeMs  = EventFormUtil.parseDateTimeMs(dateText, startText);
+        if (hasError) return;
+
+        long dateTimeMs = EventFormUtil.parseDateTimeMs(dateText, startText);
         if (dateTimeMs <= 0) {
             mEtDate.setError("Enter a valid date.");
             mEtStartTime.setError("Enter a valid start time.");
             Toast.makeText(this, "Could not parse date/time. Try formats like 2026-04-06 and 5:00pm.", Toast.LENGTH_LONG).show();
             return;
+        }
+        if (dateTimeMs < System.currentTimeMillis()) {
+            mEtDate.setError("Event date cannot be in the past.");
+            return;
+        }
+
+        String endText = mEtEndTime.getText().toString().trim();
+        if (!endText.isEmpty()) {
+            long endTimeMs = EventFormUtil.parseDateTimeMs(dateText, endText);
+            if (endTimeMs > 0 && endTimeMs <= dateTimeMs) {
+                mEtEndTime.setError("End time must be after start time.");
+                return;
+            }
+        }
+
+        String regByText = mEtRegisterBy.getText().toString().trim();
+        if (!regByText.isEmpty()) {
+            long regByMs = EventFormUtil.parseDateTimeMs(regByText, "11:59pm");
+            if (regByMs > 0 && regByMs < System.currentTimeMillis()) {
+                mEtRegisterBy.setError("Registration deadline cannot be in the past.");
+                return;
+            }
+            if (regByMs > 0 && regByMs > dateTimeMs) {
+                mEtRegisterBy.setError("Registration deadline must be before the event date.");
+                return;
+            }
         }
 
         String category = mEtCategory.getText().toString().trim();
@@ -300,6 +344,7 @@ public class AddEventActivity extends AppCompatActivity {
                 RoleUtil.getCurrentUser().getUid()
         );
 
+        event.setOrganizerName(RoleUtil.getCurrentUser().getName());
         event.setDescription(mEtDescription.getText().toString().trim());
         event.setCategory(category);
         event.setDateOfEvent(dateText);

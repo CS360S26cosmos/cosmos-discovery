@@ -26,44 +26,80 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
 
-            <!-- PROFILE IMAGE -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardProfileImage"
+            <!-- PROFILE IMAGE WITH CAMERA OVERLAY -->
+            <FrameLayout
+                android:id="@+id/profileImageContainer"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                app:cardCornerRadius="60dp"
-                app:cardElevation="6dp"
+                android:elevation="10dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/card"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="80dp">
 
-                <ImageView
-                    android:id="@+id/ivProfileImage"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardProfileImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_sidebar_main_profileimage"/>
-            </com.google.android.material.card.MaterialCardView>
+                    app:cardCornerRadius="60dp"
+                    app:cardElevation="6dp">
+
+                    <ImageView
+                        android:id="@+id/ivProfileImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_sidebar_main_profileimage"/>
+                </com.google.android.material.card.MaterialCardView>
+
+                <ImageView
+                    android:id="@+id/ivCameraOverlay"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="bottom|end"
+                    android:padding="6dp"
+                    android:background="@drawable/bg_circle_primary"
+                    android:src="@drawable/ic_camera"
+                    android:elevation="8dp"/>
+            </FrameLayout>
 
             <!-- MAIN CARD -->
             <LinearLayout
                 android:id="@+id/card"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
+                android:minHeight="500dp"
                 android:orientation="vertical"
                 android:background="@drawable/bg_bottom_card"
                 android:paddingStart="32dp"
                 android:paddingEnd="32dp"
-                android:paddingTop="48dp"
+                android:paddingTop="72dp"
                 android:paddingBottom="48dp"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintVertical_bias="1.0"
-                android:layout_marginTop="100dp">
+                android:layout_marginTop="160dp">
+
+                <!-- UPLOAD PROGRESS -->
+                <ProgressBar
+                    android:id="@+id/progressUpload"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:max="100"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/tvUploadStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/color_primary"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone"/>
 
                 <!-- TITLE -->
                 <TextView
@@ -114,7 +150,8 @@
                             android:background="@null"
                             android:textColor="@color/color_text_secondary"
                             android:gravity="center_vertical"
-                            />
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
                 </com.google.android.material.card.MaterialCardView>

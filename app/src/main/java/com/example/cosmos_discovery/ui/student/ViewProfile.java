@@ -6,11 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
 
+import com.bumptech.glide.Glide;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.ui.organizer.EventDetailsActivity;
@@ -65,6 +67,15 @@ public class ViewProfile extends AppCompatActivity {
         if (user != null) {
             tvName.setText(user.getName() != null ? user.getName() : "");
             tvMajor.setText(user.getMajor() != null ? user.getMajor() : "");
+
+            if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
+                ImageView ivProfile = findViewById(R.id.ivProfileImage);
+                Glide.with(this)
+                        .load(user.getPhotoUrl())
+                        .placeholder(R.drawable.ic_sidebar_main_profileimage)
+                        .centerCrop()
+                        .into(ivProfile);
+            }
             String bio = user.getBio();
             if (bio != null && !bio.trim().isEmpty()) {
                 tvBio.setText(bio);
@@ -134,6 +145,31 @@ eventListener = eventService.listenMyRsvpedEvents(uid,
                 startActivity(intent);
             });
             llUpcomingEvents.addView(row);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        User user = RoleUtil.getCurrentUser();
+        if (user != null) {
+            tvName.setText(user.getName() != null ? user.getName() : "");
+            tvMajor.setText(user.getMajor() != null ? user.getMajor() : "");
+            String bio = user.getBio();
+            if (bio != null && !bio.trim().isEmpty()) {
+                tvBio.setText(bio);
+                bioContainer.setVisibility(View.VISIBLE);
+            } else {
+                bioContainer.setVisibility(View.GONE);
+            }
+            ImageView ivProfile = findViewById(R.id.ivProfileImage);
+            if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
+                Glide.with(this)
+                        .load(user.getPhotoUrl())
+                        .placeholder(R.drawable.ic_sidebar_main_profileimage)
+                        .centerCrop()
+                        .into(ivProfile);
+            }
         }
     }
 

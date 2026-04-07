@@ -27,6 +27,7 @@ public class Event {
     private int          capacity;    // 0 = unlimited
     private String       imageUrl;
     private String       organizerId;
+    private String       organizerName;
     private String       status;
     private List<String> attendeeIds;
     private List<String> checkedInIds;
@@ -109,6 +110,9 @@ public class Event {
 
     public String getOrganizerId()           { return organizerId; }
     public void   setOrganizerId(String id)  { this.organizerId = id; }
+
+    public String getOrganizerName()                   { return organizerName; }
+    public void   setOrganizerName(String organizerName) { this.organizerName = organizerName; }
 
     public String getStatus()                { return status; }
     public void   setStatus(String status)   { this.status = status; }
