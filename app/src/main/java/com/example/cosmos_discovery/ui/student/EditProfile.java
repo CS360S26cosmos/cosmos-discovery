@@ -68,6 +68,7 @@ public class EditProfile extends AppCompatActivity {
             return;
         }
 
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) { finish(); return; }
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         FirebaseFirestore.getInstance()
