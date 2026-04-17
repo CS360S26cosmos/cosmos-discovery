@@ -9,6 +9,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cosmosdiscovery">
         <activity
+            android:name=".ui.organizer.PastEventDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.student.ViewProfile"
             android:exported="false"
             android:label="@string/title_activity_view_profile"
@@ -82,7 +85,6 @@
         <activity
             android:name=".ui.shared.ResetPasswordActivity"
             android:exported="false" />
-
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
