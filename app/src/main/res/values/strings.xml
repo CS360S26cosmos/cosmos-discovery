@@ -31,4 +31,8 @@
         <item>Psychology</item>
     </string-array>
     <string name="title_activity_view_profile">ViewProfile</string>
+    <string name="menu_edit_event">Edit Event</string>
+    <string name="menu_view_statistics">View Statistics</string>
+    <string name="menu_delete_event">Delete Event</string>
+    <string name="menu_attendee_list">Attendee List</string>
 </resources>

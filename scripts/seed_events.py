@@ -14,6 +14,7 @@ The serviceAccountKey.json file is in .gitignore — never commit it.
 """
 
 import os
+import random
 import sys
 import time
 from datetime import datetime, timedelta
@@ -71,6 +72,11 @@ def weekday_target(weekday, hour, minute=0):
     target = today + timedelta(days=days_ahead, hours=hour, minutes=minute)
     return int(target.timestamp() * 1000)
 
+def register_by(epoch_ms, days_before=1):
+    """Returns a 'yyyy-MM-dd' date string `days_before` days before the given epoch ms."""
+    dt = datetime.fromtimestamp(epoch_ms / 1000) - timedelta(days=days_before)
+    return dt.strftime("%Y-%m-%d")
+
 def delete_collection(name):
     """Batch-deletes all documents in a collection (Firestore max 500 per batch)."""
     col_ref = db.collection(name)
@@ -106,14 +112,26 @@ CATEGORIES = [
 
 NOW = now_ms()
 
+# Maps seed organizer IDs to display names for the organizerName field.
+ORGANIZER_NAMES = {
+    "seed_organizer_001": "Dr. Ahmed Raza",
+    "seed_organizer_002": "Sara Malik",
+    "seed_organizer_003": "Hassan Ali",
+    "seed_organizer_004": "Fatima Sheikh",
+    "seed_organizer_005": "Bilal Qureshi",
+    "seed_organizer_006": "Zara Iqbal",
+}
+
 EVENTS = [
     # ── Upcoming, approved, lums_only ────────────────────────────────────────
     {
         "title":       "AI & Machine Learning Symposium",
+        "description": "Explore cutting-edge AI research with talks from faculty and industry leaders. Covers deep learning, NLP, and computer vision.",
         "dateTime":    at(2, 10),        # 10:00am
         "location":    "SBASSE Auditorium",
         "tags":        ["Technology", "Academic"],
         "rsvpCount":   142,
+        "capacity":    200,
         "imageUrl":    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
         "organizerId": "seed_organizer_001",
         "status":      "approved",
@@ -122,10 +140,12 @@ EVENTS = [
     },
     {
         "title":       "LUMS Music Fest — Spring Edition",
+        "description": "Live performances from student bands and guest artists. Food stalls, merch, and a headliner surprise act at 10pm.",
         "dateTime":    at(4, 19),        # 7:00pm
         "location":    "PDC Auditorium",
         "tags":        ["Music", "Cultural"],
         "rsvpCount":   230,
+        "capacity":    300,
         "imageUrl":    "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800",
         "organizerId": "seed_organizer_002",
         "status":      "approved",
@@ -134,6 +154,7 @@ EVENTS = [
     },
     {
         "title":       "Inter-University Cricket Tournament",
+        "description": "Six universities compete in a T20 format over two days. Come cheer for the LUMS squad!",
         "dateTime":    at(5, 9),         # 9:00am
         "location":    "LUMS Sports Complex",
         "tags":        ["Sports"],
@@ -146,10 +167,12 @@ EVENTS = [
     },
     {
         "title":       "Startup Pitch Night",
+        "description": "Student founders pitch to a panel of VCs and alumni investors. Top three teams win seed funding and mentorship.",
         "dateTime":    at(6, 18, 30),    # 6:30pm
         "location":    "SDSB Atrium",
         "tags":        ["Technology", "Workshop"],
         "rsvpCount":   65,
+        "capacity":    80,
         "imageUrl":    "https://images.unsplash.com/photo-1551818255-e6e10975bc17?w=800",
         "organizerId": "seed_organizer_001",
         "status":      "approved",
@@ -158,10 +181,12 @@ EVENTS = [
     },
     {
         "title":       "Iqbal Day Poetry Recitation",
+        "description": "An afternoon of Urdu and Persian poetry celebrating Allama Iqbal's legacy. Open mic session follows the featured readings.",
         "dateTime":    at(7, 16),        # 4:00pm
         "location":    "Social Sciences Block",
         "tags":        ["Cultural", "Academic"],
         "rsvpCount":   54,
+        "capacity":    60,
         "imageUrl":    "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=800",
         "organizerId": "seed_organizer_004",
         "status":      "approved",
@@ -172,6 +197,7 @@ EVENTS = [
     # ── Upcoming, approved, open ──────────────────────────────────────────────
     {
         "title":       "Spring Food Festival",
+        "description": "Lahore's best food trucks and campus societies serve up desi and fusion bites. Bring your appetite and your friends.",
         "dateTime":    at(3, 12),        # 12:00pm
         "location":    "LUMS Main Lawn",
         "tags":        ["Food", "Cultural"],
@@ -184,10 +210,12 @@ EVENTS = [
     },
     {
         "title":       "Photography Workshop",
+        "description": "Hands-on session covering composition, lighting, and editing. Bring your own camera or phone. Beginner-friendly!",
         "dateTime":    at(8, 14),        # 2:00pm
         "location":    "Arts & Design Studio, AC-1",
         "tags":        ["Arts", "Workshop"],
         "rsvpCount":   38,
+        "capacity":    40,
         "imageUrl":    "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800",
         "organizerId": "seed_organizer_005",
         "status":      "approved",
@@ -196,10 +224,12 @@ EVENTS = [
     },
     {
         "title":       "Hackathon 2026 — 24 Hours",
+        "description": "Build something amazing in 24 hours. Teams of up to 4. Prizes include internships, cash, and gadgets.",
         "dateTime":    at(10, 20),       # 8:00pm
         "location":    "SBASSE Labs",
         "tags":        ["Technology", "Workshop"],
         "rsvpCount":   121,
+        "capacity":    150,
         "imageUrl":    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800",
         "organizerId": "seed_organizer_001",
         "status":      "approved",
@@ -208,6 +238,7 @@ EVENTS = [
     },
     {
         "title":       "Mental Health Awareness Walk",
+        "description": "A peaceful morning walk around campus to raise awareness for student mental health. Free breakfast provided afterwards.",
         "dateTime":    at(12, 8),        # 8:00am
         "location":    "LUMS Main Lawn",
         "tags":        ["Academic", "Cultural"],
@@ -220,10 +251,12 @@ EVENTS = [
     },
     {
         "title":       "Guest Lecture: Quantum Computing",
+        "description": "Dr. Ayesha Khan from MIT discusses the state of quantum hardware and its implications for cryptography.",
         "dateTime":    at(14, 11),       # 11:00am
         "location":    "SBASSE Lecture Hall 3",
         "tags":        ["Technology", "Academic"],
         "rsvpCount":   93,
+        "capacity":    120,
         "imageUrl":    "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800",
         "organizerId": "seed_organizer_003",
         "status":      "approved",
@@ -232,10 +265,12 @@ EVENTS = [
     },
     {
         "title":       "Campus Comedy Jam",
+        "description": "Stand-up night featuring five student comedians and a surprise guest. Expect roasts, hot takes, and zero chill.",
         "dateTime":    at(9, 20, 30),    # 8:30pm
         "location":    "PDC Auditorium",
         "tags":        ["Music", "Cultural"],
         "rsvpCount":   190,
+        "capacity":    200,
         "imageUrl":    "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800",
         "organizerId": "seed_organizer_002",
         "status":      "approved",
@@ -244,10 +279,12 @@ EVENTS = [
     },
     {
         "title":       "Badminton Singles Championship",
+        "description": "Open to all skill levels. Single-elimination bracket. Medals and certificates for top 3 finishers.",
         "dateTime":    at(11, 15),       # 3:00pm
         "location":    "Indoor Sports Hall",
         "tags":        ["Sports"],
         "rsvpCount":   44,
+        "capacity":    64,
         "imageUrl":    "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800",
         "organizerId": "seed_organizer_003",
         "status":      "approved",
@@ -256,6 +293,7 @@ EVENTS = [
     },
     {
         "title":       "Traditional Crafts Exhibition",
+        "description": "Showcasing handmade crafts from artisans across Pakistan. Live demos of block printing, truck art, and pottery.",
         "dateTime":    at(15, 13),       # 1:00pm
         "location":    "SDSB Atrium",
         "tags":        ["Arts", "Cultural"],
@@ -272,10 +310,12 @@ EVENTS = [
     # script on any day still produces events that hit these filter windows.
     {
         "title":       "Study Skills Masterclass",
+        "description": "Learn effective note-taking, time management, and exam strategies from top academic achievers.",
         "dateTime":    weekday_target((datetime.now().weekday() + 1) % 7, 15),  # tomorrow 3:00pm
         "location":    "SDSB Lecture Hall 1",
         "tags":        ["Academic", "Workshop"],
         "rsvpCount":   28,
+        "capacity":    50,
         "imageUrl":    "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800",
         "organizerId": "seed_organizer_005",
         "status":      "approved",
@@ -284,10 +324,12 @@ EVENTS = [
     },
     {
         "title":       "Saturday Astronomy Meetup",
+        "description": "Stargazing session with telescopes on the main lawn. Learn to identify constellations visible from Lahore.",
         "dateTime":    weekday_target(5, 20),   # this Saturday 8:00pm
         "location":    "LUMS Main Lawn",
         "tags":        ["Technology", "Academic"],
         "rsvpCount":   41,
+        "capacity":    75,
         "imageUrl":    "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800",
         "organizerId": "seed_organizer_001",
         "status":      "approved",
@@ -296,10 +338,12 @@ EVENTS = [
     },
     {
         "title":       "Sunday Morning Yoga & Wellness",
+        "description": "Guided yoga followed by a mindfulness session. Mats provided. All fitness levels welcome.",
         "dateTime":    weekday_target(6, 8),    # this Sunday 8:00am
         "location":    "LUMS Sports Complex",
         "tags":        ["Sports", "Cultural"],
         "rsvpCount":   35,
+        "capacity":    40,
         "imageUrl":    "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800",
         "organizerId": "seed_organizer_006",
         "status":      "approved",
@@ -310,10 +354,12 @@ EVENTS = [
     # ── Past, approved ────────────────────────────────────────────────────────
     {
         "title":       "Winter Gala Night",
+        "description": "A formal evening of music, dinner, and awards. Celebrating another great semester at LUMS.",
         "dateTime":    at(-10, 19),      # 7:00pm
         "location":    "PDC Auditorium",
         "tags":        ["Music", "Cultural"],
         "rsvpCount":   215,
+        "capacity":    250,
         "imageUrl":    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800",
         "organizerId": "seed_organizer_002",
         "status":      "approved",
@@ -322,10 +368,12 @@ EVENTS = [
     },
     {
         "title":       "Robotics Demo Day",
+        "description": "Student teams showcase their semester-long robotics projects. Judges award prizes for innovation and design.",
         "dateTime":    at(-5, 14, 30),   # 2:30pm
         "location":    "SBASSE Labs",
         "tags":        ["Technology", "Workshop"],
         "rsvpCount":   98,
+        "capacity":    100,
         "imageUrl":    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800",
         "organizerId": "seed_organizer_001",
         "status":      "approved",
@@ -334,10 +382,12 @@ EVENTS = [
     },
     {
         "title":       "Annual Sports Day",
+        "description": "Track and field events, tug of war, and relay races. Hostels compete for the overall championship trophy.",
         "dateTime":    at(-15, 9),       # 9:00am
         "location":    "LUMS Sports Complex",
         "tags":        ["Sports"],
         "rsvpCount":   247,
+        "capacity":    500,
         "imageUrl":    "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800",
         "organizerId": "seed_organizer_003",
         "status":      "approved",
@@ -346,10 +396,12 @@ EVENTS = [
     },
     {
         "title":       "Alumni Networking Dinner",
+        "description": "Connect with LUMS alumni working in tech, finance, and consulting. Formal attire required.",
         "dateTime":    at(-3, 18),       # 6:00pm
         "location":    "Faculty Club",
         "tags":        ["Academic"],
         "rsvpCount":   60,
+        "capacity":    80,
         "imageUrl":    "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800",
         "organizerId": "seed_organizer_006",
         "status":      "approved",
@@ -360,10 +412,12 @@ EVENTS = [
     # ── Upcoming, pending (not yet approved — won't show in Discover) ─────────
     {
         "title":       "Debating Society Open Mic",
+        "description": "Sharpen your rhetoric at this casual open-mic debate night. Topics announced on the spot.",
         "dateTime":    at(20, 17),       # 5:00pm
         "location":    "Social Sciences Block",
         "tags":        ["Academic", "Cultural"],
         "rsvpCount":   0,
+        "capacity":    100,
         "imageUrl":    "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800",
         "organizerId": "seed_organizer_005",
         "status":      "pending",
@@ -372,10 +426,12 @@ EVENTS = [
     },
     {
         "title":       "Pottery & Ceramics Workshop",
+        "description": "Get your hands dirty! Learn wheel-throwing and hand-building techniques. All materials provided.",
         "dateTime":    at(18, 11),       # 11:00am
         "location":    "Arts & Design Studio, AC-1",
         "tags":        ["Arts", "Workshop"],
         "rsvpCount":   0,
+        "capacity":    25,
         "imageUrl":    "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800",
         "organizerId": "seed_organizer_004",
         "status":      "pending",
@@ -386,6 +442,7 @@ EVENTS = [
     # ── Past, rejected (won't appear anywhere in the app) ────────────────────
     {
         "title":       "Off-Campus Concert Trip",
+        "description": "Group trip to a live concert downtown. Transport arranged by the music society.",
         "dateTime":    at(-20, 21),      # 9:00pm
         "location":    "Liberty Roundabout, Lahore",
         "tags":        ["Music"],
@@ -417,11 +474,17 @@ def main():
         col.add({"name": name})
     print(f"✅ Seeded {len(CATEGORIES)} categories")
 
-    # Seed events — set createdAt to now at run time
+    # Seed events — auto-fill createdAt, registerBy, and dateOfEvent
     col = db.collection("events")
     for event in EVENTS:
         doc = dict(event)
         doc["createdAt"] = now
+        doc["organizerName"] = ORGANIZER_NAMES.get(doc.get("organizerId", ""), "Unknown Organizer")
+        dt = datetime.fromtimestamp(doc["dateTime"] / 1000)
+        if "registerBy" not in doc:
+            doc["registerBy"] = (dt - timedelta(days=1)).strftime("%Y-%m-%d")
+        if "dateOfEvent" not in doc:
+            doc["dateOfEvent"] = dt.strftime("%Y-%m-%d")
         col.add(doc)
     print(f"✅ Seeded {len(EVENTS)} events")
 

@@ -17,6 +17,8 @@ import com.example.cosmos_discovery.database.AuthService;
  */
 public class ForgotPasswordActivity extends AppCompatActivity {
 
+    public static final String EXTRA_EMAIL = "extra_email";
+
     private EditText mEmailField;
     private Button mSendButton;
     private TextView mBackToSignIn;
@@ -31,6 +33,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         mEmailField = findViewById(R.id.editTextEmail);
         mSendButton = findViewById(R.id.buttonSend);
         mBackToSignIn = findViewById(R.id.textViewBackToSignIn);
+
+        String prefill = getIntent().getStringExtra(EXTRA_EMAIL);
+        if (prefill != null && !prefill.isEmpty()) {
+            mEmailField.setText(prefill);
+        }
 
         mSendButton.setOnClickListener(v -> {
             String email = mEmailField.getText().toString().trim();

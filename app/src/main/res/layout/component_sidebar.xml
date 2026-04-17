@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -48,11 +49,13 @@
                 android:layout_marginBottom="20dp"
                 android:gravity="center_vertical">
 
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/sidebarProfileIcon"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:src="@drawable/ic_sidebar_main_profileimage"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/CircleImage"
                     android:contentDescription="Profile" />
 
                 <LinearLayout
@@ -98,6 +101,7 @@
 
         <!-- settings -->
         <LinearLayout
+            android:id="@+id/settingsRow"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:orientation="horizontal"
@@ -107,7 +111,7 @@
 
             <ImageView
                 android:layout_width="16dp"
-                android:layout_height="20dp"
+                android:layout_height="16dp"
                 android:src="@drawable/ic_sidebar_settings_icon"
                 android:contentDescription="Settings" />
 
@@ -150,7 +154,7 @@
 
             <ImageView
                 android:layout_width="16dp"
-                android:layout_height="20dp"
+                android:layout_height="16dp"
                 android:src="@drawable/ic_sidebar_profile_icon"
                 android:contentDescription="View profile" />
 
@@ -169,6 +173,112 @@
                 android:layout_height="16dp"
                 android:src="@drawable/ic_sidebar_arrow_icon"
                 android:contentDescription="Go to profile" />
+        </LinearLayout>
+
+        <!-- organizer-only section (hidden by default) -->
+        <LinearLayout
+            android:id="@+id/organizerSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="#DDD6DD" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="6dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:fontFamily="@font/inter_variable"
+                android:text="ORGANIZER"
+                android:textColor="@color/color_primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/organizerPostedEventsRow"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_bookmark_outline"
+                    android:contentDescription="My Posted Events" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="My Posted Events"
+                    android:textSize="17sp"
+                    android:textColor="@color/color_text_secondary"
+                    android:fontFamily="@font/inter_variable" />
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_sidebar_arrow_icon"
+                    android:contentDescription="Go to posted events" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="#DDD6DD" />
+
+            <LinearLayout
+                android:id="@+id/organizerCreateEventRow"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_addevent_upload"
+                    android:contentDescription="Create Event" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="Create Event"
+                    android:textSize="17sp"
+                    android:textColor="@color/color_text_secondary"
+                    android:fontFamily="@font/inter_variable" />
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_sidebar_arrow_icon"
+                    android:contentDescription="Go to create event" />
+            </LinearLayout>
         </LinearLayout>
 
         <Space
@@ -200,7 +310,7 @@
 
             <ImageView
                 android:layout_width="16dp"
-                android:layout_height="20dp"
+                android:layout_height="16dp"
                 android:src="@drawable/ic_sidebar_logout"
                 android:contentDescription="Log out" />
 

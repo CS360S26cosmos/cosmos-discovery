@@ -105,7 +105,8 @@ EXISTING_USER_EMAILS = [
     "27100337@lums.edu.pk",   # sameen abid
     "27100026@lums.edu.pk",   # Hamania Asim
     "27100088@lums.edu.pk",   # Ammara Haroon
-    "27100052@lums.edu.pk"    # Elizeh Faisal
+    "27100052@lums.edu.pk",    # Elizeh Faisal
+    "27100237@lums.edu.pk"    # Hafsah Nasir
 ]
 
 # 12 new seed students — sex determines which local image pool to pick from

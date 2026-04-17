@@ -2,6 +2,7 @@ package com.example.cosmos_discovery.database;
 
 import com.example.cosmos_discovery.model.FriendEntry;
 import com.example.cosmos_discovery.model.User;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -107,6 +108,42 @@ public class FriendService {
     }
 
     /**
+     * One-shot fetch of a single user document by UID.
+     */
+    public void fetchUserById(String uid,
+                              Consumer<User> onSuccess,
+                              Consumer<String> onFailure) {
+        mDb.collection(USERS_COLLECTION)
+                .document(uid)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    User u = doc.toObject(User.class);
+                    if (u != null) {
+                        u.setUid(doc.getId());
+                        onSuccess.accept(u);
+                    } else {
+                        onFailure.accept("User not found.");
+                    }
+                })
+                .addOnFailureListener(e -> onFailure.accept("Could not load user."));
+    }
+
+    /**
+     * Atomically removes a mutual friendship by deleting both subcollection entries.
+     */
+    public void removeFriend(String currentUid, String targetUid,
+                             Runnable onSuccess, Consumer<String> onFailure) {
+        WriteBatch batch = mDb.batch();
+        batch.delete(mDb.collection(USERS_COLLECTION).document(currentUid)
+                .collection(FRIENDS_SUB).document(targetUid));
+        batch.delete(mDb.collection(USERS_COLLECTION).document(targetUid)
+                .collection(FRIENDS_SUB).document(currentUid));
+        batch.commit()
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(e -> onFailure.accept("Could not remove friend."));
+    }
+
+    /**
      * One-shot fetch of all user documents (for the user search feature).
      * The caller is responsible for excluding the current user client-side.
      */
@@ -122,5 +159,48 @@ public class FriendService {
                     onSuccess.accept(users);
                 })
                 .addOnFailureListener(e -> onFailure.accept("Could not load users."));
+    }
+
+    /**
+     * Fetches multiple users by uid.
+     *
+     * Firestore's {@code whereIn} supports up to 10 values, so this method batches when needed.
+     */
+    public void fetchUsersByIds(List<String> userIds,
+                                Consumer<List<User>> onSuccess,
+                                Consumer<String> onFailure) {
+        if (userIds == null || userIds.isEmpty()) {
+            onSuccess.accept(new ArrayList<>());
+            return;
+        }
+
+        List<List<String>> chunks = new ArrayList<>();
+        for (int i = 0; i < userIds.size(); i += 10) {
+            int end = Math.min(i + 10, userIds.size());
+            chunks.add(userIds.subList(i, end));
+        }
+
+        List<User> results = new ArrayList<>();
+        final int[] pending = new int[]{chunks.size()};
+        final boolean[] failed = new boolean[]{false};
+
+        for (List<String> chunk : chunks) {
+            mDb.collection(USERS_COLLECTION)
+                    .whereIn(FieldPath.documentId(), chunk)
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                            User user = doc.toObject(User.class);
+                            if (user != null) results.add(user);
+                        }
+                        pending[0]--;
+                        if (pending[0] == 0 && !failed[0]) onSuccess.accept(results);
+                    })
+                    .addOnFailureListener(e -> {
+                        if (failed[0]) return;
+                        failed[0] = true;
+                        onFailure.accept("Could not load attendees.");
+                    });
+        }
     }
 }

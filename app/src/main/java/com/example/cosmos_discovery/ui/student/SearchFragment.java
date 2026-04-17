@@ -1,5 +1,6 @@
 package com.example.cosmos_discovery.ui.student;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.adapter.EventSmallAdapter;
+import com.example.cosmos_discovery.ui.organizer.EventDetailsActivity;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.model.FilterState;
@@ -62,10 +64,11 @@ public class SearchFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.recyclerViewSearch);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        mAdapter = new EventSmallAdapter(requireContext(), new ArrayList<>(), (event, pos) ->
-                mRsvpHandler.toggle(event,
+        mAdapter = new EventSmallAdapter(requireContext(), new ArrayList<>(),
+                (event, pos) -> mRsvpHandler.toggle(event,
                         () -> mAdapter.notifyItemChanged(pos),
-                        err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()));
+                        err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()),
+                this::onEventClick);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -87,6 +90,13 @@ public class SearchFragment extends Fragment {
             mEventsListener.remove();
             mEventsListener = null;
         }
+    }
+
+    private void onEventClick(Event event) {
+        if (event.getId() == null) return;
+        Intent intent = new Intent(requireActivity(), EventDetailsActivity.class);
+        intent.putExtra(EventDetailsActivity.EXTRA_EVENT_ID, event.getId());
+        startActivity(intent);
     }
 
     // ── Public API (called by StudentActivity) ────────────────────────────

@@ -21,10 +21,16 @@ import java.util.List;
  */
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder> {
 
-    private List<FriendEntry> mFriends;
+    public interface OnFriendClickListener {
+        void onFriendClick(FriendEntry entry);
+    }
 
-    public FriendAdapter(List<FriendEntry> friends) {
-        this.mFriends = friends;
+    private List<FriendEntry> mFriends;
+    private final OnFriendClickListener mListener;
+
+    public FriendAdapter(List<FriendEntry> friends, OnFriendClickListener listener) {
+        this.mFriends  = friends;
+        this.mListener = listener;
     }
 
     public void updateData(List<FriendEntry> friends) {
@@ -55,6 +61,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
         } else {
             holder.ivFriendProfile.setImageResource(R.drawable.ic_topbar_person_icon);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (mListener != null) mListener.onFriendClick(entry);
+        });
     }
 
     @Override

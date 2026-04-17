@@ -22,6 +22,7 @@ A centralized campus event platform that allows students to discover, browse, an
 
 - [Team Information](#team-information)
 - [Meeting Minutes](#meeting-minutes)
+- [UML Diagram](#uml-diagram)
 - [CRC Diagrams](#crc-diagrams)
 - [Product Backlog](#product-backlog)
 - [Wireframes](#wireframes)
@@ -157,7 +158,11 @@ Sprint 3 Planning
 - Assigned the US-08 and US-09, creating new events and editing event details
 - Designing tests for the User stories in review
 - Assigned US-011 for View and check-in attendee list
-    
+
+## UML Diagram
+<img width="3381" height="929" alt="nLTjRzis4FwkNq5q7-OiJjSXQ50OGL37LX1XJXp8TejX60f6kiXSPT8bAMTU4M0_OhzmlsH7lTYKpDXE1yo64Ikyvrvul7kEUgyqbJgRfQGlPfHnCg1Ba9wdFZC-fvBEI9HIfRfQItQVQGWYmKViJo1lcf0hmNKk-UcqARe66eEyfD7dH8gCnpsH2ac-kphpBw_UDi6NGYAuXBnxStfwTcP1g9JYyJdX73tG1BPRK1ea2BsS" src="https://github.com/user-attachments/assets/72aed3ca-c89d-4096-8099-f7076712fc69" />
+
+
 ## CRC Diagrams
 
 <!--_Add CRC screenshots below._-->
@@ -174,6 +179,8 @@ View full backlog and Kanban board here:
 ### Kanban Board (Screenshot)
 <img width="2454" height="1792" alt="08 03 2026 at 02 54 53 PM" src="https://github.com/user-attachments/assets/40ad2948-6698-4ab0-aa5d-f8b5d3cb0467" />
 <img width="3024" height="1790" alt="08 03 2026 at 02 58 36 PM" src="https://github.com/user-attachments/assets/1d6791ae-cf2d-49aa-8407-6f5b93595556" />
+<img width="1920" height="1798" alt="07 04 2026 at 11 59 30 PM" src="https://github.com/user-attachments/assets/a6469db6-698b-4031-a027-acdc9263e442" />
+
 
 
 ---

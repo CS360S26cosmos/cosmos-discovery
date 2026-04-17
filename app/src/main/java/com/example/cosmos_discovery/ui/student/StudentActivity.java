@@ -17,12 +17,15 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.FilterState;
 import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.ui.auth.LoginActivity;
+import com.example.cosmos_discovery.ui.organizer.AddEventActivity;
+import com.example.cosmos_discovery.ui.organizer.OrganizerActivity;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -42,10 +45,11 @@ import java.util.Set;
  */
 public class StudentActivity extends AppCompatActivity {
 
-    private static final int TAB_DISCOVER   = 0;
-    private static final int TAB_MY_EVENTS  = 1;
-    private static final int TAB_FRIENDS    = 2;
+    public static final int TAB_DISCOVER   = 0;
+    public static final int TAB_MY_EVENTS  = 1;
+    public static final int TAB_FRIENDS    = 2;
     private static final String KEY_TAB     = "current_tab";
+    public static final String EXTRA_START_TAB = "extra_start_tab";
 
     private int mCurrentTab = -1; // -1 forces the first selectTab() call to load
 
@@ -119,9 +123,12 @@ public class StudentActivity extends AppCompatActivity {
         setupNavBar();
         setupSidebar();
 
-        int tab = savedInstanceState != null
-                ? savedInstanceState.getInt(KEY_TAB, TAB_DISCOVER)
-                : TAB_DISCOVER;
+        int tab;
+        if (savedInstanceState != null) {
+            tab = savedInstanceState.getInt(KEY_TAB, TAB_DISCOVER);
+        } else {
+            tab = getIntent().getIntExtra(EXTRA_START_TAB, TAB_DISCOVER);
+        }
         selectTab(tab);
     }
 
@@ -156,7 +163,10 @@ public class StudentActivity extends AppCompatActivity {
         // Menu icon (right) opens the sidebar
         ImageView iconMenu = findViewById(R.id.iconMenu);
         iconMenu.setOnClickListener(v -> showSidebar());
-        // Profile icon (left) — placeholder, no action yet
+
+        // Profile icon (left) opens the current user's profile
+        findViewById(R.id.iconProfile).setOnClickListener(v ->
+                startActivity(new Intent(this, ViewProfile.class)));
 
         // Search bar tap → enter event search or user search based on active tab
         mSearchBarInclude.findViewById(R.id.searchClickableArea)
@@ -196,6 +206,26 @@ public class StudentActivity extends AppCompatActivity {
             TextView email = mSidebarView.findViewById(R.id.sidebarUserEmail);
             name.setText(user.getName());
             email.setText(user.getEmail());
+            loadSidebarPhoto(user);
+        }
+
+        // Organizer-only section
+        View organizerSection = mSidebarView.findViewById(R.id.organizerSection);
+        if (organizerSection != null) {
+            organizerSection.setVisibility(RoleUtil.isOrganizer() ? View.VISIBLE : View.GONE);
+        }
+        if (RoleUtil.isOrganizer()) {
+            View posted = mSidebarView.findViewById(R.id.organizerPostedEventsRow);
+            View create = mSidebarView.findViewById(R.id.organizerCreateEventRow);
+
+            if (posted != null) posted.setOnClickListener(v -> {
+                hideSidebar();
+                startActivity(new Intent(this, OrganizerActivity.class));
+            });
+            if (create != null) create.setOnClickListener(v -> {
+                hideSidebar();
+                startActivity(new Intent(this, AddEventActivity.class));
+            });
         }
 
         // Dim overlay and X button both close the sidebar
@@ -221,6 +251,34 @@ public class StudentActivity extends AppCompatActivity {
                     Intent intent = new Intent(this, ViewProfile.class);
                     startActivity(intent);
                 });
+
+        mSidebarView.findViewById(R.id.settingsRow)
+                .setOnClickListener(v -> {
+                    hideSidebar();
+                    startActivity(new Intent(this, com.example.cosmos_discovery.ui.shared.SettingsActivity.class));
+                });
+    }
+
+    private void loadSidebarPhoto(User user) {
+        if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
+            ImageView icon = mSidebarView.findViewById(R.id.sidebarProfileIcon);
+            Glide.with(this)
+                    .load(user.getPhotoUrl())
+                    .placeholder(R.drawable.ic_sidebar_main_profileimage)
+                    .centerCrop()
+                    .into(icon);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        User user = RoleUtil.getCurrentUser();
+        if (user != null && mSidebarView != null) {
+            TextView name = mSidebarView.findViewById(R.id.sidebarUserName);
+            name.setText(user.getName());
+            loadSidebarPhoto(user);
+        }
     }
 
     // ── Navigation ───────────────────────────────────────────────────────

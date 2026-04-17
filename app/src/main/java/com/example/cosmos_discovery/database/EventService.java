@@ -1,15 +1,20 @@
 package com.example.cosmos_discovery.database;
 
+import android.util.Log;
+
 import com.example.cosmos_discovery.model.Event;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -133,6 +138,41 @@ public class EventService {
     }
 
     /**
+     * Attaches a real-time listener for all events created by the given organizer.
+     * No server-side ordering — callers sort client-side after splitting by status.
+     *
+     * @return a {@link ListenerRegistration} — call {@code .remove()} in {@code onStop()}.
+     */
+    public ListenerRegistration listenOrganizerEvents(String organizerId,
+                                                      Consumer<List<Event>> onUpdate,
+                                                      Consumer<String> onError) {
+        Log.d("EventService", "listenOrganizerEvents: organizerId=" + organizerId);
+        return mDb.collection(EVENTS_COLLECTION)
+                .whereEqualTo("organizerId", organizerId)
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null) {
+                        Log.e("EventService", "listenOrganizerEvents ERROR: " + error.getMessage(), error);
+                        onError.accept(error.getMessage() != null
+                                ? error.getMessage() : "Failed to load your events.");
+                        return;
+                    }
+                    Log.d("EventService", "listenOrganizerEvents: snapshot has "
+                            + (snapshot != null ? snapshot.size() : "null") + " docs");
+                    List<Event> events = new ArrayList<>();
+                    if (snapshot != null) {
+                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                            Event e = doc.toObject(Event.class);
+                            if (e != null) {
+                                e.setId(doc.getId());
+                                events.add(e);
+                            }
+                        }
+                    }
+                    onUpdate.accept(events);
+                });
+    }
+
+    /**
      * Fetches the {@code limit} most recently created approved events,
      * ordered by {@code createdAt} descending. Used for "Suggested" cards.
      */
@@ -202,6 +242,20 @@ public class EventService {
     }
 
     /**
+     * Updates arbitrary fields on an event document.
+     */
+    public void updateEvent(String eventId,
+                            Map<String, Object> fields,
+                            Runnable onSuccess,
+                            Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .update(fields)
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> onFailure.accept("Could not update event."));
+    }
+
+    /**
      * One-shot fetch of all approved upcoming events ordered chronologically.
      * Use this for polling — call on a fixed interval instead of keeping a listener open.
      */
@@ -229,6 +283,33 @@ public class EventService {
     }
 
     /**
+     * Attaches a real-time listener on a single event document.
+     * Fires immediately and on every subsequent change (RSVP, check-in, etc.).
+     *
+     * @return a {@link ListenerRegistration} — call {@code .remove()} in {@code onDestroy()}.
+     */
+    public ListenerRegistration listenEvent(String eventId,
+                                            Consumer<Event> onUpdate,
+                                            Consumer<String> onError) {
+        return mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null) {
+                        onError.accept(error.getMessage() != null
+                                ? error.getMessage() : "Failed to listen for event updates.");
+                        return;
+                    }
+                    if (snapshot != null && snapshot.exists()) {
+                        Event e = snapshot.toObject(Event.class);
+                        if (e != null) {
+                            e.setId(snapshot.getId());
+                            onUpdate.accept(e);
+                        }
+                    }
+                });
+    }
+
+    /**
      * Fetches a single event by its document ID. One-shot read.
      */
     public void fetchEventById(String eventId,
@@ -253,19 +334,42 @@ public class EventService {
 
     /**
      * Adds {@code userId} to the event's {@code attendeeIds} array and increments
-     * {@code rsvpCount} by 1. Both updates are applied atomically via a single
-     * Firestore document update.
+     * {@code rsvpCount} by 1, enforcing the event's capacity limit.
+     *
+     * Uses a Firestore transaction to atomically read-then-write, preventing
+     * overbooking when multiple users RSVP concurrently.
      */
     public void rsvpToEvent(String eventId, String userId,
                             Runnable onSuccess, Consumer<String> onFailure) {
-        mDb.collection(EVENTS_COLLECTION)
-                .document(eventId)
-                .update(
-                        "attendeeIds", FieldValue.arrayUnion(userId),
-                        "rsvpCount",   FieldValue.increment(1)
-                )
-                .addOnSuccessListener(unused -> onSuccess.run())
-                .addOnFailureListener(ex -> onFailure.accept("Could not RSVP. Try again."));
+        mDb.runTransaction(transaction -> {
+            DocumentSnapshot snapshot = transaction.get(
+                    mDb.collection(EVENTS_COLLECTION).document(eventId));
+
+            List<String> attendeeIds = (List<String>) snapshot.get("attendeeIds");
+            if (attendeeIds != null && attendeeIds.contains(userId)) {
+                return null; // already RSVPed — idempotent success
+            }
+
+            Long capLong  = snapshot.getLong("capacity");
+            Long countLong = snapshot.getLong("rsvpCount");
+            long capacity  = capLong  != null ? capLong  : 0;
+            long rsvpCount = countLong != null ? countLong : 0;
+
+            if (capacity > 0 && rsvpCount >= capacity) {
+                throw new FirebaseFirestoreException(
+                        "This event is full.",
+                        FirebaseFirestoreException.Code.ABORTED);
+            }
+
+            transaction.update(
+                    mDb.collection(EVENTS_COLLECTION).document(eventId),
+                    "attendeeIds", FieldValue.arrayUnion(userId),
+                    "rsvpCount",   FieldValue.increment(1));
+            return null;
+        })
+        .addOnSuccessListener(unused -> onSuccess.run())
+        .addOnFailureListener(ex -> onFailure.accept(
+                ex.getMessage() != null ? ex.getMessage() : "Could not RSVP. Try again."));
     }
 
     /**
@@ -282,6 +386,34 @@ public class EventService {
                 )
                 .addOnSuccessListener(unused -> onSuccess.run())
                 .addOnFailureListener(ex -> onFailure.accept("Could not cancel RSVP. Try again."));
+    }
+
+    // ── Check-in ──────────────────────────────────────────────────────────
+
+    /**
+     * Adds {@code userId} to the event's {@code checkedInIds} array.
+     * Uses {@code FieldValue.arrayUnion} for atomic, idempotent writes.
+     */
+    public void checkInAttendee(String eventId, String userId,
+                                Runnable onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .update("checkedInIds", FieldValue.arrayUnion(userId))
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> onFailure.accept("Could not check in attendee."));
+    }
+
+    /**
+     * Removes {@code userId} from the event's {@code checkedInIds} array.
+     * Uses {@code FieldValue.arrayRemove} for atomic writes.
+     */
+    public void removeCheckIn(String eventId, String userId,
+                              Runnable onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .update("checkedInIds", FieldValue.arrayRemove(userId))
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> onFailure.accept("Could not remove check-in."));
     }
 
     // ── Categories ────────────────────────────────────────────────────────

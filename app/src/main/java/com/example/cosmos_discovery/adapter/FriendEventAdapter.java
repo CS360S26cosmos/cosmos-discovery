@@ -38,18 +38,31 @@ public class FriendEventAdapter extends RecyclerView.Adapter<FriendEventAdapter.
         void onRsvpClick(Event event, int position);
     }
 
-    private List<Event>               mEvents;
-    private Map<String, String>       mFriendUidToName;
-    private final OnRsvpClickListener mListener;
-    private final Context             mContext;
+    public interface OnEventClickListener {
+        void onEventClick(Event event);
+    }
+
+    private List<Event>                mEvents;
+    private Map<String, String>        mFriendUidToName;
+    private final OnRsvpClickListener  mListener;
+    private final OnEventClickListener mCardListener;
+    private final Context              mContext;
 
     public FriendEventAdapter(Context context, List<Event> events,
                               Map<String, String> friendUidToName,
                               OnRsvpClickListener listener) {
+        this(context, events, friendUidToName, listener, null);
+    }
+
+    public FriendEventAdapter(Context context, List<Event> events,
+                              Map<String, String> friendUidToName,
+                              OnRsvpClickListener rsvpListener,
+                              OnEventClickListener cardListener) {
         this.mContext         = context;
         this.mEvents          = events;
         this.mFriendUidToName = friendUidToName;
-        this.mListener        = listener;
+        this.mListener        = rsvpListener;
+        this.mCardListener    = cardListener;
     }
 
     public void updateData(List<Event> events, Map<String, String> friendUidToName) {
@@ -100,6 +113,10 @@ public class FriendEventAdapter extends RecyclerView.Adapter<FriendEventAdapter.
             int p = holder.getAdapterPosition();
             if (p != RecyclerView.NO_ID) mListener.onRsvpClick(event, p);
         });
+
+        if (mCardListener != null) {
+            holder.itemView.setOnClickListener(v -> mCardListener.onEventClick(event));
+        }
     }
 
     /**

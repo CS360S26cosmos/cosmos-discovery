@@ -121,24 +121,44 @@
                     app:cardElevation="3dp"
                     app:strokeWidth="0dp">
 
-                    <EditText
-                        android:id="@+id/etDescription"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="74dp"
-                        android:background="@android:color/transparent"
-                        android:fontFamily="@font/inter"
-                        android:gravity="top|start"
-                        android:hint="Description"
-                        android:inputType="textMultiLine|textCapSentences"
-                        android:paddingStart="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="10dp"
-                        android:scrollHorizontally="false"
-                        android:textColor="@color/color_icon_outline"
-                        android:textColorHint="@color/color_text_tertiary"
-                        android:textSize="16sp" />
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/etDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="74dp"
+                            android:maxLength="150"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/inter"
+                            android:gravity="top|start"
+                            android:hint="Description"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:paddingStart="16dp"
+                            android:paddingTop="10dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="4dp"
+                            android:scrollHorizontally="false"
+                            android:textColor="@color/color_icon_outline"
+                            android:textColorHint="@color/color_text_tertiary"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tvDescriptionCounter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="6dp"
+                            android:text="0 / 150"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/inter"
+                            android:textColor="@color/color_text_tertiary" />
+
+                    </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- Category -->
@@ -230,10 +250,21 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- Date of Event -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="Date of Event"
+                    android:textColor="@color/color_icon_outline"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="11dp"
+                    android:layout_marginTop="4dp"
                     app:cardBackgroundColor="@color/color_surface_white"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="3dp"
@@ -274,10 +305,21 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- Start time -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="Start Time"
+                    android:textColor="@color/color_icon_outline"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="11dp"
+                    android:layout_marginTop="4dp"
                     app:cardBackgroundColor="@color/color_surface_white"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="3dp"
@@ -318,10 +360,21 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- End Time -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="End Time"
+                    android:textColor="@color/color_icon_outline"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="11dp"
+                    android:layout_marginTop="4dp"
                     app:cardBackgroundColor="@color/color_surface_white"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="3dp"
@@ -362,10 +415,21 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <!-- Register By -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="Register By"
+                    android:textColor="@color/color_icon_outline"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="11dp"
+                    android:layout_marginTop="4dp"
                     app:cardBackgroundColor="@color/color_surface_white"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="3dp"
@@ -449,6 +513,34 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Capacity (optional) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="11dp"
+                    app:cardBackgroundColor="@color/color_surface_white"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="3dp"
+                    app:strokeWidth="0dp">
+
+                    <EditText
+                        android:id="@+id/etCapacity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:background="@android:color/transparent"
+                        android:fontFamily="@font/inter"
+                        android:gravity="center_vertical"
+                        android:hint="Capacity (leave empty for unlimited)"
+                        android:inputType="number"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:singleLine="true"
+                        android:textColor="@color/color_icon_outline"
+                        android:textColorHint="@color/color_text_tertiary"
+                        android:textSize="16sp" />
+                </com.google.android.material.card.MaterialCardView>
+
                 <!-- Open to -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -525,6 +617,7 @@
                 app:strokeWidth="1dp">
 
                 <TextView
+                    android:id="@+id/tvCancel"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fontFamily="@font/inter_variable"
@@ -547,6 +640,7 @@
                 app:strokeWidth="0dp">
 
                 <TextView
+                    android:id="@+id/tvSubmit"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fontFamily="@font/inter_variable"
