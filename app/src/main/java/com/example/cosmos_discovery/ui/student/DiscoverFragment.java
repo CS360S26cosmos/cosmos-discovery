@@ -20,6 +20,9 @@ import com.example.cosmos_discovery.adapter.EventSmallAdapter;
 import com.example.cosmos_discovery.ui.organizer.EventDetailsActivity;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
+import com.example.cosmos_discovery.util.DismissedEventsStore;
+import com.example.cosmos_discovery.util.RecommendationEngine;
+import com.example.cosmos_discovery.util.RoleUtil;
 import com.example.cosmos_discovery.util.RsvpHandler;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -48,6 +51,10 @@ public class DiscoverFragment extends Fragment {
     private final EventService mEventService = new EventService();
     private ListenerRegistration mUpcomingListener;
     private ListenerRegistration mThisWeekListener;
+    private ListenerRegistration mRsvpHistoryListener;
+
+    private List<Event> mAllUpcoming  = new ArrayList<>();
+    private List<Event> mRsvpHistory  = new ArrayList<>();
 
     @Nullable
     @Override
@@ -71,7 +78,11 @@ public class DiscoverFragment extends Fragment {
                 (event, pos) -> mRsvpHandler.toggle(event,
                         () -> mSuggestedAdapter.notifyItemChanged(pos),
                         err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()),
-                this::onEventClick);
+                this::onEventClick,
+                event -> {
+                    new DismissedEventsStore(requireContext()).dismiss(event.getId());
+                    refreshSuggested();
+                });
         mRvSuggested.setAdapter(mSuggestedAdapter);
 
         // ── This Week — vertical list ─────────────────────────────────────
@@ -88,8 +99,19 @@ public class DiscoverFragment extends Fragment {
     public void onStart() {
         super.onStart();
         mUpcomingListener = mEventService.listenUpcomingEvents(
-                events -> updateSuggested(events),
+                events -> {
+                    mAllUpcoming = events;
+                    refreshSuggested();
+                },
                 err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
+
+        String uid = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : "";
+        mRsvpHistoryListener = mEventService.listenMyRsvpedEvents(uid,
+                events -> {
+                    mRsvpHistory = events;
+                    refreshSuggested();
+                },
+                err -> { /* non-critical — recommendations still work without history */ });
 
         mThisWeekListener = mEventService.listenThisWeekEvents(
                 events -> updateThisWeek(events),
@@ -103,16 +125,25 @@ public class DiscoverFragment extends Fragment {
             mUpcomingListener.remove();
             mUpcomingListener = null;
         }
+        if (mRsvpHistoryListener != null) {
+            mRsvpHistoryListener.remove();
+            mRsvpHistoryListener = null;
+        }
         if (mThisWeekListener != null) {
             mThisWeekListener.remove();
             mThisWeekListener = null;
         }
     }
 
-    /** Updates the Suggested carousel and toggles its empty-state view. */
-    private void updateSuggested(List<Event> events) {
-        mSuggestedAdapter.updateData(events);
-        boolean empty = events.isEmpty();
+    /** Runs the recommendation engine and refreshes the For You carousel. */
+    private void refreshSuggested() {
+        if (mSuggestedAdapter == null) return;
+        String uid = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : "";
+        DismissedEventsStore store = new DismissedEventsStore(requireContext());
+        List<Event> recommendations = RecommendationEngine.recommend(
+                mRsvpHistory, mAllUpcoming, store.getDismissedIds(), uid);
+        mSuggestedAdapter.updateData(recommendations);
+        boolean empty = recommendations.isEmpty();
         mRvSuggested.setVisibility(empty ? View.GONE : View.VISIBLE);
         mTvEmptySuggested.setVisibility(empty ? View.VISIBLE : View.GONE);
     }

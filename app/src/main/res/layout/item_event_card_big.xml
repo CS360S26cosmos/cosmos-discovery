@@ -115,7 +115,7 @@
             android:layout_marginTop="14dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintStart_toEndOf="@id/iconLocation"
-            app:layout_constraintEnd_toStartOf="@id/buttonRsvp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imageViewEvent" />
 
         <!-- RSVP button — pill shape, spans both bottom rows, h=35dp per spec -->
@@ -137,8 +137,25 @@
             android:layout_marginEnd="12dp"
             app:backgroundTint="@null"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imageViewEvent"
+            app:layout_constraintTop_toTopOf="@id/layoutChipsRow"
             app:layout_constraintBottom_toBottomOf="@id/layoutChipsRow" />
+
+        <!-- Not Interested — small dismiss action, sits below the image, left-aligned -->
+        <TextView
+            android:id="@+id/textViewNotInterested"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✕  Not Interested"
+            android:textSize="11sp"
+            android:textColor="@color/color_text_hint"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="8dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutChipsRow" />
 
         <!-- Chips row: tags + attendee count all inline, bounded by RSVP button -->
         <LinearLayout
@@ -149,11 +166,11 @@
             android:gravity="center_vertical"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="14dp"
+            android:layout_marginBottom="0dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewLocation"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/textViewNotInterested"
             app:layout_constraintEnd_toStartOf="@id/buttonRsvp">
 
             <com.google.android.material.chip.ChipGroup

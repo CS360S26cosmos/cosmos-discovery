@@ -26,6 +26,7 @@ import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.ui.auth.LoginActivity;
 import com.example.cosmos_discovery.ui.organizer.AddEventActivity;
 import com.example.cosmos_discovery.ui.organizer.OrganizerActivity;
+import com.example.cosmos_discovery.util.DismissedEventsStore;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -238,6 +239,7 @@ public class StudentActivity extends AppCompatActivity {
         mSidebarView.findViewById(R.id.logoutRow)
                     .setOnClickListener(v -> {
                         mAuthService.signOut();
+                        new DismissedEventsStore(this).clear();
                         RoleUtil.clear();
                         Intent intent = new Intent(this, LoginActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
