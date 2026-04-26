@@ -439,6 +439,44 @@ public class EventService {
                         ex.getMessage() != null ? ex.getMessage() : "Failed to load categories."));
     }
 
+    // ── Ratings ───────────────────────────────────────────────────────────
+
+    /**
+     * Saves a rating (1–5) for a user on an event.
+     * Stored as events/{eventId}.ratings.{userId} so it uses the same
+     * collection permissions as RSVP/check-in writes — no separate rules needed.
+     */
+    public void saveRating(String eventId, String userId, int rating,
+                           Runnable onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .update("ratings." + userId, rating)
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> {
+                    Log.e(TAG, "saveRating failed: " + ex.getMessage(), ex);
+                    onFailure.accept("Could not save rating.");
+                });
+    }
+
+    /**
+     * Fetches the user's saved rating for an event.
+     * Calls {@code onSuccess} with the rating (1–5), or {@code null} if not yet rated.
+     */
+    public void fetchRating(String eventId, String userId,
+                            Consumer<Integer> onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    Long value = doc.getLong("ratings." + userId);
+                    onSuccess.accept(value != null ? value.intValue() : null);
+                })
+                .addOnFailureListener(ex -> {
+                    Log.e(TAG, "fetchRating failed: " + ex.getMessage(), ex);
+                    onFailure.accept("Could not fetch rating.");
+                });
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     /** Returns [weekStartMs, weekEndMs] for the current Sun–Sat week. */

@@ -15,6 +15,7 @@ import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.ui.student.StudentActivity;
+import com.example.cosmos_discovery.util.RoleUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,6 +26,7 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     private final EventService mEventService = new EventService();
 
     private String mEventId;
+    private String mUserId;
     private ImageButton[] mStars;
     private boolean mRatingLocked = false;
     private TextView mTvRatingLabel;
@@ -42,16 +44,18 @@ public class PastEventDetailsActivity extends AppCompatActivity {
             return;
         }
 
+        mUserId = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : null;
+
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
         setupNavBar();
         setupStarRating();
         fetchAndBind();
+        loadExistingRating();
     }
 
     private void setupNavBar() {
-        // My Events is the active tab — this screen is always reached from MyEventsFragment
         ImageView iconHome     = findViewById(R.id.iconHome);
         ImageView iconMyEvents = findViewById(R.id.iconMyEvents);
         ImageView iconFriends  = findViewById(R.id.iconFriends);
@@ -64,10 +68,7 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         LinearLayout navMyEvents = findViewById(R.id.navMyEvents);
         LinearLayout navFriends  = findViewById(R.id.navFriends);
 
-        // My Events: pop back to the StudentActivity already in the stack
         navMyEvents.setOnClickListener(v -> finish());
-
-        // Home / Friends: clear the stack up to StudentActivity and switch tab
         navHome.setOnClickListener(v    -> navigateToStudentTab(StudentActivity.TAB_DISCOVER));
         navFriends.setOnClickListener(v -> navigateToStudentTab(StudentActivity.TAB_FRIENDS));
     }
@@ -94,9 +95,14 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         for (int i = 0; i < mStars.length; i++) {
             final int rating = i + 1;
             mStars[i].setOnClickListener(v -> {
-                if (!mRatingLocked) {
-                    applyRating(rating);
-                    mRatingLocked = true;
+                if (mRatingLocked) return;
+                applyRating(rating);
+                mRatingLocked = true;
+                if (mUserId != null) {
+                    mEventService.saveRating(mEventId, mUserId, rating,
+                            () -> {},
+                            err -> Toast.makeText(this, "Could not save rating.", Toast.LENGTH_SHORT).show()
+                    );
                 }
             });
         }
@@ -109,6 +115,19 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         mTvRatingLabel.setText(rating + "/5");
     }
 
+    private void loadExistingRating() {
+        if (mUserId == null) return;
+        mEventService.fetchRating(mEventId, mUserId,
+                rating -> {
+                    if (rating != null) {
+                        applyRating(rating);
+                        mRatingLocked = true;
+                    }
+                },
+                err -> {}
+        );
+    }
+
     private void fetchAndBind() {
         mEventService.fetchEventById(
                 mEventId,
@@ -118,12 +137,12 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     }
 
     private void bindEvent(Event event) {
-        ImageView image    = findViewById(R.id.imageViewEvent);
-        TextView  title    = findViewById(R.id.textViewEventTitle);
-        TextView  venue    = findViewById(R.id.tvVenueValue);
-        TextView  dateTime = findViewById(R.id.tvDateTimeValue);
+        ImageView image     = findViewById(R.id.imageViewEvent);
+        TextView  title     = findViewById(R.id.textViewEventTitle);
+        TextView  venue     = findViewById(R.id.tvVenueValue);
+        TextView  dateTime  = findViewById(R.id.tvDateTimeValue);
         TextView  organizer = findViewById(R.id.tvOrganizerValue);
-        TextView  desc     = findViewById(R.id.tvDescriptionValue);
+        TextView  desc      = findViewById(R.id.tvDescriptionValue);
 
         Glide.with(this)
                 .load(event.getImageUrl())
@@ -138,7 +157,8 @@ public class PastEventDetailsActivity extends AppCompatActivity {
                 new SimpleDateFormat("MMM d, yyyy | h:mma", Locale.getDefault());
         dateTime.setText(sdf.format(new Date(event.getDateTime())));
 
-        organizer.setText("Organizer");
+        String name = event.getOrganizerName();
+        organizer.setText(name != null && !name.isEmpty() ? name : "Unknown");
 
         desc.setText(
                 event.getDescription() != null &&
