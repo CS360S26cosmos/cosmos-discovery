@@ -64,7 +64,7 @@ public class RsvpHandler {
                     : new ArrayList<>();
             ids.add(uid);
             event.setAttendeeIds(ids);
-            event.setRsvpCount(event.getRsvpCount() + 1);
+            event.setRsvpCount(ids.size());
             onRefresh.run();
         };
 
@@ -83,7 +83,7 @@ public class RsvpHandler {
                     : new ArrayList<>();
             ids.remove(uid);
             event.setAttendeeIds(ids);
-            event.setRsvpCount(Math.max(0, event.getRsvpCount() - 1));
+            event.setRsvpCount(ids.size());
             onRefresh.run();
         };
 
