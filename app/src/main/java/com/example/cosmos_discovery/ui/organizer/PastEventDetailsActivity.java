@@ -1,8 +1,10 @@
 package com.example.cosmos_discovery.ui.organizer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,12 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.EventService;
+import com.example.cosmos_discovery.model.Event;
+import com.example.cosmos_discovery.ui.student.StudentActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import com.example.cosmos_discovery.model.Event;
 
 public class PastEventDetailsActivity extends AppCompatActivity {
 
@@ -25,10 +27,10 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     private String mEventId;
     private ImageButton[] mStars;
     private boolean mRatingLocked = false;
+    private TextView mTvRatingLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pastevent_details_page);
 
@@ -43,11 +45,44 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
+        setupNavBar();
         setupStarRating();
         fetchAndBind();
     }
 
+    private void setupNavBar() {
+        // My Events is the active tab — this screen is always reached from MyEventsFragment
+        ImageView iconHome     = findViewById(R.id.iconHome);
+        ImageView iconMyEvents = findViewById(R.id.iconMyEvents);
+        ImageView iconFriends  = findViewById(R.id.iconFriends);
+
+        iconHome.setImageResource(R.drawable.ic_home_outline);
+        iconMyEvents.setImageResource(R.drawable.ic_bookmark_selected);
+        iconFriends.setImageResource(R.drawable.ic_heart_outline);
+
+        LinearLayout navHome     = findViewById(R.id.navHome);
+        LinearLayout navMyEvents = findViewById(R.id.navMyEvents);
+        LinearLayout navFriends  = findViewById(R.id.navFriends);
+
+        // My Events: pop back to the StudentActivity already in the stack
+        navMyEvents.setOnClickListener(v -> finish());
+
+        // Home / Friends: clear the stack up to StudentActivity and switch tab
+        navHome.setOnClickListener(v    -> navigateToStudentTab(StudentActivity.TAB_DISCOVER));
+        navFriends.setOnClickListener(v -> navigateToStudentTab(StudentActivity.TAB_FRIENDS));
+    }
+
+    private void navigateToStudentTab(int tab) {
+        Intent intent = new Intent(this, StudentActivity.class);
+        intent.putExtra(StudentActivity.EXTRA_START_TAB, tab);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
     private void setupStarRating() {
+        mTvRatingLabel = findViewById(R.id.tvRatingLabel);
+
         mStars = new ImageButton[]{
                 findViewById(R.id.star1),
                 findViewById(R.id.star2),
@@ -71,6 +106,7 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         for (int i = 0; i < mStars.length; i++) {
             mStars[i].setImageResource(i < rating ? R.drawable.star_filled : R.drawable.star_outline);
         }
+        mTvRatingLabel.setText(rating + "/5");
     }
 
     private void fetchAndBind() {
@@ -80,13 +116,14 @@ public class PastEventDetailsActivity extends AppCompatActivity {
                 err -> Toast.makeText(this, err, Toast.LENGTH_LONG).show()
         );
     }
+
     private void bindEvent(Event event) {
-        ImageView image = findViewById(R.id.imageViewEvent);
-        TextView title = findViewById(R.id.textViewEventTitle);
-        TextView venue = findViewById(R.id.tvVenueValue);
-        TextView dateTime = findViewById(R.id.tvDateTimeValue);
-        TextView organizer = findViewById(R.id.tvOrganizerValue);
-        TextView desc = findViewById(R.id.tvDescriptionValue);
+        ImageView image    = findViewById(R.id.imageViewEvent);
+        TextView  title    = findViewById(R.id.textViewEventTitle);
+        TextView  venue    = findViewById(R.id.tvVenueValue);
+        TextView  dateTime = findViewById(R.id.tvDateTimeValue);
+        TextView  organizer = findViewById(R.id.tvOrganizerValue);
+        TextView  desc     = findViewById(R.id.tvDescriptionValue);
 
         Glide.with(this)
                 .load(event.getImageUrl())
@@ -95,12 +132,10 @@ public class PastEventDetailsActivity extends AppCompatActivity {
                 .into(image);
 
         title.setText(event.getTitle());
-
         venue.setText(event.getLocation());
 
         SimpleDateFormat sdf =
                 new SimpleDateFormat("MMM d, yyyy | h:mma", Locale.getDefault());
-
         dateTime.setText(sdf.format(new Date(event.getDateTime())));
 
         organizer.setText("Organizer");
