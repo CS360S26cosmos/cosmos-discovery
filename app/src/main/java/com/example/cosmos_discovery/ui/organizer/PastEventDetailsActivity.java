@@ -1,15 +1,12 @@
 package com.example.cosmos_discovery.ui.organizer;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.cosmos_discovery.R;
@@ -26,6 +23,8 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     private final EventService mEventService = new EventService();
 
     private String mEventId;
+    private ImageButton[] mStars;
+    private boolean mRatingLocked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +43,34 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
+        setupStarRating();
         fetchAndBind();
+    }
+
+    private void setupStarRating() {
+        mStars = new ImageButton[]{
+                findViewById(R.id.star1),
+                findViewById(R.id.star2),
+                findViewById(R.id.star3),
+                findViewById(R.id.star4),
+                findViewById(R.id.star5)
+        };
+
+        for (int i = 0; i < mStars.length; i++) {
+            final int rating = i + 1;
+            mStars[i].setOnClickListener(v -> {
+                if (!mRatingLocked) {
+                    applyRating(rating);
+                    mRatingLocked = true;
+                }
+            });
+        }
+    }
+
+    private void applyRating(int rating) {
+        for (int i = 0; i < mStars.length; i++) {
+            mStars[i].setImageResource(i < rating ? R.drawable.star_filled : R.drawable.star_outline);
+        }
     }
 
     private void fetchAndBind() {
