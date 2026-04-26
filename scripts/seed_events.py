@@ -130,7 +130,7 @@ EVENTS = [
         "dateTime":    at(2, 10),        # 10:00am
         "location":    "SBASSE Auditorium",
         "tags":        ["Technology", "Academic"],
-        "rsvpCount":   142,
+        "category":    "Technology",
         "capacity":    200,
         "imageUrl":    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
         "organizerId": "seed_organizer_001",
@@ -144,7 +144,7 @@ EVENTS = [
         "dateTime":    at(4, 19),        # 7:00pm
         "location":    "PDC Auditorium",
         "tags":        ["Music", "Cultural"],
-        "rsvpCount":   230,
+        "category":    "Music",
         "capacity":    300,
         "imageUrl":    "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800",
         "organizerId": "seed_organizer_002",
@@ -158,7 +158,7 @@ EVENTS = [
         "dateTime":    at(5, 9),         # 9:00am
         "location":    "LUMS Sports Complex",
         "tags":        ["Sports"],
-        "rsvpCount":   87,
+        "category":    "Sports",
         "imageUrl":    "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800",
         "organizerId": "seed_organizer_003",
         "status":      "approved",
@@ -171,7 +171,7 @@ EVENTS = [
         "dateTime":    at(6, 18, 30),    # 6:30pm
         "location":    "SDSB Atrium",
         "tags":        ["Technology", "Workshop"],
-        "rsvpCount":   65,
+        "category":    "Technology",
         "capacity":    80,
         "imageUrl":    "https://images.unsplash.com/photo-1551818255-e6e10975bc17?w=800",
         "organizerId": "seed_organizer_001",
@@ -185,7 +185,7 @@ EVENTS = [
         "dateTime":    at(7, 16),        # 4:00pm
         "location":    "Social Sciences Block",
         "tags":        ["Cultural", "Academic"],
-        "rsvpCount":   54,
+        "category":    "Cultural",
         "capacity":    60,
         "imageUrl":    "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=800",
         "organizerId": "seed_organizer_004",
@@ -201,7 +201,7 @@ EVENTS = [
         "dateTime":    at(3, 12),        # 12:00pm
         "location":    "LUMS Main Lawn",
         "tags":        ["Food", "Cultural"],
-        "rsvpCount":   189,
+        "category":    "Food",
         "imageUrl":    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800",
         "organizerId": "seed_organizer_002",
         "status":      "approved",
@@ -214,7 +214,7 @@ EVENTS = [
         "dateTime":    at(8, 14),        # 2:00pm
         "location":    "Arts & Design Studio, AC-1",
         "tags":        ["Arts", "Workshop"],
-        "rsvpCount":   38,
+        "category":    "Arts",
         "capacity":    40,
         "imageUrl":    "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800",
         "organizerId": "seed_organizer_005",
@@ -228,7 +228,7 @@ EVENTS = [
         "dateTime":    at(10, 20),       # 8:00pm
         "location":    "SBASSE Labs",
         "tags":        ["Technology", "Workshop"],
-        "rsvpCount":   121,
+        "category":    "Technology",
         "capacity":    150,
         "imageUrl":    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800",
         "organizerId": "seed_organizer_001",
@@ -242,7 +242,7 @@ EVENTS = [
         "dateTime":    at(12, 8),        # 8:00am
         "location":    "LUMS Main Lawn",
         "tags":        ["Academic", "Cultural"],
-        "rsvpCount":   77,
+        "category":    "Academic",
         "imageUrl":    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800",
         "organizerId": "seed_organizer_006",
         "status":      "approved",
@@ -255,7 +255,7 @@ EVENTS = [
         "dateTime":    at(14, 11),       # 11:00am
         "location":    "SBASSE Lecture Hall 3",
         "tags":        ["Technology", "Academic"],
-        "rsvpCount":   93,
+        "category":    "Technology",
         "capacity":    120,
         "imageUrl":    "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800",
         "organizerId": "seed_organizer_003",
@@ -269,7 +269,7 @@ EVENTS = [
         "dateTime":    at(9, 20, 30),    # 8:30pm
         "location":    "PDC Auditorium",
         "tags":        ["Music", "Cultural"],
-        "rsvpCount":   190,
+        "category":    "Music",
         "capacity":    200,
         "imageUrl":    "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800",
         "organizerId": "seed_organizer_002",
@@ -283,7 +283,7 @@ EVENTS = [
         "dateTime":    at(11, 15),       # 3:00pm
         "location":    "Indoor Sports Hall",
         "tags":        ["Sports"],
-        "rsvpCount":   44,
+        "category":    "Sports",
         "capacity":    64,
         "imageUrl":    "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800",
         "organizerId": "seed_organizer_003",
@@ -297,7 +297,7 @@ EVENTS = [
         "dateTime":    at(15, 13),       # 1:00pm
         "location":    "SDSB Atrium",
         "tags":        ["Arts", "Cultural"],
-        "rsvpCount":   29,
+        "category":    "Arts",
         "imageUrl":    "https://images.unsplash.com/photo-1509541206217-cde45c41aa6d?w=800",
         "organizerId": "seed_organizer_004",
         "status":      "approved",
@@ -314,7 +314,7 @@ EVENTS = [
         "dateTime":    weekday_target((datetime.now().weekday() + 1) % 7, 15),  # tomorrow 3:00pm
         "location":    "SDSB Lecture Hall 1",
         "tags":        ["Academic", "Workshop"],
-        "rsvpCount":   28,
+        "category":    "Academic",
         "capacity":    50,
         "imageUrl":    "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800",
         "organizerId": "seed_organizer_005",
@@ -328,7 +328,7 @@ EVENTS = [
         "dateTime":    weekday_target(5, 20),   # this Saturday 8:00pm
         "location":    "LUMS Main Lawn",
         "tags":        ["Technology", "Academic"],
-        "rsvpCount":   41,
+        "category":    "Technology",
         "capacity":    75,
         "imageUrl":    "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800",
         "organizerId": "seed_organizer_001",
@@ -342,7 +342,7 @@ EVENTS = [
         "dateTime":    weekday_target(6, 8),    # this Sunday 8:00am
         "location":    "LUMS Sports Complex",
         "tags":        ["Sports", "Cultural"],
-        "rsvpCount":   35,
+        "category":    "Sports",
         "capacity":    40,
         "imageUrl":    "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800",
         "organizerId": "seed_organizer_006",
@@ -358,7 +358,7 @@ EVENTS = [
         "dateTime":    at(-10, 19),      # 7:00pm
         "location":    "PDC Auditorium",
         "tags":        ["Music", "Cultural"],
-        "rsvpCount":   215,
+        "category":    "Music",
         "capacity":    250,
         "imageUrl":    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800",
         "organizerId": "seed_organizer_002",
@@ -372,7 +372,7 @@ EVENTS = [
         "dateTime":    at(-5, 14, 30),   # 2:30pm
         "location":    "SBASSE Labs",
         "tags":        ["Technology", "Workshop"],
-        "rsvpCount":   98,
+        "category":    "Technology",
         "capacity":    100,
         "imageUrl":    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800",
         "organizerId": "seed_organizer_001",
@@ -386,7 +386,7 @@ EVENTS = [
         "dateTime":    at(-15, 9),       # 9:00am
         "location":    "LUMS Sports Complex",
         "tags":        ["Sports"],
-        "rsvpCount":   247,
+        "category":    "Sports",
         "capacity":    500,
         "imageUrl":    "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800",
         "organizerId": "seed_organizer_003",
@@ -400,7 +400,7 @@ EVENTS = [
         "dateTime":    at(-3, 18),       # 6:00pm
         "location":    "Faculty Club",
         "tags":        ["Academic"],
-        "rsvpCount":   60,
+        "category":    "Academic",
         "capacity":    80,
         "imageUrl":    "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800",
         "organizerId": "seed_organizer_006",
@@ -416,7 +416,7 @@ EVENTS = [
         "dateTime":    at(20, 17),       # 5:00pm
         "location":    "Social Sciences Block",
         "tags":        ["Academic", "Cultural"],
-        "rsvpCount":   0,
+        "category":    "Academic",
         "capacity":    100,
         "imageUrl":    "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800",
         "organizerId": "seed_organizer_005",
@@ -430,7 +430,7 @@ EVENTS = [
         "dateTime":    at(18, 11),       # 11:00am
         "location":    "Arts & Design Studio, AC-1",
         "tags":        ["Arts", "Workshop"],
-        "rsvpCount":   0,
+        "category":    "Arts",
         "capacity":    25,
         "imageUrl":    "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800",
         "organizerId": "seed_organizer_004",
@@ -446,7 +446,7 @@ EVENTS = [
         "dateTime":    at(-20, 21),      # 9:00pm
         "location":    "Liberty Roundabout, Lahore",
         "tags":        ["Music"],
-        "rsvpCount":   0,
+        "category":    "Music",
         "imageUrl":    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800",
         "organizerId": "seed_organizer_002",
         "status":      "rejected",
@@ -479,6 +479,7 @@ def main():
     for event in EVENTS:
         doc = dict(event)
         doc["createdAt"] = now
+        doc["rsvpCount"] = len(doc.get("attendeeIds", []))
         doc["organizerName"] = ORGANIZER_NAMES.get(doc.get("organizerId", ""), "Unknown Organizer")
         dt = datetime.fromtimestamp(doc["dateTime"] / 1000)
         if "registerBy" not in doc:

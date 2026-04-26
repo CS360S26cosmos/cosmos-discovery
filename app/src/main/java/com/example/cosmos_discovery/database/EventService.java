@@ -346,25 +346,27 @@ public class EventService {
                     mDb.collection(EVENTS_COLLECTION).document(eventId));
 
             List<String> attendeeIds = (List<String>) snapshot.get("attendeeIds");
-            if (attendeeIds != null && attendeeIds.contains(userId)) {
+            List<String> newIds = attendeeIds != null
+                    ? new ArrayList<>(attendeeIds) : new ArrayList<>();
+
+            if (newIds.contains(userId)) {
                 return null; // already RSVPed — idempotent success
             }
 
-            Long capLong  = snapshot.getLong("capacity");
-            Long countLong = snapshot.getLong("rsvpCount");
-            long capacity  = capLong  != null ? capLong  : 0;
-            long rsvpCount = countLong != null ? countLong : 0;
+            Long capLong = snapshot.getLong("capacity");
+            long capacity = capLong != null ? capLong : 0;
 
-            if (capacity > 0 && rsvpCount >= capacity) {
+            if (capacity > 0 && newIds.size() >= capacity) {
                 throw new FirebaseFirestoreException(
                         "This event is full.",
                         FirebaseFirestoreException.Code.ABORTED);
             }
 
+            newIds.add(userId);
             transaction.update(
                     mDb.collection(EVENTS_COLLECTION).document(eventId),
-                    "attendeeIds", FieldValue.arrayUnion(userId),
-                    "rsvpCount",   FieldValue.increment(1));
+                    "attendeeIds", newIds,
+                    "rsvpCount",   newIds.size());
             return null;
         })
         .addOnSuccessListener(unused -> onSuccess.run())
@@ -378,14 +380,21 @@ public class EventService {
      */
     public void cancelRsvp(String eventId, String userId,
                            Runnable onSuccess, Consumer<String> onFailure) {
-        mDb.collection(EVENTS_COLLECTION)
-                .document(eventId)
-                .update(
-                        "attendeeIds", FieldValue.arrayRemove(userId),
-                        "rsvpCount",   FieldValue.increment(-1)
-                )
-                .addOnSuccessListener(unused -> onSuccess.run())
-                .addOnFailureListener(ex -> onFailure.accept("Could not cancel RSVP. Try again."));
+        mDb.runTransaction(transaction -> {
+            DocumentSnapshot snapshot = transaction.get(
+                    mDb.collection(EVENTS_COLLECTION).document(eventId));
+            List<String> attendeeIds = (List<String>) snapshot.get("attendeeIds");
+            List<String> newIds = attendeeIds != null
+                    ? new ArrayList<>(attendeeIds) : new ArrayList<>();
+            newIds.remove(userId);
+            transaction.update(
+                    mDb.collection(EVENTS_COLLECTION).document(eventId),
+                    "attendeeIds", newIds,
+                    "rsvpCount",   newIds.size());
+            return null;
+        })
+        .addOnSuccessListener(unused -> onSuccess.run())
+        .addOnFailureListener(ex -> onFailure.accept("Could not cancel RSVP. Try again."));
     }
 
     // ── Check-in ──────────────────────────────────────────────────────────

@@ -97,7 +97,7 @@ EVENTS = [
         "dateTime":    at(5, 19),
         "location":    "LUMS Student Lounge",
         "tags":        ["Cultural", "Social"],
-        "rsvpCount":   12,
+        "category":    "Cultural",
         "imageUrl":    "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800",
         "status":      "pending",
         "attendeeIds": [],
@@ -108,7 +108,7 @@ EVENTS = [
         "dateTime":    at(8, 18, 30),
         "location":    "PDC Lobby",
         "tags":        ["Arts", "Cultural"],
-        "rsvpCount":   0,
+        "category":    "Arts",
         "imageUrl":    "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800",
         "status":      "pending",
         "attendeeIds": [],
@@ -119,7 +119,7 @@ EVENTS = [
         "dateTime":    at(12, 22),
         "location":    "SBASSE Labs",
         "tags":        ["Technology", "Workshop"],
-        "rsvpCount":   5,
+        "category":    "Technology",
         "imageUrl":    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800",
         "status":      "pending",
         "attendeeIds": [],
@@ -132,7 +132,7 @@ EVENTS = [
         "dateTime":    at(3, 16),
         "location":    "LUMS Main Lawn",
         "tags":        ["Arts", "Cultural"],
-        "rsvpCount":   34,
+        "category":    "Arts",
         "imageUrl":    "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800",
         "status":      "approved",
         "attendeeIds": [],
@@ -143,7 +143,7 @@ EVENTS = [
         "dateTime":    at(6, 14),
         "location":    "SDSB Auditorium",
         "tags":        ["Technology", "Academic"],
-        "rsvpCount":   78,
+        "category":    "Technology",
         "imageUrl":    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
         "status":      "approved",
         "attendeeIds": [],
@@ -154,7 +154,7 @@ EVENTS = [
         "dateTime":    at(10, 12),
         "location":    "REDC Lawn",
         "tags":        ["Food", "Cultural"],
-        "rsvpCount":   156,
+        "category":    "Food",
         "imageUrl":    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800",
         "status":      "approved",
         "attendeeIds": [],
@@ -167,7 +167,7 @@ EVENTS = [
         "dateTime":    at(7, 23),
         "location":    "Cricket Ground",
         "tags":        ["Cultural"],
-        "rsvpCount":   0,
+        "category":    "Cultural",
         "imageUrl":    "https://images.unsplash.com/photo-1497906539264-eb74442e37a9?w=800",
         "status":      "rejected",
         "attendeeIds": [],
@@ -178,7 +178,7 @@ EVENTS = [
         "dateTime":    at(14, 20),
         "location":    "Liberty Roundabout, Lahore",
         "tags":        ["Music"],
-        "rsvpCount":   0,
+        "category":    "Music",
         "imageUrl":    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800",
         "status":      "rejected",
         "attendeeIds": [],
@@ -223,6 +223,7 @@ def main():
         doc = dict(event)
         doc["organizerId"] = organizer_uid
         doc["createdAt"] = now_ms()
+        doc["rsvpCount"] = len(doc.get("attendeeIds", []))
 
         col.add(doc)
         counts[doc["status"]] += 1
