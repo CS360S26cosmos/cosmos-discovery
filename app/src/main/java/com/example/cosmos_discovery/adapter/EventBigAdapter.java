@@ -43,22 +43,35 @@ public class EventBigAdapter extends RecyclerView.Adapter<EventBigAdapter.ViewHo
         void onEventClick(Event event);
     }
 
-    private List<Event>                mEvents;
-    private final OnRsvpClickListener  mListener;
-    private final OnEventClickListener mCardListener;
-    private final Context              mContext;
+    public interface OnNotInterestedListener {
+        void onNotInterested(Event event);
+    }
+
+    private List<Event>                    mEvents;
+    private final OnRsvpClickListener      mListener;
+    private final OnEventClickListener     mCardListener;
+    private final OnNotInterestedListener  mNotInterestedListener;
+    private final Context                  mContext;
 
     public EventBigAdapter(Context context, List<Event> events, OnRsvpClickListener listener) {
-        this(context, events, listener, null);
+        this(context, events, listener, null, null);
     }
 
     public EventBigAdapter(Context context, List<Event> events,
                            OnRsvpClickListener rsvpListener,
                            OnEventClickListener cardListener) {
-        this.mContext      = context;
-        this.mEvents       = events;
-        this.mListener     = rsvpListener;
-        this.mCardListener = cardListener;
+        this(context, events, rsvpListener, cardListener, null);
+    }
+
+    public EventBigAdapter(Context context, List<Event> events,
+                           OnRsvpClickListener rsvpListener,
+                           OnEventClickListener cardListener,
+                           OnNotInterestedListener notInterestedListener) {
+        this.mContext               = context;
+        this.mEvents                = events;
+        this.mListener              = rsvpListener;
+        this.mCardListener          = cardListener;
+        this.mNotInterestedListener = notInterestedListener;
     }
 
     /** Replaces the data set and refreshes the list. Call after a Firestore fetch completes. */
@@ -166,6 +179,14 @@ public class EventBigAdapter extends RecyclerView.Adapter<EventBigAdapter.ViewHo
         if (mCardListener != null) {
             holder.itemView.setOnClickListener(v -> mCardListener.onEventClick(event));
         }
+
+        if (mNotInterestedListener != null) {
+            holder.textViewNotInterested.setVisibility(View.VISIBLE);
+            holder.textViewNotInterested.setOnClickListener(v ->
+                    mNotInterestedListener.onNotInterested(event));
+        } else {
+            holder.textViewNotInterested.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -188,16 +209,18 @@ public class EventBigAdapter extends RecyclerView.Adapter<EventBigAdapter.ViewHo
         final ChipGroup chipGroupTags;
         final TextView  textViewRsvpCount;
         final Button    buttonRsvp;
+        final TextView  textViewNotInterested;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageViewEvent    = itemView.findViewById(R.id.imageViewEvent);
-            textViewTitle     = itemView.findViewById(R.id.textViewTitle);
-            textViewDateTime  = itemView.findViewById(R.id.textViewDateTime);
-            textViewLocation  = itemView.findViewById(R.id.textViewLocation);
-            chipGroupTags     = itemView.findViewById(R.id.chipGroupTags);
-            textViewRsvpCount = itemView.findViewById(R.id.textViewRsvpCount);
-            buttonRsvp        = itemView.findViewById(R.id.buttonRsvp);
+            imageViewEvent        = itemView.findViewById(R.id.imageViewEvent);
+            textViewTitle         = itemView.findViewById(R.id.textViewTitle);
+            textViewDateTime      = itemView.findViewById(R.id.textViewDateTime);
+            textViewLocation      = itemView.findViewById(R.id.textViewLocation);
+            chipGroupTags         = itemView.findViewById(R.id.chipGroupTags);
+            textViewRsvpCount     = itemView.findViewById(R.id.textViewRsvpCount);
+            buttonRsvp            = itemView.findViewById(R.id.buttonRsvp);
+            textViewNotInterested = itemView.findViewById(R.id.textViewNotInterested);
         }
     }
 }
