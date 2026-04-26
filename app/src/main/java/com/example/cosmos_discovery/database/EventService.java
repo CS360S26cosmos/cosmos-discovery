@@ -477,6 +477,38 @@ public class EventService {
                 });
     }
 
+    /**
+     * Saves a text review for a user on an event.
+     * Stored as events/{eventId}.reviews.{userId} alongside the ratings map.
+     */
+    public void saveReview(String eventId, String userId, String review,
+                           Runnable onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .update("reviews." + userId, review)
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> {
+                    Log.e(TAG, "saveReview failed: " + ex.getMessage(), ex);
+                    onFailure.accept("Could not save review.");
+                });
+    }
+
+    /**
+     * Fetches the user's saved review text for an event.
+     * Calls {@code onSuccess} with the review string, or {@code null} if none exists yet.
+     */
+    public void fetchReview(String eventId, String userId,
+                            Consumer<String> onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(doc -> onSuccess.accept(doc.getString("reviews." + userId)))
+                .addOnFailureListener(ex -> {
+                    Log.e(TAG, "fetchReview failed: " + ex.getMessage(), ex);
+                    onFailure.accept("Could not fetch review.");
+                });
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     /** Returns [weekStartMs, weekEndMs] for the current Sun–Sat week. */

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000"
+    android:visibility="gone">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/reviewCard"
+        android:layout_width="340dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:cardBackgroundColor="@color/color_surface"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="20dp">
+
+            <!-- Header -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="Add Review"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/btnCloseReview"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="21dp"
+                    android:src="@drawable/ic_sidebar_close_btn" />
+
+            </FrameLayout>
+
+            <!-- Review input -->
+            <EditText
+                android:id="@+id/etReviewText"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_edittext_review"
+                android:fontFamily="@font/inter_variable"
+                android:gravity="top|start"
+                android:hint="Write your review here..."
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLength="700"
+                android:padding="12dp"
+                android:textColor="@color/color_text_secondary"
+                android:textColorHint="@color/color_text_hint"
+                android:textSize="14sp" />
+
+            <!-- Character counter -->
+            <TextView
+                android:id="@+id/tvCharCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="24dp"
+                android:fontFamily="@font/inter_variable"
+                android:gravity="end"
+                android:text="0/700"
+                android:textColor="@color/color_text_hint"
+                android:textSize="12sp" />
+
+            <!-- Action buttons — same style as filter overlay -->
+            <LinearLayout
+                android:layout_width="290dp"
+                android:layout_height="44dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/bg_filter_button_container"
+                android:orientation="horizontal"
+                android:padding="1dp">
+
+                <TextView
+                    android:id="@+id/btnCancelReview"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_clear_filters"
+                    android:fontFamily="@font/inter_variable"
+                    android:gravity="center"
+                    android:text="Cancel"
+                    android:textColor="@color/color_icon_outline"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/color_text_secondary" />
+
+                <TextView
+                    android:id="@+id/btnAddReview"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_view_results_selector"
+                    android:fontFamily="@font/inter_variable"
+                    android:gravity="center"
+                    android:text="Add"
+                    android:textColor="@color/color_text_on_primary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>

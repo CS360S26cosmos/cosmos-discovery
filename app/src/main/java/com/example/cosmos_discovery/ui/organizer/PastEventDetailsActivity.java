@@ -2,6 +2,11 @@ package com.example.cosmos_discovery.ui.organizer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,13 +28,23 @@ import java.util.Locale;
 
 public class PastEventDetailsActivity extends AppCompatActivity {
 
+    private static final int MAX_CHARS = 700;
+
     private final EventService mEventService = new EventService();
 
     private String mEventId;
     private String mUserId;
+
+    // Star rating
     private ImageButton[] mStars;
     private boolean mRatingLocked = false;
     private TextView mTvRatingLabel;
+
+    // Review overlay
+    private View mReviewOverlay;
+    private EditText mEtReviewText;
+    private TextView mTvCharCount;
+    private String mExistingReview = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +66,14 @@ public class PastEventDetailsActivity extends AppCompatActivity {
 
         setupNavBar();
         setupStarRating();
+        setupReviewButton();
+        setupReviewOverlay();
         fetchAndBind();
         loadExistingRating();
+        loadExistingReview();
     }
+
+    // ── Navigation ────────────────────────────────────────────────────────
 
     private void setupNavBar() {
         ImageView iconHome     = findViewById(R.id.iconHome);
@@ -80,6 +100,8 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    // ── Star rating ───────────────────────────────────────────────────────
 
     private void setupStarRating() {
         mTvRatingLabel = findViewById(R.id.tvRatingLabel);
@@ -128,6 +150,87 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         );
     }
 
+    // ── Review overlay ────────────────────────────────────────────────────
+
+    private void setupReviewButton() {
+        findViewById(R.id.addReviewButtonCard).setOnClickListener(v -> {
+            if (!mRatingLocked) {
+                Toast.makeText(this, "Add rating first", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            showReviewOverlay();
+        });
+    }
+
+    private void setupReviewOverlay() {
+        mReviewOverlay = findViewById(R.id.reviewOverlay);
+        mEtReviewText  = mReviewOverlay.findViewById(R.id.etReviewText);
+        mTvCharCount   = mReviewOverlay.findViewById(R.id.tvCharCount);
+
+        mEtReviewText.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mTvCharCount.setText(s.length() + "/" + MAX_CHARS);
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        // Backdrop tap dismisses the overlay
+        mReviewOverlay.setOnClickListener(v -> dismissReviewOverlay());
+        // Card tap is consumed so it doesn't bubble to the backdrop listener
+        mReviewOverlay.findViewById(R.id.reviewCard).setOnClickListener(v -> {});
+
+        mReviewOverlay.findViewById(R.id.btnCloseReview)
+                .setOnClickListener(v -> dismissReviewOverlay());
+        mReviewOverlay.findViewById(R.id.btnCancelReview)
+                .setOnClickListener(v -> dismissReviewOverlay());
+        mReviewOverlay.findViewById(R.id.btnAddReview)
+                .setOnClickListener(v -> submitReview());
+    }
+
+    private void showReviewOverlay() {
+        String prefill = mExistingReview != null ? mExistingReview : "";
+        mEtReviewText.setText(prefill);
+        mEtReviewText.setSelection(prefill.length());
+        mTvCharCount.setText(prefill.length() + "/" + MAX_CHARS);
+
+        mReviewOverlay.setVisibility(View.VISIBLE);
+        mEtReviewText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mEtReviewText, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    private void dismissReviewOverlay() {
+        mReviewOverlay.setVisibility(View.GONE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mEtReviewText.getWindowToken(), 0);
+    }
+
+    private void submitReview() {
+        String text = mEtReviewText.getText().toString().trim();
+        if (mUserId == null) {
+            dismissReviewOverlay();
+            return;
+        }
+        mEventService.saveReview(mEventId, mUserId, text,
+                () -> {
+                    mExistingReview = text;
+                    dismissReviewOverlay();
+                },
+                err -> Toast.makeText(this, "Could not save review.", Toast.LENGTH_SHORT).show()
+        );
+    }
+
+    private void loadExistingReview() {
+        if (mUserId == null) return;
+        mEventService.fetchReview(mEventId, mUserId,
+                review -> mExistingReview = review,
+                err -> {}
+        );
+    }
+
+    // ── Event data ────────────────────────────────────────────────────────
+
     private void fetchAndBind() {
         mEventService.fetchEventById(
                 mEventId,
@@ -161,8 +264,7 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         organizer.setText(name != null && !name.isEmpty() ? name : "Unknown");
 
         desc.setText(
-                event.getDescription() != null &&
-                        !event.getDescription().trim().isEmpty()
+                event.getDescription() != null && !event.getDescription().trim().isEmpty()
                         ? event.getDescription()
                         : "No description provided."
         );

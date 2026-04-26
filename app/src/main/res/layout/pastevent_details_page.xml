@@ -528,4 +528,12 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Review overlay — rendered on top of everything -->
+    <include
+        android:id="@+id/reviewOverlay"
+        layout="@layout/component_review_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </FrameLayout>
