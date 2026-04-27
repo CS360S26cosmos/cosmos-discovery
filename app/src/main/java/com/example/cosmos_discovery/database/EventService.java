@@ -10,11 +10,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
+import com.example.cosmos_discovery.model.Review;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
@@ -478,6 +481,41 @@ public class EventService {
     }
 
     /**
+     * Computes the average rating for an event across all raters.
+     * Calls {@code onSuccess} with the average (1.0–5.0), or {@code null} if no ratings exist.
+     */
+    public void fetchAverageRating(String eventId,
+                                   Consumer<Double> onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> ratingsMap = (Map<String, Object>) doc.get("ratings");
+                    if (ratingsMap == null || ratingsMap.isEmpty()) {
+                        onSuccess.accept(null);
+                        return;
+                    }
+                    double sum = 0;
+                    int count = 0;
+                    for (Object val : ratingsMap.values()) {
+                        if (val instanceof Long) {
+                            sum += (Long) val;
+                            count++;
+                        } else if (val instanceof Double) {
+                            sum += (Double) val;
+                            count++;
+                        }
+                    }
+                    onSuccess.accept(count > 0 ? sum / count : null);
+                })
+                .addOnFailureListener(ex -> {
+                    Log.e(TAG, "fetchAverageRating failed: " + ex.getMessage(), ex);
+                    onFailure.accept("Could not fetch average rating.");
+                });
+    }
+
+    /**
      * Saves a text review for a user on an event.
      * Stored as events/{eventId}.reviews.{userId} alongside the ratings map.
      */
@@ -502,11 +540,68 @@ public class EventService {
         mDb.collection(EVENTS_COLLECTION)
                 .document(eventId)
                 .get()
-                .addOnSuccessListener(doc -> onSuccess.accept(doc.getString("reviews." + userId)))
+                .addOnSuccessListener(doc -> {
+                    Object val = doc.get("reviews." + userId);
+                    onSuccess.accept(val instanceof String ? (String) val : null);
+                })
                 .addOnFailureListener(ex -> {
                     Log.e(TAG, "fetchReview failed: " + ex.getMessage(), ex);
                     onFailure.accept("Could not fetch review.");
                 });
+    }
+
+    /**
+     * Fetches all reviews for an event, joining each reviewer's display name from
+     * the users collection. Calls {@code onSuccess} with a list of {@link Review}
+     * objects — one per user who has a stored review entry (text may be empty).
+     */
+    public void fetchAllReviews(String eventId,
+                                Consumer<List<Review>> onSuccess,
+                                Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> reviewsMap = (Map<String, Object>) doc.get("reviews");
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> ratingsMap = (Map<String, Object>) doc.get("ratings");
+
+                    if (reviewsMap == null || reviewsMap.isEmpty()) {
+                        onSuccess.accept(new ArrayList<>());
+                        return;
+                    }
+
+                    List<String> userIds = new ArrayList<>(reviewsMap.keySet());
+                    List<Review> results = Collections.synchronizedList(new ArrayList<>());
+                    AtomicInteger remaining = new AtomicInteger(userIds.size());
+
+                    for (String uid : userIds) {
+                        String text = reviewsMap.get(uid) instanceof String
+                                ? (String) reviewsMap.get(uid) : "";
+                        final String finalText = text;
+
+                        int rating = 0;
+                        if (ratingsMap != null && ratingsMap.get(uid) instanceof Long) {
+                            rating = ((Long) ratingsMap.get(uid)).intValue();
+                        }
+                        final int finalRating = rating;
+
+                        mDb.collection("users").document(uid).get()
+                                .addOnSuccessListener(userDoc -> {
+                                    String name = userDoc.getString("name");
+                                    results.add(new Review(uid, name != null ? name : "Unknown",
+                                            finalRating, finalText));
+                                    if (remaining.decrementAndGet() == 0) onSuccess.accept(results);
+                                })
+                                .addOnFailureListener(ex -> {
+                                    results.add(new Review(uid, "Unknown", finalRating, finalText));
+                                    if (remaining.decrementAndGet() == 0) onSuccess.accept(results);
+                                });
+                    }
+                })
+                .addOnFailureListener(ex -> onFailure.accept(
+                        ex.getMessage() != null ? ex.getMessage() : "Could not load reviews."));
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────

@@ -73,6 +73,9 @@
             android:name=".ui.organizer.AttendeeListActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.organizer.ViewReviewsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.student.StudentActivity"
             android:exported="false" />
         <activity

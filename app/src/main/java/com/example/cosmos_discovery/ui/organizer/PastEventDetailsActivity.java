@@ -38,6 +38,7 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     // Star rating
     private ImageButton[] mStars;
     private boolean mRatingLocked = false;
+    private int mCurrentRating = -1;
     private TextView mTvRatingLabel;
 
     // Review overlay
@@ -67,10 +68,12 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         setupNavBar();
         setupStarRating();
         setupReviewButton();
+        setupViewReviewsButton();
         setupReviewOverlay();
         fetchAndBind();
         loadExistingRating();
         loadExistingReview();
+        loadAverageRating();
     }
 
     // ── Navigation ────────────────────────────────────────────────────────
@@ -131,6 +134,7 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     }
 
     private void applyRating(int rating) {
+        mCurrentRating = rating;
         for (int i = 0; i < mStars.length; i++) {
             mStars[i].setImageResource(i < rating ? R.drawable.star_filled : R.drawable.star_outline);
         }
@@ -151,6 +155,16 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     }
 
     // ── Review overlay ────────────────────────────────────────────────────
+
+    private void setupViewReviewsButton() {
+        findViewById(R.id.tvViewReviews).setOnClickListener(v -> {
+            Intent intent = new Intent(this, ViewReviewsActivity.class);
+            intent.putExtra("event_id", mEventId);
+            intent.putExtra("current_user_rating", mCurrentRating);
+            intent.putExtra("current_user_review", mExistingReview);
+            startActivity(intent);
+        });
+    }
 
     private void setupReviewButton() {
         findViewById(R.id.addReviewButtonCard).setOnClickListener(v -> {
@@ -225,6 +239,20 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         if (mUserId == null) return;
         mEventService.fetchReview(mEventId, mUserId,
                 review -> mExistingReview = review,
+                err -> {}
+        );
+    }
+
+    private void loadAverageRating() {
+        TextView tvAvgRating = findViewById(R.id.tvAvgRatingValue);
+        mEventService.fetchAverageRating(mEventId,
+                avg -> {
+                    if (avg == null) {
+                        tvAvgRating.setText("No ratings yet");
+                    } else {
+                        tvAvgRating.setText(String.format(Locale.getDefault(), "%.1f / 5", avg));
+                    }
+                },
                 err -> {}
         );
     }
