@@ -47,6 +47,10 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     private TextView mTvCharCount;
     private String mExistingReview = null;
 
+    // Add Review button
+    private com.google.android.material.card.MaterialCardView mAddReviewCard;
+    private TextView mTvAddReviewLabel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,13 +171,24 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     }
 
     private void setupReviewButton() {
-        findViewById(R.id.addReviewButtonCard).setOnClickListener(v -> {
+        mAddReviewCard   = findViewById(R.id.addReviewButtonCard);
+        mTvAddReviewLabel = findViewById(R.id.tvaddReview);
+
+        mAddReviewCard.setOnClickListener(v -> {
             if (!mRatingLocked) {
                 Toast.makeText(this, "Add rating first", Toast.LENGTH_SHORT).show();
                 return;
             }
             showReviewOverlay();
         });
+    }
+
+    private void markReviewSubmitted() {
+        mTvAddReviewLabel.setText("Review Added!");
+        mAddReviewCard.setClickable(false);
+        mAddReviewCard.setFocusable(false);
+        mAddReviewCard.setCardBackgroundColor(
+                getResources().getColor(android.R.color.darker_gray, getTheme()));
     }
 
     private void setupReviewOverlay() {
@@ -230,6 +245,7 @@ public class PastEventDetailsActivity extends AppCompatActivity {
                 () -> {
                     mExistingReview = text;
                     dismissReviewOverlay();
+                    markReviewSubmitted();
                 },
                 err -> Toast.makeText(this, "Could not save review.", Toast.LENGTH_SHORT).show()
         );
@@ -238,7 +254,10 @@ public class PastEventDetailsActivity extends AppCompatActivity {
     private void loadExistingReview() {
         if (mUserId == null) return;
         mEventService.fetchReview(mEventId, mUserId,
-                review -> mExistingReview = review,
+                review -> {
+                    mExistingReview = review;
+                    if (review != null && !review.isEmpty()) markReviewSubmitted();
+                },
                 err -> {}
         );
     }
