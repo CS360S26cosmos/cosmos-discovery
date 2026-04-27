@@ -18,6 +18,7 @@ import com.example.cosmos_discovery.adapter.EventSmallAdapter;
 import com.example.cosmos_discovery.ui.organizer.EventDetailsActivity;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
+import com.example.cosmos_discovery.ui.organizer.PastEventDetailsActivity;
 import com.example.cosmos_discovery.util.EventSorter;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.example.cosmos_discovery.util.RsvpHandler;
@@ -90,7 +91,7 @@ public class MyEventsFragment extends Fragment
         RecyclerView rvPast     = root.findViewById(R.id.recyclerViewPast);
 
         mUpcomingAdapter = new EventSmallAdapter(requireContext(), mUpcomingEvents, this, true, this::onEventClick);
-        mPastAdapter     = new EventSmallAdapter(requireContext(), mPastEvents, null, false, this::onEventClick);
+        mPastAdapter = new EventSmallAdapter(requireContext(), mPastEvents, null, false, this::onPastEventClick);
 
         rvUpcoming.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvUpcoming.setAdapter(mUpcomingAdapter);
@@ -138,6 +139,14 @@ public class MyEventsFragment extends Fragment
         if (event.getId() == null) return;
         Intent intent = new Intent(requireActivity(), EventDetailsActivity.class);
         intent.putExtra(EventDetailsActivity.EXTRA_EVENT_ID, event.getId());
+        startActivity(intent);
+    }
+
+    private void onPastEventClick(Event event) {
+        if (event.getId() == null) return;
+
+        Intent intent = new Intent(requireActivity(), PastEventDetailsActivity.class);
+        intent.putExtra("event_id", event.getId());
         startActivity(intent);
     }
 
