@@ -1,5 +1,6 @@
 package com.example.cosmos_discovery.ui.organizer;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -17,7 +18,9 @@ import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.ui.student.StudentActivity;
+import com.example.cosmos_discovery.util.CalendarUtil;
 import com.example.cosmos_discovery.util.RoleUtil;
+import com.google.android.material.card.MaterialCardView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -126,6 +129,18 @@ public class EventDetailsActivity extends AppCompatActivity {
             capacityInfo.setText(event.getSpotsText());
         } else {
             capacityRow.setVisibility(View.GONE);
+        }
+
+        MaterialCardView addToCalendarCard = findViewById(R.id.addToCalendarCard);
+        if (addToCalendarCard != null) {
+            addToCalendarCard.setOnClickListener(v -> {
+                Intent calIntent = CalendarUtil.buildCalendarIntent(mEvent);
+                try {
+                    startActivity(calIntent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "No calendar app found", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
