@@ -189,28 +189,42 @@ public class AdminUserManagementFragment extends Fragment
 
     @Override
     public void onDeactivate(User user) {
-        mAdminService.deactivateUser(
-                user.getUid(),
-                () -> {
-                    if (!isAdded()) return;
-                    user.setActive(false);
-                    mUserAdapter.updateUser(user);
-                    showToast("User deactivated.");
-                },
-                err -> showToast(err));
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Deactivate User")
+                .setMessage("Deactivate " + (user.getName() != null ? user.getName() : "this user")
+                        + "? They will be unable to sign in.")
+                .setPositiveButton("Deactivate", (d, w) ->
+                        mAdminService.deactivateUser(
+                                user.getUid(),
+                                () -> {
+                                    if (!isAdded()) return;
+                                    user.setActive(false);
+                                    mUserAdapter.updateUser(user);
+                                    showToast("User deactivated.");
+                                },
+                                err -> showToast(err)))
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     @Override
     public void onReactivate(User user) {
-        mAdminService.reactivateUser(
-                user.getUid(),
-                () -> {
-                    if (!isAdded()) return;
-                    user.setActive(true);
-                    mUserAdapter.updateUser(user);
-                    showToast("User reactivated.");
-                },
-                err -> showToast(err));
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Reactivate User")
+                .setMessage("Reactivate " + (user.getName() != null ? user.getName() : "this user")
+                        + "? They will be able to sign in again.")
+                .setPositiveButton("Reactivate", (d, w) ->
+                        mAdminService.reactivateUser(
+                                user.getUid(),
+                                () -> {
+                                    if (!isAdded()) return;
+                                    user.setActive(true);
+                                    mUserAdapter.updateUser(user);
+                                    showToast("User reactivated.");
+                                },
+                                err -> showToast(err)))
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     @Override

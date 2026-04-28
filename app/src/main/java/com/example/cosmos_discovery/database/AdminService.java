@@ -93,7 +93,7 @@ public class AdminService {
         mDb.collection(USERS_COLLECTION).document(userId)
                 .update(updates)
                 .addOnSuccessListener(unused -> onSuccess.run())
-                .addOnFailureListener(e -> onFailure.accept("Could not update role."));
+                .addOnFailureListener(e -> onFailure.accept("Could not update role: " + e.getMessage()));
     }
 
     public void deactivateUser(String userId, Runnable onSuccess, Consumer<String> onFailure) {

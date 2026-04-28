@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.ui.admin.AdminActivity;
-import com.example.cosmos_discovery.ui.auth.LoginActivity;
 import com.example.cosmos_discovery.ui.student.StudentActivity;
 import com.example.cosmos_discovery.util.RoleUtil;
 
@@ -37,26 +36,14 @@ public class MainActivity extends AppCompatActivity {
     private void showPromotionPopup(User user) {
         new AlertDialog.Builder(this)
                 .setTitle("Request Approved!")
-                .setMessage("Your request to become an organizer has been approved. "
-                        + "Sign out now to access the Organizer panel.")
+                .setMessage("Your request to become an organizer has been approved!")
                 .setCancelable(false)
-                .setPositiveButton("Sign Out Now", (d, w) -> {
-                    mAuthService.clearPromotionFlag(
-                            user.getUid(),
-                            () -> signOutAndGoToLogin(),
-                            err -> signOutAndGoToLogin());
+                .setPositiveButton("OK", (d, w) -> {
+                    mAuthService.clearPromotionFlag(user.getUid(),
+                            () -> routeUser(user),
+                            err -> routeUser(user));
                 })
-                .setNegativeButton("Later", (d, w) -> routeUser(user))
                 .show();
-    }
-
-    private void signOutAndGoToLogin() {
-        mAuthService.signOut();
-        RoleUtil.clear();
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
     }
 
     private void routeUser(User user) {

@@ -65,22 +65,27 @@ public class SettingsActivity extends AppCompatActivity {
         row.setAlpha(1f);
         row.setClickable(true);
         subtitle.setVisibility(View.GONE);
-        row.setOnClickListener(v -> {
-            row.setClickable(false);
-            mAuthService.submitOrganizerRequest(
-                    user.getUid(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getPhotoUrl(),
-                    () -> {
-                        disableRequestRow(row, subtitle);
-                        Toast.makeText(this, "Request sent!", Toast.LENGTH_SHORT).show();
-                    },
-                    err -> {
-                        row.setClickable(true);
-                        Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
-                    });
-        });
+        row.setOnClickListener(v -> new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Request Organizer Role")
+                .setMessage("Send a request to the admin to become an organizer?")
+                .setPositiveButton("Send Request", (d, w) -> {
+                    row.setClickable(false);
+                    mAuthService.submitOrganizerRequest(
+                            user.getUid(),
+                            user.getName(),
+                            user.getEmail(),
+                            user.getPhotoUrl(),
+                            () -> {
+                                disableRequestRow(row, subtitle);
+                                Toast.makeText(this, "Request sent!", Toast.LENGTH_SHORT).show();
+                            },
+                            err -> {
+                                row.setClickable(true);
+                                Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .setNegativeButton("Cancel", null)
+                .show());
     }
 
     private void disableRequestRow(View row, TextView subtitle) {
