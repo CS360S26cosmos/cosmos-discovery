@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer circle (stroke only) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.6"
+        android:pathData="M12,2 A10,10 0 1 0 12,22 A10,10 0 1 0 12,2 Z" />
+
+    <!-- 5-point star filled -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M12,6.8 L13.27,10.17 L16.9,10.25 L14.05,12.49 L15.09,15.95 L12,14.03 L8.91,15.95 L9.95,12.49 L7.1,10.25 L10.73,10.17 Z" />
+
+</vector>
