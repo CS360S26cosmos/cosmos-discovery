@@ -51,10 +51,12 @@ public class DiscoverFragment extends Fragment {
     private final EventService mEventService = new EventService();
     private ListenerRegistration mUpcomingListener;
     private ListenerRegistration mThisWeekListener;
-    private ListenerRegistration mRsvpHistoryListener;
 
     private List<Event> mAllUpcoming  = new ArrayList<>();
     private List<Event> mRsvpHistory  = new ArrayList<>();
+    // Counts how many initial data sources still need to arrive before refreshSuggested() runs.
+    // Resets to 2 on each onStart(); live listener updates after that don't re-render suggestions.
+    private int mInitialLoadsPending = 0;
 
     @Nullable
     @Override
@@ -98,20 +100,30 @@ public class DiscoverFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        mInitialLoadsPending = 2; // upcoming events + rsvp history must both arrive first
         mUpcomingListener = mEventService.listenUpcomingEvents(
                 events -> {
                     mAllUpcoming = events;
-                    refreshSuggested();
+                    // Subsequent fires (e.g. after a user RSVPs) must not re-render suggestions,
+                    // otherwise the just-RSVP'd card disappears immediately.
+                    if (mInitialLoadsPending > 0) {
+                        mInitialLoadsPending--;
+                        if (mInitialLoadsPending == 0) refreshSuggested();
+                    }
                 },
                 err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
 
         String uid = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : "";
-        mRsvpHistoryListener = mEventService.listenMyRsvpedEvents(uid,
+        mEventService.fetchMyRsvpedEvents(uid,
                 events -> {
                     mRsvpHistory = events;
-                    refreshSuggested();
+                    if (mInitialLoadsPending > 0) {
+                        mInitialLoadsPending--;
+                        if (mInitialLoadsPending == 0) refreshSuggested();
+                    }
                 },
-                err -> { /* non-critical — recommendations still work without history */ });
+                err -> { mInitialLoadsPending = Math.max(0, mInitialLoadsPending - 1);
+                         if (mInitialLoadsPending == 0) refreshSuggested(); });
 
         mThisWeekListener = mEventService.listenThisWeekEvents(
                 events -> updateThisWeek(events),
@@ -124,10 +136,6 @@ public class DiscoverFragment extends Fragment {
         if (mUpcomingListener != null) {
             mUpcomingListener.remove();
             mUpcomingListener = null;
-        }
-        if (mRsvpHistoryListener != null) {
-            mRsvpHistoryListener.remove();
-            mRsvpHistoryListener = null;
         }
         if (mThisWeekListener != null) {
             mThisWeekListener.remove();

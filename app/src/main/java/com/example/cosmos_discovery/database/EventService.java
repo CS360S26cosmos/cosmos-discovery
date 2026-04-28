@@ -140,6 +140,29 @@ public class EventService {
                 });
     }
 
+    /** One-time fetch of all events the user has RSVPed to — used by For You so that
+     *  recommendations don't refresh mid-session when the user RSVPs. */
+    public void fetchMyRsvpedEvents(String userId,
+                                    Consumer<List<Event>> onSuccess,
+                                    Consumer<String> onError) {
+        mDb.collection(EVENTS_COLLECTION)
+                .whereArrayContains("attendeeIds", userId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    List<Event> events = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        Event e = doc.toObject(Event.class);
+                        if (e != null) {
+                            e.setId(doc.getId());
+                            events.add(e);
+                        }
+                    }
+                    onSuccess.accept(events);
+                })
+                .addOnFailureListener(e -> onError.accept(
+                        e.getMessage() != null ? e.getMessage() : "Failed to load your events."));
+    }
+
     /**
      * Attaches a real-time listener for all events created by the given organizer.
      * No server-side ordering — callers sort client-side after splitting by status.
