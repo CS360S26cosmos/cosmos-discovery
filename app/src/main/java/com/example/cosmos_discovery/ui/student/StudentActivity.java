@@ -254,6 +254,14 @@ public class StudentActivity extends AppCompatActivity {
                     startActivity(intent);
                 });
 
+        View friendRequestsRow = mSidebarView.findViewById(R.id.friendRequestsRow);
+        if (friendRequestsRow != null) {
+            friendRequestsRow.setOnClickListener(v -> {
+                hideSidebar();
+                startActivity(new Intent(this, FriendRequestsActivity.class));
+            });
+        }
+
         mSidebarView.findViewById(R.id.settingsRow)
                 .setOnClickListener(v -> {
                     hideSidebar();

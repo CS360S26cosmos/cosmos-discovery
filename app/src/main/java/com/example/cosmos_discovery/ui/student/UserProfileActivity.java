@@ -70,6 +70,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private List<FriendEntry> targetFriends  = new ArrayList<>();
     private Set<String>       currentFriendUids = new HashSet<>();
     private final AtomicInteger fetchCount = new AtomicInteger(0);
+    private boolean mRequestPending = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +144,11 @@ public class UserProfileActivity extends AppCompatActivity {
                 },
                 err -> Toast.makeText(this, err, Toast.LENGTH_SHORT).show());
 
+        // 4b. Check if a request is already pending to this user
+        friendService.checkSentRequest(currentUid, targetUid,
+                pending -> { mRequestPending = pending; updateActionButton(); },
+                err -> { /* non-critical, silently skip */ });
+
         // 4. Listen to target's RSVPed events → show upcoming
         eventListener = eventService.listenMyRsvpedEvents(targetUid,
                 events -> {
@@ -189,30 +195,34 @@ public class UserProfileActivity extends AppCompatActivity {
                     ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_primary)));
             btnAction.setTextColor(ContextCompat.getColor(this, R.color.color_text_on_primary));
             btnAction.setStrokeWidth(0);
+            btnAction.setEnabled(true);
             btnAction.setOnClickListener(v -> removeFriend());
+        } else if (mRequestPending) {
+            btnAction.setText("Requested");
+            btnAction.setBackgroundTintList(ColorStateList.valueOf(android.graphics.Color.TRANSPARENT));
+            btnAction.setTextColor(ContextCompat.getColor(this, R.color.color_text_hint));
+            btnAction.setStrokeWidthResource(R.dimen.btn_stroke_width);
+            btnAction.setStrokeColorResource(R.color.color_text_hint);
+            btnAction.setEnabled(false);
+            btnAction.setOnClickListener(null);
         } else {
             btnAction.setText("Add Friend");
             btnAction.setBackgroundTintList(ColorStateList.valueOf(android.graphics.Color.TRANSPARENT));
             btnAction.setTextColor(ContextCompat.getColor(this, R.color.color_text_secondary));
             btnAction.setStrokeWidthResource(R.dimen.btn_stroke_width);
             btnAction.setStrokeColorResource(R.color.color_text_hint);
-            btnAction.setOnClickListener(v -> addFriend());
+            btnAction.setEnabled(true);
+            btnAction.setOnClickListener(v -> sendRequest());
         }
     }
 
-    private void addFriend() {
+    private void sendRequest() {
         User currentUser = RoleUtil.getCurrentUser();
+        if (currentUser == null) return;
         friendService.fetchUserById(targetUid,
-                target -> {
-                    friendService.addFriend(currentUser, target,
-                            () -> {
-                                currentFriendUids.add(targetUid);
-                                updateActionButton();
-                                int newCount = Integer.parseInt(tvFriendsCount.getText().toString()) + 1;
-                                tvFriendsCount.setText(String.valueOf(newCount));
-                            },
-                            err -> Toast.makeText(this, err, Toast.LENGTH_SHORT).show());
-                },
+                target -> friendService.sendFriendRequest(currentUser, target,
+                        () -> { mRequestPending = true; updateActionButton(); },
+                        err -> Toast.makeText(this, err, Toast.LENGTH_SHORT).show()),
                 err -> Toast.makeText(this, err, Toast.LENGTH_SHORT).show());
     }
 

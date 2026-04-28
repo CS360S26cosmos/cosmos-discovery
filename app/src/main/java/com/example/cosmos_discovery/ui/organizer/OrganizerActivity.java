@@ -318,6 +318,14 @@ public class OrganizerActivity extends AppCompatActivity {
             startActivity(new Intent(this, ViewProfile.class));
         });
 
+        View friendRequestsRow = mSidebarView.findViewById(R.id.friendRequestsRow);
+        if (friendRequestsRow != null) {
+            friendRequestsRow.setOnClickListener(v -> {
+                hideSidebar();
+                startActivity(new Intent(this, com.example.cosmos_discovery.ui.student.FriendRequestsActivity.class));
+            });
+        }
+
         mSidebarView.findViewById(R.id.settingsRow).setOnClickListener(v -> {
             hideSidebar();
             startActivity(new Intent(this, com.example.cosmos_discovery.ui.shared.SettingsActivity.class));

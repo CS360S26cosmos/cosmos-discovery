@@ -161,6 +161,158 @@ public class FriendService {
                 .addOnFailureListener(e -> onFailure.accept("Could not load users."));
     }
 
+    // ── Friend Requests ───────────────────────────────────────────────────
+
+    private static final String REQUESTS_SUB      = "friendRequests";
+    private static final String SENT_REQUESTS_SUB = "sentRequests";
+
+    /**
+     * Sends a friend request: writes a {@link FriendEntry} to the target's
+     * {@code friendRequests} subcollection (keyed by sender UID) and a mirror entry to the
+     * sender's {@code sentRequests} subcollection (keyed by target UID). Atomic via batch.
+     */
+    public void sendFriendRequest(User sender, User target,
+                                  Runnable onSuccess, Consumer<String> onFailure) {
+        FriendEntry forTarget = new FriendEntry(
+                sender.getUid(), sender.getName(), sender.getPhotoUrl());
+        FriendEntry forSender = new FriendEntry(
+                target.getUid(), target.getName(), target.getPhotoUrl());
+
+        WriteBatch batch = mDb.batch();
+        batch.set(mDb.collection(USERS_COLLECTION).document(target.getUid())
+                        .collection(REQUESTS_SUB).document(sender.getUid()), forTarget);
+        batch.set(mDb.collection(USERS_COLLECTION).document(sender.getUid())
+                        .collection(SENT_REQUESTS_SUB).document(target.getUid()), forSender);
+        batch.commit()
+                .addOnSuccessListener(u -> onSuccess.run())
+                .addOnFailureListener(e -> onFailure.accept("Could not send request."));
+    }
+
+    /**
+     * Real-time listener for incoming friend requests (documents in the current user's
+     * {@code friendRequests} subcollection).
+     *
+     * @return A {@link ListenerRegistration} — call {@code .remove()} in {@code onStop()}.
+     */
+    public ListenerRegistration listenIncomingRequests(String uid,
+                                                       Consumer<List<FriendEntry>> onUpdate,
+                                                       Consumer<String> onError) {
+        return mDb.collection(USERS_COLLECTION).document(uid)
+                .collection(REQUESTS_SUB)
+                .addSnapshotListener((snap, err) -> {
+                    if (err != null) {
+                        onError.accept(err.getMessage() != null
+                                ? err.getMessage() : "Failed to load requests.");
+                        return;
+                    }
+                    List<FriendEntry> list = new ArrayList<>();
+                    if (snap != null) {
+                        for (DocumentSnapshot doc : snap.getDocuments()) {
+                            FriendEntry e = doc.toObject(FriendEntry.class);
+                            if (e != null) list.add(e);
+                        }
+                    }
+                    onUpdate.accept(list);
+                });
+    }
+
+    /**
+     * Real-time listener for sent friend requests (documents in the current user's
+     * {@code sentRequests} subcollection).
+     *
+     * @return A {@link ListenerRegistration} — call {@code .remove()} in {@code onStop()}.
+     */
+    public ListenerRegistration listenSentRequests(String uid,
+                                                   Consumer<List<FriendEntry>> onUpdate,
+                                                   Consumer<String> onError) {
+        return mDb.collection(USERS_COLLECTION).document(uid)
+                .collection(SENT_REQUESTS_SUB)
+                .addSnapshotListener((snap, err) -> {
+                    if (err != null) {
+                        onError.accept(err.getMessage() != null
+                                ? err.getMessage() : "Failed to load sent requests.");
+                        return;
+                    }
+                    List<FriendEntry> list = new ArrayList<>();
+                    if (snap != null) {
+                        for (DocumentSnapshot doc : snap.getDocuments()) {
+                            FriendEntry e = doc.toObject(FriendEntry.class);
+                            if (e != null) list.add(e);
+                        }
+                    }
+                    onUpdate.accept(list);
+                });
+    }
+
+    /**
+     * Accepts an incoming request: atomically adds a mutual friendship and deletes the request
+     * from both the receiver's {@code friendRequests} and sender's {@code sentRequests}.
+     */
+    public void acceptRequest(User currentUser, String senderUid,
+                              String senderName, String senderPhoto,
+                              Runnable onSuccess, Consumer<String> onFailure) {
+        FriendEntry forCurrent = new FriendEntry(senderUid, senderName, senderPhoto);
+        FriendEntry forSender  = new FriendEntry(
+                currentUser.getUid(), currentUser.getName(), currentUser.getPhotoUrl());
+
+        WriteBatch batch = mDb.batch();
+        batch.set(mDb.collection(USERS_COLLECTION).document(currentUser.getUid())
+                        .collection(FRIENDS_SUB).document(senderUid), forCurrent);
+        batch.set(mDb.collection(USERS_COLLECTION).document(senderUid)
+                        .collection(FRIENDS_SUB).document(currentUser.getUid()), forSender);
+        batch.delete(mDb.collection(USERS_COLLECTION).document(currentUser.getUid())
+                        .collection(REQUESTS_SUB).document(senderUid));
+        batch.delete(mDb.collection(USERS_COLLECTION).document(senderUid)
+                        .collection(SENT_REQUESTS_SUB).document(currentUser.getUid()));
+        batch.commit()
+                .addOnSuccessListener(u -> onSuccess.run())
+                .addOnFailureListener(e -> onFailure.accept("Could not accept request."));
+    }
+
+    /**
+     * Declines an incoming request: atomically deletes it from both sides.
+     */
+    public void declineRequest(String currentUid, String senderUid,
+                               Runnable onSuccess, Consumer<String> onFailure) {
+        WriteBatch batch = mDb.batch();
+        batch.delete(mDb.collection(USERS_COLLECTION).document(currentUid)
+                        .collection(REQUESTS_SUB).document(senderUid));
+        batch.delete(mDb.collection(USERS_COLLECTION).document(senderUid)
+                        .collection(SENT_REQUESTS_SUB).document(currentUid));
+        batch.commit()
+                .addOnSuccessListener(u -> onSuccess.run())
+                .addOnFailureListener(e -> onFailure.accept("Could not decline request."));
+    }
+
+    /**
+     * Cancels a sent request: atomically deletes it from both sides.
+     */
+    public void cancelSentRequest(String senderUid, String targetUid,
+                                  Runnable onSuccess, Consumer<String> onFailure) {
+        WriteBatch batch = mDb.batch();
+        batch.delete(mDb.collection(USERS_COLLECTION).document(targetUid)
+                        .collection(REQUESTS_SUB).document(senderUid));
+        batch.delete(mDb.collection(USERS_COLLECTION).document(senderUid)
+                        .collection(SENT_REQUESTS_SUB).document(targetUid));
+        batch.commit()
+                .addOnSuccessListener(u -> onSuccess.run())
+                .addOnFailureListener(e -> onFailure.accept("Could not cancel request."));
+    }
+
+    /**
+     * One-shot check: does a pending sent request already exist from sender → target?
+     */
+    public void checkSentRequest(String senderUid, String targetUid,
+                                 Consumer<Boolean> onResult, Consumer<String> onFailure) {
+        mDb.collection(USERS_COLLECTION).document(senderUid)
+                .collection(SENT_REQUESTS_SUB).document(targetUid)
+                .get()
+                .addOnSuccessListener(doc -> onResult.accept(doc.exists()))
+                .addOnFailureListener(e -> onFailure.accept("Could not check request status."));
+    }
+
+    // ── User fetches ──────────────────────────────────────────────────────
+
     /**
      * Fetches multiple users by uid.
      *

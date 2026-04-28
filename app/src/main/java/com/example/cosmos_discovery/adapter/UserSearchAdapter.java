@@ -18,6 +18,7 @@ import com.example.cosmos_discovery.model.User;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +40,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     private List<User>              mAllUsers;
     private List<User>              mFiltered;
     private Set<String>             mFriendUids;
+    private Set<String>             mRequestedUids = new HashSet<>();
     private String                  mCurrentUid;
     private String                  mQuery      = "";
     private final Context           mContext;
@@ -68,6 +70,12 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     /** Updates only the friend UIDs set (e.g. after a successful addFriend), then re-filters. */
     public void updateFriendUids(Set<String> friendUids) {
         mFriendUids = friendUids;
+        applyFilter();
+    }
+
+    /** Updates the set of UIDs with a pending sent request, then re-renders. */
+    public void updateRequestedUids(Set<String> requestedUids) {
+        mRequestedUids = requestedUids;
         applyFilter();
     }
 
@@ -125,10 +133,19 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
             if (mUserClickListener != null) mUserClickListener.onUserClick(user);
         });
 
-        // Add Friend / Friends state
-        boolean isFriend = mFriendUids != null && mFriendUids.contains(user.getUid());
+        // Add Friend / Requested / Friends state
+        boolean isFriend    = mFriendUids    != null && mFriendUids.contains(user.getUid());
+        boolean isRequested = mRequestedUids != null && mRequestedUids.contains(user.getUid());
+
         if (isFriend) {
             holder.btnAddFriend.setText("Friends ✓");
+            holder.btnAddFriend.setBackground(
+                    ContextCompat.getDrawable(mContext, R.drawable.bg_btn_going));
+            holder.btnAddFriend.setTextColor(
+                    ContextCompat.getColor(mContext, R.color.color_button_going_stroke));
+            holder.btnAddFriend.setEnabled(false);
+        } else if (isRequested) {
+            holder.btnAddFriend.setText("Requested");
             holder.btnAddFriend.setBackground(
                     ContextCompat.getDrawable(mContext, R.drawable.bg_btn_going));
             holder.btnAddFriend.setTextColor(

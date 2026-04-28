@@ -40,9 +40,11 @@ public class UserSearchFragment extends Fragment {
 
     private final FriendService mFriendService = new FriendService();
     private ListenerRegistration mFriendsListener;
+    private ListenerRegistration mSentRequestsListener;
 
-    private List<User>   mAllUsers   = new ArrayList<>();
-    private Set<String>  mFriendUids = new HashSet<>();
+    private List<User>   mAllUsers      = new ArrayList<>();
+    private Set<String>  mFriendUids    = new HashSet<>();
+    private Set<String>  mRequestedUids = new HashSet<>();
 
     @Nullable
     @Override
@@ -89,6 +91,15 @@ public class UserSearchFragment extends Fragment {
                     updateEmptyState();
                 },
                 err -> { /* non-critical — button state may lag */ });
+
+        // Listen to sent requests so "Requested" state stays up to date
+        mSentRequestsListener = mFriendService.listenSentRequests(currentUid,
+                entries -> {
+                    mRequestedUids = new HashSet<>();
+                    for (FriendEntry e : entries) mRequestedUids.add(e.getUid());
+                    mAdapter.updateRequestedUids(mRequestedUids);
+                },
+                err -> { /* non-critical */ });
     }
 
     /** Called by StudentActivity whenever the search query changes. */
@@ -109,16 +120,16 @@ public class UserSearchFragment extends Fragment {
         User currentUser = RoleUtil.getCurrentUser();
         if (currentUser == null) return;
 
-        // Optimistic update: add to local set and refresh adapter
-        mFriendUids.add(target.getUid());
-        mAdapter.updateFriendUids(mFriendUids);
+        // Optimistic update: mark as requested immediately
+        mRequestedUids.add(target.getUid());
+        mAdapter.updateRequestedUids(mRequestedUids);
 
-        mFriendService.addFriend(currentUser, target,
-                () -> { /* listener will refresh the button state */ },
+        mFriendService.sendFriendRequest(currentUser, target,
+                () -> { /* listener will confirm state */ },
                 err -> {
                     // Roll back optimistic update on failure
-                    mFriendUids.remove(target.getUid());
-                    mAdapter.updateFriendUids(mFriendUids);
+                    mRequestedUids.remove(target.getUid());
+                    mAdapter.updateRequestedUids(mRequestedUids);
                     Toast.makeText(getContext(), err, Toast.LENGTH_SHORT).show();
                 });
     }
@@ -136,6 +147,10 @@ public class UserSearchFragment extends Fragment {
         if (mFriendsListener != null) {
             mFriendsListener.remove();
             mFriendsListener = null;
+        }
+        if (mSentRequestsListener != null) {
+            mSentRequestsListener.remove();
+            mSentRequestsListener = null;
         }
     }
 }
