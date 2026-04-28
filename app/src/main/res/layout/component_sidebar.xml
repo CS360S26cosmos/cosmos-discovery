@@ -175,6 +175,62 @@
                 android:contentDescription="Go to profile" />
         </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="#DDD6DD" />
+
+        <!-- friend requests -->
+        <LinearLayout
+            android:id="@+id/friendRequestsRow"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_group"
+                android:contentDescription="Friend Requests" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:text="Friend Requests"
+                android:textSize="17sp"
+                android:textColor="@color/color_text_secondary"
+                android:fontFamily="@font/inter_variable" />
+
+            <TextView
+                android:id="@+id/sidebarRequestBadge"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_count_badge"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter_variable"
+                android:visibility="gone" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_sidebar_arrow_icon"
+                android:contentDescription="Go to friend requests" />
+        </LinearLayout>
+
         <!-- organizer-only section (hidden by default) -->
         <LinearLayout
             android:id="@+id/organizerSection"
