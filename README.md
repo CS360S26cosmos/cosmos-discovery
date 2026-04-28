@@ -176,11 +176,11 @@ Ensured features in review are aligned with requirements before final approval
 Identified that most remaining work is either actively being developed or under review
 
 ### Sprint Progress Overview
-US-13 (View Event Analytics) is ready to be picked up – Sameen Abid
-US-07 (Rate & Review Attended Event) is in progress – Ammara Haroon
-US-22 (Send & Accept Friend Requests) is in progress – Elizeh Faisal
-US-21 (Personalized Event Recommendations) is in review – Hafsah Nasir
-US-06 (Add Event to Phone Calendar) is in review – Hamania Asim
+- US-13 (View Event Analytics) is ready to be picked up – Sameen Abid
+- US-07 (Rate & Review Attended Event) is in progress – Ammara Haroon
+- US-22 (Send & Accept Friend Requests) is in progress – Elizeh Faisal
+- US-21 (Personalized Event Recommendations) is in review – Hafsah Nasir
+- US-06 (Add Event to Phone Calendar) is in review – Hamania Asim
 
 ## UML Diagram
 <img width="3381" height="929" alt="nLTjRzis4FwkNq5q7-OiJjSXQ50OGL37LX1XJXp8TejX60f6kiXSPT8bAMTU4M0_OhzmlsH7lTYKpDXE1yo64Ikyvrvul7kEUgyqbJgRfQGlPfHnCg1Ba9wdFZC-fvBEI9HIfRfQItQVQGWYmKViJo1lcf0hmNKk-UcqARe66eEyfD7dH8gCnpsH2ac-kphpBw_UDi6NGYAuXBnxStfwTcP1g9JYyJdX73tG1BPRK1ea2BsS" src="https://github.com/user-attachments/assets/72aed3ca-c89d-4096-8099-f7076712fc69" />
