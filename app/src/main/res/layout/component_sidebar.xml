@@ -211,6 +211,19 @@
                 android:textColor="@color/color_text_secondary"
                 android:fontFamily="@font/inter_variable" />
 
+            <TextView
+                android:id="@+id/sidebarRequestBadge"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_count_badge"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter_variable"
+                android:visibility="gone" />
+
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"

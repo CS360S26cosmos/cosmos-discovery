@@ -21,8 +21,11 @@ import com.bumptech.glide.Glide;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.database.EventService;
+import com.example.cosmos_discovery.database.FriendService;
 import com.example.cosmos_discovery.model.FilterState;
+import com.example.cosmos_discovery.model.FriendEntry;
 import com.example.cosmos_discovery.model.User;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.example.cosmos_discovery.ui.auth.LoginActivity;
 import com.example.cosmos_discovery.ui.organizer.AddEventActivity;
 import com.example.cosmos_discovery.ui.organizer.OrganizerActivity;
@@ -111,6 +114,9 @@ public class StudentActivity extends AppCompatActivity {
 
     private final AuthService  mAuthService  = new AuthService();
     private final EventService mEventService = new EventService();
+    private final FriendService mFriendService = new FriendService();
+    private ListenerRegistration mIncomingRequestsListener;
+    private TextView             mSidebarRequestBadge;
 
     // ── Lifecycle ────────────────────────────────────────────────────────
 
@@ -254,6 +260,8 @@ public class StudentActivity extends AppCompatActivity {
                     startActivity(intent);
                 });
 
+        mSidebarRequestBadge = mSidebarView.findViewById(R.id.sidebarRequestBadge);
+
         View friendRequestsRow = mSidebarView.findViewById(R.id.friendRequestsRow);
         if (friendRequestsRow != null) {
             friendRequestsRow.setOnClickListener(v -> {
@@ -281,6 +289,21 @@ public class StudentActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        attachIncomingRequestsListener();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mIncomingRequestsListener != null) {
+            mIncomingRequestsListener.remove();
+            mIncomingRequestsListener = null;
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         User user = RoleUtil.getCurrentUser();
@@ -288,6 +311,26 @@ public class StudentActivity extends AppCompatActivity {
             TextView name = mSidebarView.findViewById(R.id.sidebarUserName);
             name.setText(user.getName());
             loadSidebarPhoto(user);
+        }
+    }
+
+    private void attachIncomingRequestsListener() {
+        User current = RoleUtil.getCurrentUser();
+        if (current == null || mIncomingRequestsListener != null) return;
+        mIncomingRequestsListener = mFriendService.listenIncomingRequests(
+                current.getUid(),
+                this::updateSidebarBadge,
+                err -> { /* non-critical */ });
+    }
+
+    private void updateSidebarBadge(java.util.List<FriendEntry> entries) {
+        if (mSidebarRequestBadge == null) return;
+        int count = entries.size();
+        if (count > 0) {
+            mSidebarRequestBadge.setText(String.valueOf(count));
+            mSidebarRequestBadge.setVisibility(View.VISIBLE);
+        } else {
+            mSidebarRequestBadge.setVisibility(View.GONE);
         }
     }
 
