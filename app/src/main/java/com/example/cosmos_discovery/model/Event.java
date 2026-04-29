@@ -30,6 +30,8 @@ public class Event {
     private List<String> attendeeIds;
     private long         createdAt;
     private String       accessType;  // "lums_only" | "open" | null (null treated as open)
+    private int          totalViews;
+    private double       cancellationRate;
 
     /** Required by Firestore for deserialization. Do not use in application code. */
     protected Event() {}
@@ -93,4 +95,10 @@ public class Event {
 
     public String getAccessType()                    { return accessType; }
     public void   setAccessType(String accessType)   { this.accessType = accessType; }
+
+    public int    getTotalViews()                    { return totalViews; }
+    public void   setTotalViews(int totalViews)      { this.totalViews = totalViews; }
+
+    public double getCancellationRate()              { return cancellationRate; }
+    public void   setCancellationRate(double rate)   { this.cancellationRate = rate; }
 }
