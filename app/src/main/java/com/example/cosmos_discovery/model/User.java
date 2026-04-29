@@ -35,6 +35,8 @@ public class User {
     private long createdAt;
     /** URL of the user's profile photo, or null when not set. */
     private String photoUrl;
+    /** Flag set when an organizer request is approved; cleared after the promotion popup is dismissed. */
+    private boolean promotionApproved;
 
     /**
      * Default constructor required for serialization/deserialization frameworks.
@@ -236,4 +238,7 @@ public class User {
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
+
+    public boolean isPromotionApproved() { return promotionApproved; }
+    public void setPromotionApproved(boolean v) { this.promotionApproved = v; }
 }

@@ -13,7 +13,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
 
         <TextView
             android:id="@+id/chipPendingRequests"
@@ -44,14 +45,70 @@
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="48dp"
-        android:fontFamily="@font/inter_variable"
-        android:text="User Management Page"
-        android:textColor="@color/color_text_secondary"
-        android:textSize="18sp" />
+    <!-- PENDING REQUESTS panel -->
+    <FrameLayout
+        android:id="@+id/panelPendingRequests"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPendingRequests"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp" />
+
+        <TextView
+            android:id="@+id/tvEmptyRequests"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="No pending requests"
+            android:textColor="@color/color_text_hint"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <!-- ALL USERS panel -->
+    <LinearLayout
+        android:id="@+id/panelAllUsers"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchUsers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAllUsers"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tvEmptyUsers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="No users found"
+                android:textColor="@color/color_text_hint"
+                android:textSize="15sp"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

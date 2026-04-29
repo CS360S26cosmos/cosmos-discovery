@@ -133,6 +133,7 @@
                     android:paddingVertical="8dp">
 
                     <TextView
+                        android:id="@+id/tvRequestOrganizerTitle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Request to be an Organizer"
@@ -141,6 +142,19 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/ivArrowRequest"
                         app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/tvRequestOrganizerSubtitle"/>
+
+                    <TextView
+                        android:id="@+id/tvRequestOrganizerSubtitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="12sp"
+                        android:textColor="@color/color_text_hint"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/ivArrowRequest"
+                        app:layout_constraintTop_toBottomOf="@+id/tvRequestOrganizerTitle"
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
                     <ImageView

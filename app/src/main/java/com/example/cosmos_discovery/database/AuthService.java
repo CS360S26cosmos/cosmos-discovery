@@ -2,6 +2,7 @@ package com.example.cosmos_discovery.database;
 
 import android.util.Log;
 
+import com.example.cosmos_discovery.model.OrganizerRequest;
 import com.example.cosmos_discovery.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,7 +16,8 @@ import java.util.function.Consumer;
  */
 public class AuthService {
     private static final String TAG = "AuthService";
-    private static final String USERS_COLLECTION = "users";
+    private static final String USERS_COLLECTION    = "users";
+    private static final String REQUESTS_COLLECTION = "organizer_requests";
 
     private static final String ALLOWED_DOMAIN = "@lums.edu.pk";
     private static final String ALLOWED_PASSWORD_SPECIALS = "!@#$%^&*!?~";
@@ -286,5 +288,34 @@ public class AuthService {
     public boolean isSignedIn() {
         FirebaseUser u = mAuth.getCurrentUser();
         return u != null && u.isEmailVerified();
+    }
+
+    public void submitOrganizerRequest(String userId, String userName,
+            String userEmail, String userPhotoUrl,
+            Runnable onSuccess, Consumer<String> onFailure) {
+        OrganizerRequest request = new OrganizerRequest(userId, userName, userEmail, userPhotoUrl);
+        mDb.collection(REQUESTS_COLLECTION)
+                .document(userId)
+                .set(request)
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(e -> onFailure.accept("Could not submit request. Try again."));
+    }
+
+    public void fetchOrganizerRequestStatus(String userId,
+            Consumer<Boolean> isPending, Consumer<String> onFailure) {
+        mDb.collection(REQUESTS_COLLECTION)
+                .document(userId)
+                .get()
+                .addOnSuccessListener(snapshot -> isPending.accept(snapshot.exists()))
+                .addOnFailureListener(e -> onFailure.accept("Could not check request status."));
+    }
+
+    public void clearPromotionFlag(String userId,
+            Runnable onSuccess, Consumer<String> onFailure) {
+        mDb.collection(USERS_COLLECTION)
+                .document(userId)
+                .update("promotionApproved", false)
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(e -> onFailure.accept("Could not clear promotion flag."));
     }
 }
