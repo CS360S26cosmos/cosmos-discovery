@@ -63,16 +63,14 @@ public class AdminService {
                 .addOnFailureListener(e -> onFailure.accept("Could not reject request."));
     }
 
-    public void fetchAllNonAdminUsers(Consumer<List<User>> onSuccess, Consumer<String> onFailure) {
+    public void fetchAllUsers(Consumer<List<User>> onSuccess, Consumer<String> onFailure) {
         mDb.collection(USERS_COLLECTION)
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     List<User> users = new ArrayList<>();
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         User user = doc.toObject(User.class);
-                        if (user != null && !User.ROLE_ADMIN.equals(user.getRole())) {
-                            users.add(user);
-                        }
+                        if (user != null) users.add(user);
                     }
                     onSuccess.accept(users);
                 })
@@ -81,13 +79,9 @@ public class AdminService {
 
     public void updateUserRole(String userId, String newRole,
             Runnable onSuccess, Consumer<String> onFailure) {
-        if (User.ROLE_ADMIN.equals(newRole)) {
-            onFailure.accept("Cannot promote to admin via this interface.");
-            return;
-        }
         Map<String, Object> updates = new HashMap<>();
         updates.put("role", newRole);
-        if (User.ROLE_STUDENT.equals(newRole)) {
+        if (!User.ROLE_ORGANIZER.equals(newRole)) {
             updates.put("promotionApproved", false);
         }
         mDb.collection(USERS_COLLECTION).document(userId)

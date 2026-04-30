@@ -92,7 +92,10 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
 
         // Role badge
         String role = user.getRole();
-        String badge = User.ROLE_ORGANIZER.equals(role) ? "Organizer" : "Student";
+        String badge;
+        if (User.ROLE_ADMIN.equals(role))          badge = "Admin";
+        else if (User.ROLE_ORGANIZER.equals(role)) badge = "Organizer";
+        else                                        badge = "Student";
         if (!user.isActive()) badge += " · Inactive";
         h.tvRoleBadge.setText(badge);
 
@@ -107,13 +110,15 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
             h.ivPhoto.setImageResource(R.drawable.ic_topbar_person_icon);
         }
 
-        // Deactivate / Reactivate button
+        // Deactivate / Reactivate and Change Status buttons — hidden for current admin (self-protection)
         boolean isCurrentAdmin = user.getUid() != null
                 && user.getUid().equals(mCurrentAdminUid);
         if (isCurrentAdmin) {
             h.btnDeactivate.setVisibility(View.GONE);
+            h.btnChangeStatus.setVisibility(View.GONE);
         } else {
             h.btnDeactivate.setVisibility(View.VISIBLE);
+            h.btnChangeStatus.setVisibility(View.VISIBLE);
             if (user.isActive()) {
                 h.btnDeactivate.setText("Deactivate");
                 h.btnDeactivate.setOnClickListener(v -> {
@@ -125,12 +130,10 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
                     if (mListener != null) mListener.onReactivate(user);
                 });
             }
+            h.btnChangeStatus.setOnClickListener(v -> {
+                if (mListener != null) mListener.onChangeStatus(user);
+            });
         }
-
-        // Change Status button
-        h.btnChangeStatus.setOnClickListener(v -> {
-            if (mListener != null) mListener.onChangeStatus(user);
-        });
     }
 
     @Override
