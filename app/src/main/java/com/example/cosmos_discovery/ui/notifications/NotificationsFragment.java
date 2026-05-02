@@ -1,15 +1,22 @@
 package com.example.cosmos_discovery.ui.notifications;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,7 +25,6 @@ import com.example.cosmos_discovery.adapter.NotificationAdapter;
 import com.example.cosmos_discovery.database.NotificationService;
 import com.example.cosmos_discovery.model.Notification;
 import com.example.cosmos_discovery.util.RoleUtil;
-import android.widget.TextView;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -33,6 +39,7 @@ public class NotificationsFragment extends Fragment {
     private View                 mEmptyState;
     private View                 mOrganizerComingSoon;
     private RecyclerView         mRv;
+    private String               mUid;
     private List<Notification>   mCurrentNotifications = new ArrayList<>();
     private boolean              mShowingPersonal = true;
 
@@ -56,9 +63,11 @@ public class NotificationsFragment extends Fragment {
         mRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         mRv.setAdapter(mAdapter);
 
+        attachSwipeToDelete();
+
         // Show toggle and wire it — organizers only
         if (RoleUtil.isOrganizer()) {
-            View toggle        = view.findViewById(R.id.toggleNotifType);
+            View toggle           = view.findViewById(R.id.toggleNotifType);
             TextView tabPersonal  = view.findViewById(R.id.btnPersonal);
             TextView tabOrganizer = view.findViewById(R.id.btnOrganizer);
             toggle.setVisibility(View.VISIBLE);
@@ -85,10 +94,10 @@ public class NotificationsFragment extends Fragment {
         }
 
         if (RoleUtil.getCurrentUser() == null) return;
-        String uid = RoleUtil.getCurrentUser().getUid();
+        mUid = RoleUtil.getCurrentUser().getUid();
 
         mService  = new NotificationService();
-        mListener = mService.listenNotifications(uid, notifications -> {
+        mListener = mService.listenNotifications(mUid, notifications -> {
             mCurrentNotifications = notifications != null ? notifications : new ArrayList<>();
             refreshView();
         }, err -> {
@@ -96,6 +105,85 @@ public class NotificationsFragment extends Fragment {
             Toast.makeText(requireContext(), "Notifications error: " + err, Toast.LENGTH_LONG).show();
         });
     }
+
+    // ── Swipe to delete ───────────────────────────────────────────────────
+
+    private void attachSwipeToDelete() {
+        int swipeColor   = ContextCompat.getColor(requireContext(), R.color.color_primary);
+        Drawable trashIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete);
+
+        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(
+                0, ItemTouchHelper.LEFT) {
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView rv,
+                                  @NonNull RecyclerView.ViewHolder vh,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public int getSwipeDirs(@NonNull RecyclerView rv,
+                                    @NonNull RecyclerView.ViewHolder vh) {
+                // Only notification rows are swipeable — not date headers
+                if (mAdapter.getItemViewType(vh.getAdapterPosition())
+                        == NotificationAdapter.VIEW_TYPE_HEADER) return 0;
+                return super.getSwipeDirs(rv, vh);
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder vh, int direction) {
+                int pos = vh.getAdapterPosition();
+                Notification notif = mAdapter.getNotificationAt(pos);
+                if (notif == null || notif.getId() == null || mUid == null) return;
+
+                mService.deleteNotification(mUid, notif.getId(),
+                        () -> { /* real-time listener will refresh the list */ },
+                        err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c,
+                                    @NonNull RecyclerView rv,
+                                    @NonNull RecyclerView.ViewHolder vh,
+                                    float dX, float dY,
+                                    int actionState, boolean isCurrentlyActive) {
+
+                View itemView = vh.itemView;
+                float cornerRadius = 16f; // ~8dp, matches notification card corners
+
+                // Background rectangle revealed on swipe
+                Paint bgPaint = new Paint();
+                bgPaint.setColor(swipeColor);
+                RectF bg = new RectF(
+                        itemView.getRight() + dX,
+                        itemView.getTop() + 8f,
+                        itemView.getRight(),
+                        itemView.getBottom() - 8f);
+                c.drawRoundRect(bg, cornerRadius, cornerRadius, bgPaint);
+
+                // Trash icon — centred in the revealed area, max 24dp wide
+                if (trashIcon != null) {
+                    int iconSize  = (int) (24 * rv.getResources().getDisplayMetrics().density);
+                    int iconMargin = (int) (16 * rv.getResources().getDisplayMetrics().density);
+                    int iconLeft  = itemView.getRight() - iconMargin - iconSize;
+                    int iconTop   = itemView.getTop()
+                            + (itemView.getHeight() - iconSize) / 2;
+                    trashIcon.setBounds(iconLeft, iconTop,
+                            iconLeft + iconSize, iconTop + iconSize);
+                    trashIcon.setAlpha(Math.min(255,
+                            (int) (255 * Math.abs(dX) / (iconMargin * 2 + iconSize))));
+                    trashIcon.draw(c);
+                }
+
+                super.onChildDraw(c, rv, vh, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+
+        new ItemTouchHelper(callback).attachToRecyclerView(mRv);
+    }
+
+    // ── View logic ────────────────────────────────────────────────────────
 
     private void refreshView() {
         if (mShowingPersonal) {

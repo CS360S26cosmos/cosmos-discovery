@@ -23,7 +23,7 @@ import java.util.List;
 public class NotificationAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int VIEW_TYPE_HEADER       = 0;
+    public  static final int VIEW_TYPE_HEADER       = 0;
     private static final int VIEW_TYPE_NOTIFICATION = 1;
 
     private final Context      mContext;
@@ -68,6 +68,15 @@ public class NotificationAdapter
 
     @Override
     public int getItemCount() { return mItems.size(); }
+
+    /**
+     * Returns the Notification at {@code position}, or {@code null} if it's a header.
+     * Used by the swipe-to-delete callback.
+     */
+    public Notification getNotificationAt(int position) {
+        Object item = mItems.get(position);
+        return item instanceof Notification ? (Notification) item : null;
+    }
 
     // ── Header ViewHolder ─────────────────────────────────────────────────
 

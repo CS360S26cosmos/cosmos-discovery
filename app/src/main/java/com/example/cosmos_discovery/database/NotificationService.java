@@ -67,6 +67,20 @@ public class NotificationService {
                 .addOnFailureListener(e      -> onError.accept("Failed to notify attendees."));
     }
 
+    // ── Delete ────────────────────────────────────────────────────────────
+
+    /** Deletes a single notification document from a user's subcollection. */
+    public void deleteNotification(String userId, String notifId,
+                                   Runnable onSuccess, Consumer<String> onError) {
+        mDb.collection(USERS_COL)
+                .document(userId)
+                .collection(NOTIFS_SUB)
+                .document(notifId)
+                .delete()
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(e -> onError.accept("Failed to delete notification."));
+    }
+
     // ── Listen ────────────────────────────────────────────────────────────
 
     /**
