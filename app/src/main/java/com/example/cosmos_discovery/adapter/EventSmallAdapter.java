@@ -173,7 +173,7 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
             if (!rsvped && event.isRegistrationClosed()) {
                 holder.buttonRsvp.setEnabled(false);
                 holder.buttonRsvp.setAlpha(0.5f);
-                holder.buttonRsvp.setText("Registration Closed");
+                holder.buttonRsvp.setText("Closed");
                 holder.buttonRsvp.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bg_btn_rsvp));
                 holder.buttonRsvp.setTextColor(Color.WHITE);
             } else if (!rsvped && event.isFull()) {

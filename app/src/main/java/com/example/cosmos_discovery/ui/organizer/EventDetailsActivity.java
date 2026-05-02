@@ -20,6 +20,7 @@ import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.ui.student.StudentActivity;
 import com.example.cosmos_discovery.util.CalendarUtil;
 import com.example.cosmos_discovery.util.RoleUtil;
+import com.example.cosmos_discovery.util.RsvpHandler;
 import com.google.android.material.card.MaterialCardView;
 
 import java.text.SimpleDateFormat;
@@ -31,6 +32,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     public static final String EXTRA_EVENT_ID = "extra_event_id";
 
     private final EventService mEventService = new EventService();
+    private final RsvpHandler  mRsvpHandler  = new RsvpHandler();
 
     private String mEventId;
     private Event  mEvent;
@@ -52,9 +54,6 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         ImageButton btnOverflowMenu = findViewById(R.id.btnOverflowMenu);
         btnOverflowMenu.setOnClickListener(v -> showOverflowMenu(btnOverflowMenu));
-
-        // Organizers shouldn't RSVP to their own events.
-        if (findViewById(R.id.rsvpButton) != null) findViewById(R.id.rsvpButton).setVisibility(android.view.View.GONE);
 
         wireBottomNav();
 
@@ -141,6 +140,46 @@ public class EventDetailsActivity extends AppCompatActivity {
                     Toast.makeText(this, "No calendar app found", Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+
+        MaterialCardView rsvpCard = findViewById(R.id.rsvpButton);
+        TextView tvRsvp = findViewById(R.id.tvRsvp);
+        if (rsvpCard != null && tvRsvp != null) {
+            boolean isOwner = RoleUtil.getCurrentUser() != null
+                    && event.getOrganizerId() != null
+                    && event.getOrganizerId().equals(RoleUtil.getCurrentUser().getUid());
+            if (isOwner) {
+                rsvpCard.setVisibility(View.GONE);
+            } else {
+                rsvpCard.setVisibility(View.VISIBLE);
+                bindRsvpButton(event, rsvpCard, tvRsvp);
+            }
+        }
+    }
+
+    private void bindRsvpButton(Event event, MaterialCardView card, TextView label) {
+        String uid = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : "";
+        boolean rsvped = event.isRsvped(uid);
+
+        if (!rsvped && event.isRegistrationClosed()) {
+            label.setText("Closed");
+            card.setEnabled(false);
+            card.setAlpha(0.5f);
+            card.setOnClickListener(null);
+        } else if (!rsvped && event.isFull()) {
+            label.setText("Full");
+            card.setEnabled(false);
+            card.setAlpha(0.5f);
+            card.setOnClickListener(null);
+        } else {
+            label.setText(rsvped ? "✓ Going" : "RSVP");
+            card.setEnabled(true);
+            card.setAlpha(1.0f);
+            card.setOnClickListener(v -> mRsvpHandler.toggle(
+                    event,
+                    () -> bindRsvpButton(event, card, label),
+                    err -> Toast.makeText(this, err, Toast.LENGTH_SHORT).show()
+            ));
         }
     }
 
