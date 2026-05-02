@@ -81,6 +81,30 @@ public class NotificationService {
                 .addOnFailureListener(e -> onError.accept("Failed to delete notification."));
     }
 
+    /**
+     * Batch-deletes all supplied notification documents for the given user.
+     * Uses WriteBatch so all deletes are atomic (safe for up to 500 items).
+     */
+    public void deleteAllNotifications(String userId, List<Notification> notifications,
+                                       Runnable onSuccess, Consumer<String> onError) {
+        if (notifications == null || notifications.isEmpty()) {
+            onSuccess.run();
+            return;
+        }
+        WriteBatch batch = mDb.batch();
+        for (Notification n : notifications) {
+            if (n.getId() == null) continue;
+            DocumentReference ref = mDb.collection(USERS_COL)
+                    .document(userId)
+                    .collection(NOTIFS_SUB)
+                    .document(n.getId());
+            batch.delete(ref);
+        }
+        batch.commit()
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(e -> onError.accept("Failed to clear notifications."));
+    }
+
     // ── Listen ────────────────────────────────────────────────────────────
 
     /**

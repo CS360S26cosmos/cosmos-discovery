@@ -38,6 +38,7 @@ public class NotificationsFragment extends Fragment {
     private ListenerRegistration mListener;
     private View                 mEmptyState;
     private View                 mOrganizerComingSoon;
+    private View                 mClearAll;
     private RecyclerView         mRv;
     private String               mUid;
     private List<Notification>   mCurrentNotifications = new ArrayList<>();
@@ -57,11 +58,14 @@ public class NotificationsFragment extends Fragment {
 
         mEmptyState          = view.findViewById(R.id.tvEmptyGeneralNotifications);
         mOrganizerComingSoon = view.findViewById(R.id.tvOrganizerComingSoon);
+        mClearAll            = view.findViewById(R.id.tvClearAll);
         mRv                  = view.findViewById(R.id.rvGeneralNotifications);
 
         mAdapter = new NotificationAdapter(requireContext());
         mRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         mRv.setAdapter(mAdapter);
+
+        mClearAll.setOnClickListener(v -> confirmClearAll());
 
         attachSwipeToDelete();
 
@@ -185,16 +189,31 @@ public class NotificationsFragment extends Fragment {
 
     // ── View logic ────────────────────────────────────────────────────────
 
+    private void confirmClearAll() {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Clear all notifications")
+                .setMessage("Remove all notifications? This cannot be undone.")
+                .setNegativeButton("Cancel", (d, w) -> d.dismiss())
+                .setPositiveButton("Clear all", (d, w) ->
+                        mService.deleteAllNotifications(mUid, mCurrentNotifications,
+                                () -> { /* real-time listener auto-refreshes */ },
+                                err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()))
+                .show();
+    }
+
     private void refreshView() {
         if (mShowingPersonal) {
             mOrganizerComingSoon.setVisibility(View.GONE);
             mRv.setVisibility(View.VISIBLE);
             List<Object> grouped = groupByDate(mCurrentNotifications);
             mAdapter.updateData(grouped);
-            mEmptyState.setVisibility(mCurrentNotifications.isEmpty() ? View.VISIBLE : View.GONE);
+            boolean empty = mCurrentNotifications.isEmpty();
+            mEmptyState.setVisibility(empty ? View.VISIBLE : View.GONE);
+            mClearAll.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else {
             mRv.setVisibility(View.GONE);
             mEmptyState.setVisibility(View.GONE);
+            mClearAll.setVisibility(View.GONE);
             mOrganizerComingSoon.setVisibility(View.VISIBLE);
         }
     }
