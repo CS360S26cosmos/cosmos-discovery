@@ -148,12 +148,13 @@ public class EventDetailsActivity extends AppCompatActivity {
         PopupMenu popup = new PopupMenu(this, anchor);
         popup.getMenuInflater().inflate(R.menu.menu_event_details, popup.getMenu());
 
-        // Attendee List is organizer-only.
-        boolean isOrganizer = mEvent != null
+        boolean isEventOwner = mEvent != null
                 && RoleUtil.getCurrentUser() != null
                 && mEvent.getOrganizerId() != null
                 && mEvent.getOrganizerId().equals(RoleUtil.getCurrentUser().getUid());
-        popup.getMenu().findItem(R.id.action_attendee_list).setVisible(isOrganizer);
+        popup.getMenu().findItem(R.id.action_edit).setVisible(isEventOwner);
+        popup.getMenu().findItem(R.id.action_attendee_list).setVisible(isEventOwner);
+        popup.getMenu().findItem(R.id.action_delete).setVisible(isEventOwner);
 
         popup.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
