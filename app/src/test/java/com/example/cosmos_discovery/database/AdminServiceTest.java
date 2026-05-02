@@ -1,46 +1,77 @@
 package com.example.cosmos_discovery.database;
 
-import org.junit.Test;
+import com.example.cosmos_discovery.model.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class AdminServiceTest {
 
     /**
-     * updateUserRole with "admin" as newRole must reject via onFailure
-     * without touching Firestore (so null db is safe here).
+     * updateUserRole with "admin" as newRole must now succeed (reach Firestore),
+     * not be rejected by a client-side guard.
      */
+    @SuppressWarnings("unchecked")
     @Test
-    public void updateUserRole_adminNewRole_callsOnFailure() {
-        AdminService service = new AdminService(null);
+    public void updateUserRole_adminNewRole_reachesFirestore() {
+        FirebaseFirestore mockDb = mock(FirebaseFirestore.class);
+        CollectionReference mockCollection = mock(CollectionReference.class);
+        DocumentReference mockDoc = mock(DocumentReference.class);
+        Task<Void> mockTask = mock(Task.class);
 
-        boolean[] successCalled = {false};
-        String[]  errorMessage  = {null};
+        when(mockDb.collection("users")).thenReturn(mockCollection);
+        when(mockCollection.document(anyString())).thenReturn(mockDoc);
+        when(mockDoc.update(anyMap())).thenReturn(mockTask);
+        when(mockTask.addOnSuccessListener(any())).thenReturn(mockTask);
+        when(mockTask.addOnFailureListener(any())).thenReturn(mockTask);
 
-        service.updateUserRole(
-                "someUserId",
-                "admin",
-                () -> successCalled[0] = true,
-                err -> errorMessage[0] = err);
+        AdminService service = new AdminService(mockDb);
 
-        assertFalse("onSuccess must not be called for admin role", successCalled[0]);
-        assertNotNull("onFailure must be called with an error message", errorMessage[0]);
+        service.updateUserRole("someUserId", User.ROLE_ADMIN, () -> {}, err -> {});
+
+        // Verify Firestore was actually called (not short-circuited)
+        verify(mockDoc).update(anyMap());
     }
 
+    /**
+     * updateUserRole with "admin" sets role to "admin" in the update map.
+     */
+    @SuppressWarnings("unchecked")
     @Test
-    public void updateUserRole_adminNewRole_errorMessageNotEmpty() {
-        AdminService service = new AdminService(null);
+    public void updateUserRole_adminNewRole_setsCorrectRoleInUpdate() {
+        FirebaseFirestore mockDb = mock(FirebaseFirestore.class);
+        CollectionReference mockCollection = mock(CollectionReference.class);
+        DocumentReference mockDoc = mock(DocumentReference.class);
+        Task<Void> mockTask = mock(Task.class);
 
-        String[] errorMessage = {null};
+        when(mockDb.collection("users")).thenReturn(mockCollection);
+        when(mockCollection.document(anyString())).thenReturn(mockDoc);
+        when(mockDoc.update(anyMap())).thenReturn(mockTask);
+        when(mockTask.addOnSuccessListener(any())).thenReturn(mockTask);
+        when(mockTask.addOnFailureListener(any())).thenReturn(mockTask);
 
-        service.updateUserRole(
-                "someUserId",
-                "admin",
-                () -> {},
-                err -> errorMessage[0] = err);
+        AdminService service = new AdminService(mockDb);
 
-        assertNotNull(errorMessage[0]);
-        assertFalse("Error message must not be empty", errorMessage[0].isEmpty());
+        ArgumentCaptor<Map> mapCaptor = ArgumentCaptor.forClass(Map.class);
+        service.updateUserRole("someUserId", User.ROLE_ADMIN, () -> {}, err -> {});
+
+        verify(mockDoc).update(mapCaptor.capture());
+        assertEquals(User.ROLE_ADMIN, mapCaptor.getValue().get("role"));
     }
 }

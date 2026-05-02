@@ -1,16 +1,18 @@
 package com.example.cosmos_discovery.ui.admin;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,6 +47,17 @@ public class AdminUserManagementFragment extends Fragment
 
     private OrganizerRequestAdapter mRequestAdapter;
     private AdminUserAdapter        mUserAdapter;
+
+    // Role change overlay views
+    private View     mOverlayRoleChange;
+    private TextView mTvRoleChangeUserName;
+    private TextView mRoleChipStudent;
+    private TextView mRoleChipOrganizer;
+    private TextView mRoleChipAdmin;
+
+    // Overlay state
+    private User   mPendingRoleUser;
+    private String mSelectedRole;
 
     @Nullable
     @Override
@@ -81,20 +94,38 @@ public class AdminUserManagementFragment extends Fragment
         mRvAllUsers.setLayoutManager(new LinearLayoutManager(requireContext()));
         mRvAllUsers.setAdapter(mUserAdapter);
 
-        // Chip click listeners
+        // Chip tab listeners
         mChipPending.setOnClickListener(v -> selectTab(true));
         mChipAllUsers.setOnClickListener(v -> selectTab(false));
 
-        // Search listener
-        SearchView searchView = view.findViewById(R.id.searchUsers);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override public boolean onQueryTextSubmit(String q) { return false; }
-            @Override public boolean onQueryTextChange(String q) {
-                mUserAdapter.setQuery(q);
+        // Search bar
+        EditText etSearch = view.findViewById(R.id.etSearchUsers);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mUserAdapter.setQuery(s.toString());
                 updateEmptyUsers();
-                return true;
             }
+            @Override public void afterTextChanged(Editable s) {}
         });
+
+        // Role change overlay
+        mOverlayRoleChange    = view.findViewById(R.id.overlayRoleChange);
+        mTvRoleChangeUserName = view.findViewById(R.id.tvRoleChangeUserName);
+        mRoleChipStudent      = view.findViewById(R.id.chipRoleStudent);
+        mRoleChipOrganizer    = view.findViewById(R.id.chipRoleOrganizer);
+        mRoleChipAdmin        = view.findViewById(R.id.chipRoleAdmin);
+
+        mOverlayRoleChange.setOnClickListener(v -> dismissRoleChangeOverlay());
+        view.findViewById(R.id.roleChangeCard).setOnClickListener(v -> { /* consume backdrop tap */ });
+        view.findViewById(R.id.btnCloseRoleChange).setOnClickListener(v -> dismissRoleChangeOverlay());
+        view.findViewById(R.id.btnCancelRoleChange).setOnClickListener(v -> dismissRoleChangeOverlay());
+
+        mRoleChipStudent.setOnClickListener(v -> selectRoleChip(mRoleChipStudent, User.ROLE_STUDENT));
+        mRoleChipOrganizer.setOnClickListener(v -> selectRoleChip(mRoleChipOrganizer, User.ROLE_ORGANIZER));
+        mRoleChipAdmin.setOnClickListener(v -> selectRoleChip(mRoleChipAdmin, User.ROLE_ADMIN));
+
+        view.findViewById(R.id.btnConfirmRoleChange).setOnClickListener(v -> confirmRoleChange());
 
         // Start on Pending Requests tab
         selectTab(true);
@@ -136,7 +167,7 @@ public class AdminUserManagementFragment extends Fragment
     }
 
     private void loadAllUsers() {
-        mAdminService.fetchAllNonAdminUsers(
+        mAdminService.fetchAllUsers(
                 users -> {
                     if (!isAdded()) return;
                     mUserAdapter.updateData(users);
@@ -229,29 +260,71 @@ public class AdminUserManagementFragment extends Fragment
 
     @Override
     public void onChangeStatus(User user) {
-        String currentRole = user.getRole();
-        boolean isOrganizer = User.ROLE_ORGANIZER.equals(currentRole);
-        String newRole  = isOrganizer ? User.ROLE_STUDENT : User.ROLE_ORGANIZER;
-        String newLabel = isOrganizer ? "Student" : "Organizer";
-
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Change Role")
-                .setMessage("Change " + (user.getName() != null ? user.getName() : "this user")
-                        + "'s role to " + newLabel + "?")
-                .setPositiveButton("Confirm", (d, w) ->
-                        mAdminService.updateUserRole(
-                                user.getUid(),
-                                newRole,
-                                () -> {
-                                    if (!isAdded()) return;
-                                    user.setRole(newRole);
-                                    mUserAdapter.updateUser(user);
-                                    showToast("Role updated to " + newLabel + ".");
-                                },
-                                err -> showToast(err)))
-                .setNegativeButton("Cancel", null)
-                .show();
+        showRoleChangeOverlay(user);
     }
+
+    // -- Role change overlay -----------------------------------------------
+
+    private void showRoleChangeOverlay(User user) {
+        mPendingRoleUser = user;
+        mSelectedRole    = null;
+
+        String currentRole = user.getRole();
+        mRoleChipStudent.setVisibility(User.ROLE_STUDENT.equals(currentRole)   ? View.GONE : View.VISIBLE);
+        mRoleChipOrganizer.setVisibility(User.ROLE_ORGANIZER.equals(currentRole) ? View.GONE : View.VISIBLE);
+        mRoleChipAdmin.setVisibility(User.ROLE_ADMIN.equals(currentRole)        ? View.GONE : View.VISIBLE);
+
+        resetRoleChips();
+        mTvRoleChangeUserName.setText(user.getName() != null ? user.getName() : "");
+        mOverlayRoleChange.setVisibility(View.VISIBLE);
+    }
+
+    private void dismissRoleChangeOverlay() {
+        mPendingRoleUser = null;
+        mSelectedRole    = null;
+        mOverlayRoleChange.setVisibility(View.GONE);
+    }
+
+    private void resetRoleChips() {
+        for (TextView chip : new TextView[]{mRoleChipStudent, mRoleChipOrganizer, mRoleChipAdmin}) {
+            chip.setBackgroundResource(R.drawable.bg_chip_unselected);
+            chip.setTextColor(requireContext().getColor(R.color.color_text_secondary));
+        }
+    }
+
+    private void selectRoleChip(TextView selected, String role) {
+        resetRoleChips();
+        selected.setBackgroundResource(R.drawable.bg_chip_selected);
+        selected.setTextColor(requireContext().getColor(R.color.white));
+        mSelectedRole = role;
+    }
+
+    private void confirmRoleChange() {
+        if (mSelectedRole == null) {
+            showToast("Please select a role.");
+            return;
+        }
+        String newLabel = getLabelForRole(mSelectedRole);
+        mAdminService.updateUserRole(
+                mPendingRoleUser.getUid(),
+                mSelectedRole,
+                () -> {
+                    if (!isAdded()) return;
+                    mPendingRoleUser.setRole(mSelectedRole);
+                    mUserAdapter.updateUser(mPendingRoleUser);
+                    showToast("Role updated to " + newLabel + ".");
+                    dismissRoleChangeOverlay();
+                },
+                err -> showToast(err));
+    }
+
+    private String getLabelForRole(String role) {
+        if (User.ROLE_ADMIN.equals(role))     return "Admin";
+        if (User.ROLE_ORGANIZER.equals(role)) return "Organizer";
+        return "Student";
+    }
+
+    // ----------------------------------------------------------------------
 
     @Override
     public void onDestroyView() {
