@@ -20,6 +20,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <!-- Unread-notifications dot — shown/hidden from StudentActivity -->
+    <View
+        android:id="@+id/notifDot"
+        android:layout_width="9dp"
+        android:layout_height="9dp"
+        android:background="@drawable/bg_notif_dot"
+        android:visibility="gone"
+        android:translationX="-4dp"
+        android:translationY="-3dp"
+        app:layout_constraintStart_toEndOf="@id/iconProfile"
+        app:layout_constraintTop_toTopOf="@id/iconProfile" />
+
     <ImageView
         android:id="@+id/iconMenu"
         android:clickable="true"
