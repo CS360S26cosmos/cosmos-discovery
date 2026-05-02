@@ -636,8 +636,6 @@ public class EventService {
                         ex.getMessage() != null ? ex.getMessage() : "Could not load reviews."));
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────
-
     /** Returns [weekStartMs, weekEndMs] for the current Sun–Sat week. */
     private long[] currentWeekBounds() {
         Calendar start = Calendar.getInstance();

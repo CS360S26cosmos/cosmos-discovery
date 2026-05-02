@@ -1,7 +1,9 @@
 package com.example.cosmos_discovery.util;
 
 import com.example.cosmos_discovery.database.EventService;
+import com.example.cosmos_discovery.database.NotificationService;
 import com.example.cosmos_discovery.model.Event;
+import com.example.cosmos_discovery.model.Notification;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -16,7 +18,8 @@ import java.util.function.Consumer;
  */
 public class RsvpHandler {
 
-    private EventService mService; // lazily initialized — keeps RsvpHandler testable without Firebase
+    private EventService       mService;      // lazily initialized — keeps RsvpHandler testable without Firebase
+    private NotificationService mNotifService = new NotificationService();
 
     public RsvpHandler() {}
 
@@ -73,7 +76,18 @@ public class RsvpHandler {
             applyLocally.run();
             return;
         }
-        service().rsvpToEvent(event.getId(), uid, applyLocally, onError);
+        service().rsvpToEvent(event.getId(), uid, () -> {
+            applyLocally.run();
+            Notification notif = new Notification(
+                    Notification.TYPE_RSVP_CONFIRMED,
+                    "RSVP Confirmed",
+                    "You have successfully RSVPed to " + event.getTitle() + "!",
+                    System.currentTimeMillis()
+            );
+            notif.setEventId(event.getId());
+            notif.setEventTitle(event.getTitle());
+            mNotifService.writeNotification(uid, notif, () -> {}, err -> {});
+        }, onError);
     }
 
     private void cancelRsvp(Event event, String uid, Runnable onRefresh, Consumer<String> onError) {

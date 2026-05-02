@@ -171,9 +171,9 @@ public class StudentActivity extends AppCompatActivity {
         ImageView iconMenu = findViewById(R.id.iconMenu);
         iconMenu.setOnClickListener(v -> showSidebar());
 
-        // Profile icon (left) opens the current user's profile
+        // Bell icon (left) opens the notifications screen
         findViewById(R.id.iconProfile).setOnClickListener(v ->
-                startActivity(new Intent(this, ViewProfile.class)));
+                startActivity(new Intent(this, com.example.cosmos_discovery.ui.notifications.NotificationsActivity.class)));
 
         // Search bar tap → enter event search or user search based on active tab
         mSearchBarInclude.findViewById(R.id.searchClickableArea)

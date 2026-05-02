@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_surface"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="24dp"
+        android:paddingBottom="90dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <!-- ── General Notifications section header ──────────────────────── -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_notifications"
+                app:tint="@color/color_text_secondary"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="General Notifications"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/color_text_secondary"
+                android:fontFamily="@font/inter_variable" />
+
+        </LinearLayout>
+
+        <!-- Real-time general notifications list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvGeneralNotifications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:clipToPadding="false" />
+
+        <TextView
+            android:id="@+id/tvEmptyGeneralNotifications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="No notifications yet."
+            android:textSize="14sp"
+            android:textColor="@color/color_text_hint"
+            android:fontFamily="@font/inter_variable"
+            android:gravity="center"
+            android:visibility="gone" />
+
+        <!-- ── Organizer Notifications section (hidden for non-organizers) ── -->
+
+        <LinearLayout
+            android:id="@+id/layoutOrganizerSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="28dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_eventdetails_organizer"
+                    app:tint="@color/color_text_secondary"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Organizer Notifications"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/color_text_secondary"
+                    android:fontFamily="@font/inter_variable" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:text="Organizer notifications coming soon."
+                android:textSize="14sp"
+                android:textColor="@color/color_text_hint"
+                android:fontFamily="@font/inter_variable"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
