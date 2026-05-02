@@ -385,6 +385,7 @@ public class EditEventActivity extends AppCompatActivity {
         }
         if (startText.isEmpty()) {
             mEtStartTime.setError("Start time is required.");
+            Toast.makeText(this, "Start time is required.", Toast.LENGTH_LONG).show();
             hasError = true;
         }
 
