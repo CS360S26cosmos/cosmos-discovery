@@ -181,8 +181,8 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     private void confirmDelete() {
         new AlertDialog.Builder(this)
-                .setTitle("Delete event")
-                .setMessage("Are you sure you want to delete this event?")
+                .setTitle("Are you sure you want to delete this event?")
+                .setMessage("This action cannot be undone. All attendees will be notified that the event has been cancelled.")
                 .setNegativeButton("Cancel", (d, which) -> d.dismiss())
                 .setPositiveButton("Delete", (d, which) -> deleteEvent())
                 .show();
