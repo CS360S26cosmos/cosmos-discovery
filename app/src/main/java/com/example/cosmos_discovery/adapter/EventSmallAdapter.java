@@ -170,8 +170,13 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
                     ? ContextCompat.getColor(mContext, R.color.color_button_going_stroke)
                     : Color.WHITE);
 
-            // Disable RSVP button when event is full (only for users who haven't RSVPed)
-            if (!rsvped && event.isFull()) {
+            if (!rsvped && event.isRegistrationClosed()) {
+                holder.buttonRsvp.setEnabled(false);
+                holder.buttonRsvp.setAlpha(0.5f);
+                holder.buttonRsvp.setText("Registration Closed");
+                holder.buttonRsvp.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bg_btn_rsvp));
+                holder.buttonRsvp.setTextColor(Color.WHITE);
+            } else if (!rsvped && event.isFull()) {
                 holder.buttonRsvp.setEnabled(false);
                 holder.buttonRsvp.setAlpha(0.5f);
                 holder.buttonRsvp.setText("Full");
