@@ -21,44 +21,74 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationAdapter
-        extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private final Context mContext;
-    private final List<Notification> mItems = new ArrayList<>();
+    private static final int VIEW_TYPE_HEADER       = 0;
+    private static final int VIEW_TYPE_NOTIFICATION = 1;
+
+    private final Context      mContext;
+    private final List<Object> mItems = new ArrayList<>();
 
     public NotificationAdapter(Context context) {
         mContext = context;
     }
 
-    public void updateData(List<Notification> items) {
+    /** Accepts a mixed list of String headers and Notification items. */
+    public void updateData(List<Object> items) {
         mItems.clear();
         if (items != null) mItems.addAll(items);
         notifyDataSetChanged();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return mItems.get(position) instanceof String ? VIEW_TYPE_HEADER : VIEW_TYPE_NOTIFICATION;
+    }
+
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_notification, parent, false);
-        return new ViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        if (viewType == VIEW_TYPE_HEADER) {
+            View v = inflater.inflate(R.layout.item_notification_header, parent, false);
+            return new HeaderViewHolder(v);
+        }
+        View v = inflater.inflate(R.layout.item_notification, parent, false);
+        return new NotificationViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(mItems.get(position));
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof HeaderViewHolder) {
+            ((HeaderViewHolder) holder).bind((String) mItems.get(position));
+        } else {
+            ((NotificationViewHolder) holder).bind((Notification) mItems.get(position));
+        }
     }
 
     @Override
     public int getItemCount() { return mItems.size(); }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    // ── Header ViewHolder ─────────────────────────────────────────────────
+
+    static class HeaderViewHolder extends RecyclerView.ViewHolder {
+        final TextView tvHeader;
+        HeaderViewHolder(View itemView) {
+            super(itemView);
+            tvHeader = itemView.findViewById(R.id.tvHeader);
+        }
+        void bind(String label) { tvHeader.setText(label); }
+    }
+
+    // ── Notification ViewHolder ───────────────────────────────────────────
+
+    class NotificationViewHolder extends RecyclerView.ViewHolder {
         final ImageView ivIcon;
         final TextView  tvTitle;
         final TextView  tvMessage;
         final TextView  tvTime;
 
-        ViewHolder(View itemView) {
+        NotificationViewHolder(View itemView) {
             super(itemView);
             ivIcon    = itemView.findViewById(R.id.ivIcon);
             tvTitle   = itemView.findViewById(R.id.tvTitle);

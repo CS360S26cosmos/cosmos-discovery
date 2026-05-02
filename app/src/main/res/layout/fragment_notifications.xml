@@ -16,39 +16,50 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
-        <!-- ── General Notifications section header ──────────────────────── -->
-
+        <!-- Tab toggle — organizers only, hidden by default -->
         <LinearLayout
+            android:id="@+id/toggleNotifType"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="44dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_notifications"
-                app:tint="@color/color_text_secondary"
-                android:contentDescription="@null" />
+            android:background="@drawable/bg_toggle_container"
+            android:padding="4dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="General Notifications"
-                android:textSize="22sp"
+                android:id="@+id/btnPersonal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Personal"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:fontFamily="@font/inter_variable"
                 android:textStyle="bold"
-                android:textColor="@color/color_text_secondary"
-                android:fontFamily="@font/inter_variable" />
+                android:background="@drawable/bg_notif_tab_selected"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/btnOrganizer"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Organizer"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:fontFamily="@font/inter_variable"
+                android:textStyle="bold"
+                android:background="@drawable/bg_notif_tab_unselected"
+                android:textColor="@color/color_text_hint" />
 
         </LinearLayout>
 
-        <!-- Real-time general notifications list -->
+        <!-- Personal notifications list -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvGeneralNotifications"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:nestedScrollingEnabled="false"
             android:overScrollMode="never"
             android:clipToPadding="false" />
@@ -57,8 +68,7 @@
             android:id="@+id/tvEmptyGeneralNotifications"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="32dp"
             android:text="No notifications yet."
             android:textSize="14sp"
             android:textColor="@color/color_text_hint"
@@ -66,53 +76,18 @@
             android:gravity="center"
             android:visibility="gone" />
 
-        <!-- ── Organizer Notifications section (hidden for non-organizers) ── -->
-
-        <LinearLayout
-            android:id="@+id/layoutOrganizerSection"
+        <!-- Organizer tab content (shown when Organizer tab selected) -->
+        <TextView
+            android:id="@+id/tvOrganizerComingSoon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="28dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_eventdetails_organizer"
-                    app:tint="@color/color_text_secondary"
-                    android:contentDescription="@null" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Organizer Notifications"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/color_text_secondary"
-                    android:fontFamily="@font/inter_variable" />
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="8dp"
-                android:text="Organizer notifications coming soon."
-                android:textSize="14sp"
-                android:textColor="@color/color_text_hint"
-                android:fontFamily="@font/inter_variable"
-                android:gravity="center" />
-
-        </LinearLayout>
+            android:layout_marginTop="32dp"
+            android:text="Organizer notifications coming soon."
+            android:textSize="14sp"
+            android:textColor="@color/color_text_hint"
+            android:fontFamily="@font/inter_variable"
+            android:gravity="center"
+            android:visibility="gone" />
 
     </LinearLayout>
 
