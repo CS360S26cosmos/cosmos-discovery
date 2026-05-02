@@ -1,5 +1,7 @@
 package com.example.cosmos_discovery.model;
 
+import com.example.cosmos_discovery.util.EventFormUtil;
+
 import java.util.List;
 
 /**
@@ -70,6 +72,13 @@ public class Event {
 
     /** Returns true if RSVPs have reached or exceeded the capacity limit. */
     public boolean isFull() { return hasCapacity() && rsvpCount >= capacity; }
+
+    /** Returns true if the registration deadline has passed. */
+    public boolean isRegistrationClosed() {
+        if (registerBy == null || registerBy.trim().isEmpty()) return false;
+        long deadlineMs = EventFormUtil.parseDateTimeMs(registerBy, "11:59pm");
+        return deadlineMs > 0 && System.currentTimeMillis() > deadlineMs;
+    }
 
     /**
      * Returns a display string for RSVP/capacity info.
