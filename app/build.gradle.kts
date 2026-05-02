@@ -51,5 +51,4 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
-    implementation(libs.mpandroidchart)
 }

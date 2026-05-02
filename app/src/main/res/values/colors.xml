@@ -37,15 +37,4 @@
     <color name="color_approved">#1565C0</color>        <!-- blue -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-
-    <!-- Analytics screen additions only — existing colours are unchanged -->
-    <color name="cosmos_background">#F5F5F5</color>      <!-- page background -->
-    <color name="cosmos_card">#FFFFFF</color>            <!-- card surface -->
-    <color name="cosmos_text_primary">#1A1A2E</color>   <!-- main body text -->
-    <color name="cosmos_text_secondary">#6B6B8A</color> <!-- labels / captions -->
-    <color name="cosmos_divider">#E0E0E0</color>         <!-- dividers -->
-    <color name="cosmos_accent">#E74C3C</color>          <!-- cancellation rate highlight -->
-    <color name="cosmos_arrived">#2ECC71</color>         <!-- Arrived badge -->
-    <color name="cosmos_not_arrived">#E74C3C</color>     <!-- Not Arrived badge -->
-
 </resources>
