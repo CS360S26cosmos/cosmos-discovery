@@ -116,12 +116,17 @@ public class NotificationAdapter
                     ivIcon.setImageResource(R.drawable.ic_group);
                     break;
                 case Notification.TYPE_RSVP_CONFIRMED:
+                case Notification.TYPE_RSVP_RECEIVED:
+                case Notification.TYPE_EVENT_APPROVED:
+                case Notification.TYPE_CAPACITY_FULL:
                     ivIcon.setImageResource(R.drawable.ic_check_circle);
                     break;
                 case Notification.TYPE_EVENT_UPDATED:
+                case Notification.TYPE_ANNOUNCEMENT:
                     ivIcon.setImageResource(R.drawable.ic_eventdetails_calendar);
                     break;
                 case Notification.TYPE_EVENT_CANCELLED:
+                case Notification.TYPE_EVENT_REJECTED:
                     ivIcon.setImageResource(R.drawable.ic_cancel);
                     break;
                 default:
@@ -129,13 +134,25 @@ public class NotificationAdapter
                     break;
             }
 
-            if (Notification.TYPE_EVENT_UPDATED.equals(n.getType()) && n.getEventId() != null) {
+            String type = n.getType() != null ? n.getType() : "";
+            boolean opensEvent =
+                       Notification.TYPE_EVENT_UPDATED.equals(type)
+                    || Notification.TYPE_EVENT_CANCELLED.equals(type)
+                    || Notification.TYPE_ANNOUNCEMENT.equals(type)
+                    || Notification.TYPE_EVENT_APPROVED.equals(type)
+                    || Notification.TYPE_EVENT_REJECTED.equals(type)
+                    || Notification.TYPE_CAPACITY_FULL.equals(type)
+                    || Notification.TYPE_RSVP_CONFIRMED.equals(type)
+                    || Notification.TYPE_RSVP_RECEIVED.equals(type);
+
+            if (opensEvent && n.getEventId() != null && !n.getEventId().isEmpty()) {
                 itemView.setOnClickListener(v -> {
                     Intent intent = new Intent(mContext, EventDetailsActivity.class);
                     intent.putExtra(EventDetailsActivity.EXTRA_EVENT_ID, n.getEventId());
                     mContext.startActivity(intent);
                 });
-            } else if (Notification.TYPE_FRIEND_REQUEST_RECEIVED.equals(n.getType())) {
+            } else if (Notification.TYPE_FRIEND_REQUEST_RECEIVED.equals(type)
+                    || Notification.TYPE_FRIEND_REQUEST_ACCEPTED.equals(type)) {
                 itemView.setOnClickListener(v ->
                         mContext.startActivity(new Intent(mContext, FriendRequestsActivity.class)));
             } else {

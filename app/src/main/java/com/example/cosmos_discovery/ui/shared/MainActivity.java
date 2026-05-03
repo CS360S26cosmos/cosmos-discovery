@@ -7,6 +7,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.cosmos_discovery.database.AuthService;
+import com.example.cosmos_discovery.database.PreferenceService;
+import com.example.cosmos_discovery.messaging.FcmTokenRegistrar;
 import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.ui.admin.AdminActivity;
 import com.example.cosmos_discovery.ui.student.StudentActivity;
@@ -25,6 +27,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         User user = RoleUtil.getCurrentUser();
+
+        if (user != null) {
+            FcmTokenRegistrar.register(user.getUid());
+            new PreferenceService().ensurePrefsInitialized(user.getUid());
+        }
 
         if (user != null && user.isPromotionApproved()) {
             showPromotionPopup(user);

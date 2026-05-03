@@ -95,7 +95,50 @@ public class RsvpHandler {
             );
             notif.setEventId(event.getId());
             notif.setEventTitle(event.getTitle());
+            notif.setAudience(Notification.AUDIENCE_PERSONAL);
             notifService().writeNotification(uid, notif, () -> {}, err -> {});
+
+            // Ping the organizer that someone RSVPed (skip self-RSVP).
+            if (event.getOrganizerId() != null
+                    && !event.getOrganizerId().isEmpty()
+                    && !event.getOrganizerId().equals(uid)) {
+                String attendeeName = RoleUtil.getCurrentUser() != null
+                        ? RoleUtil.getCurrentUser().getName() : null;
+                String displayName = attendeeName != null && !attendeeName.isEmpty()
+                        ? attendeeName : "Someone";
+                Notification rsvpNotif = new Notification(
+                        Notification.TYPE_RSVP_RECEIVED,
+                        "New RSVP",
+                        displayName + " RSVPed to \"" + event.getTitle() + "\".",
+                        System.currentTimeMillis());
+                rsvpNotif.setEventId(event.getId());
+                rsvpNotif.setEventTitle(event.getTitle());
+                rsvpNotif.setAudience(Notification.AUDIENCE_ORGANIZER);
+                notifService().writeNotification(event.getOrganizerId(), rsvpNotif,
+                        () -> {}, err -> {});
+            }
+
+            // If this RSVP just filled the event, ping the organizer (once).
+            if (event.getCapacity() > 0
+                    && event.getRsvpCount() >= event.getCapacity()
+                    && event.getOrganizerId() != null
+                    && !event.getOrganizerId().isEmpty()
+                    && !event.getOrganizerId().equals(uid)) {
+                Notification organizerNotif = new Notification(
+                        Notification.TYPE_CAPACITY_FULL,
+                        "Your event is full",
+                        "\"" + event.getTitle() + "\" has reached its capacity of "
+                                + event.getCapacity() + ".",
+                        System.currentTimeMillis());
+                organizerNotif.setEventId(event.getId());
+                organizerNotif.setEventTitle(event.getTitle());
+                organizerNotif.setAudience(Notification.AUDIENCE_ORGANIZER);
+                // Fixed doc ID per event → idempotent; only one capacity-full notif per event.
+                String docId = "capacity_full_" + event.getId();
+                notifService().writeNotificationToUsers(
+                        java.util.Collections.singletonList(event.getOrganizerId()),
+                        docId, organizerNotif, () -> {}, err -> {});
+            }
         }, onError);
     }
 

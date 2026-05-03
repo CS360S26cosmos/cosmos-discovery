@@ -23,13 +23,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.adapter.NotificationAdapter;
 import com.example.cosmos_discovery.database.NotificationService;
+import com.example.cosmos_discovery.database.PreferenceService;
 import com.example.cosmos_discovery.model.Notification;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationsFragment extends Fragment {
 
@@ -43,6 +46,23 @@ public class NotificationsFragment extends Fragment {
     private String               mUid;
     private List<Notification>   mCurrentNotifications = new ArrayList<>();
     private boolean              mShowingPersonal = true;
+    private Map<String, Boolean> mPrefs = new HashMap<>();
+    private final PreferenceService mPrefService = new PreferenceService();
+
+    /** Mirrors the Cloud Function's TYPE_TO_PREF map so the UI hides what wouldn't push. */
+    private static final Map<String, String> TYPE_TO_PREF = new HashMap<>();
+    static {
+        TYPE_TO_PREF.put(Notification.TYPE_RSVP_CONFIRMED,          "rsvp");
+        TYPE_TO_PREF.put(Notification.TYPE_EVENT_UPDATED,           "eventUpdates");
+        TYPE_TO_PREF.put(Notification.TYPE_EVENT_CANCELLED,         "eventUpdates");
+        TYPE_TO_PREF.put(Notification.TYPE_ANNOUNCEMENT,            "announcements");
+        TYPE_TO_PREF.put(Notification.TYPE_FRIEND_REQUEST_RECEIVED, "friendRequests");
+        TYPE_TO_PREF.put(Notification.TYPE_FRIEND_REQUEST_ACCEPTED, "friendRequests");
+        TYPE_TO_PREF.put(Notification.TYPE_EVENT_APPROVED,          "adminDecisions");
+        TYPE_TO_PREF.put(Notification.TYPE_EVENT_REJECTED,          "adminDecisions");
+        TYPE_TO_PREF.put(Notification.TYPE_CAPACITY_FULL,           "capacityFull");
+        TYPE_TO_PREF.put(Notification.TYPE_RSVP_RECEIVED,           "rsvpReceived");
+    }
 
     @Nullable
     @Override
@@ -103,6 +123,9 @@ public class NotificationsFragment extends Fragment {
         mService  = new NotificationService();
         mListener = mService.listenNotifications(mUid, notifications -> {
             mCurrentNotifications = notifications != null ? notifications : new ArrayList<>();
+            // Stamp legacy docs (pre-audience field) with their inferred audience so
+            // they show up in the right tab. No-op once they're all stamped.
+            mService.backfillAudience(mUid, mCurrentNotifications);
             refreshView();
         }, err -> {
             Log.e("NotificationsFragment", "Listener error: " + err);
@@ -202,20 +225,69 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void refreshView() {
-        if (mShowingPersonal) {
-            mOrganizerComingSoon.setVisibility(View.GONE);
-            mRv.setVisibility(View.VISIBLE);
-            List<Object> grouped = groupByDate(mCurrentNotifications);
-            mAdapter.updateData(grouped);
-            boolean empty = mCurrentNotifications.isEmpty();
-            mEmptyState.setVisibility(empty ? View.VISIBLE : View.GONE);
-            mClearAll.setVisibility(empty ? View.GONE : View.VISIBLE);
-        } else {
-            mRv.setVisibility(View.GONE);
-            mEmptyState.setVisibility(View.GONE);
-            mClearAll.setVisibility(View.GONE);
-            mOrganizerComingSoon.setVisibility(View.VISIBLE);
+        // The "coming soon" placeholder is no longer used — both tabs render real lists.
+        mOrganizerComingSoon.setVisibility(View.GONE);
+        mRv.setVisibility(View.VISIBLE);
+
+        List<Notification> filtered = filterByPrefs(mCurrentNotifications);
+        List<Notification> visible  = filterByTab(filtered, mShowingPersonal);
+        List<Object> grouped = groupByDate(visible);
+        mAdapter.updateData(grouped);
+        boolean empty = visible.isEmpty();
+        mEmptyState.setVisibility(empty ? View.VISIBLE : View.GONE);
+        mClearAll.setVisibility(empty ? View.GONE : View.VISIBLE);
+    }
+
+    /**
+     * Splits notifications by audience perspective:
+     *   • Personal — things that happen to YOU (RSVP'd, friend requests, event you attend updated/cancelled, announcements you receive).
+     *   • Organizer — things about events YOU run (someone RSVPed, your event filled, admin approved/rejected your event).
+     */
+    private List<Notification> filterByTab(List<Notification> source, boolean personal) {
+        List<Notification> kept = new ArrayList<>(source.size());
+        for (Notification n : source) {
+            boolean isOrganizerNotif = isOrganizerNotif(n);
+            if (personal != isOrganizerNotif) kept.add(n);
         }
+        return kept;
+    }
+
+    /**
+     * Trust the explicit audience field when present (set by all current writers).
+     * Falls back to type-based heuristic for any legacy notif docs that pre-date the field.
+     */
+    private boolean isOrganizerNotif(Notification n) {
+        if (Notification.AUDIENCE_ORGANIZER.equals(n.getAudience())) return true;
+        if (Notification.AUDIENCE_PERSONAL .equals(n.getAudience())) return false;
+
+        String type = n.getType();
+        if (type == null) return false;
+        return Notification.TYPE_RSVP_RECEIVED  .equals(type)
+            || Notification.TYPE_CAPACITY_FULL  .equals(type)
+            || Notification.TYPE_EVENT_APPROVED .equals(type)
+            || Notification.TYPE_EVENT_REJECTED .equals(type);
+    }
+
+    /**
+     * Drops notifications whose category is disabled in user preferences.
+     * Master "push" off hides everything. Missing keys are treated as enabled
+     * (matches the Cloud Function's behavior).
+     */
+    private List<Notification> filterByPrefs(List<Notification> source) {
+        if (mPrefs == null || mPrefs.isEmpty()) return source;
+        Boolean master = mPrefs.get("push");
+        if (master != null && !master) return new ArrayList<>();
+
+        List<Notification> kept = new ArrayList<>(source.size());
+        for (Notification n : source) {
+            String prefKey = TYPE_TO_PREF.get(n.getType());
+            if (prefKey != null) {
+                Boolean v = mPrefs.get(prefKey);
+                if (v != null && !v) continue;
+            }
+            kept.add(n);
+        }
+        return kept;
     }
 
     /** Groups a newest-first list into Today / Yesterday / This Week / Older with String headers. */
@@ -246,6 +318,16 @@ public class NotificationsFragment extends Fragment {
             result.add(n);
         }
         return result;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mUid == null) return;
+        mPrefService.getPrefs(mUid, prefs -> {
+            mPrefs = prefs;
+            refreshView();
+        }, err -> { /* fall back to showing everything */ });
     }
 
     @Override

@@ -268,6 +268,84 @@ public class EventService {
     }
 
     /**
+     * Cancels an event by setting its status to {@link Event#STATUS_CANCELLED} and
+     * fanning out a {@link com.example.cosmos_discovery.model.Notification#TYPE_EVENT_CANCELLED}
+     * notification to every attendee (and to the organizer when the canceller is someone else,
+     * e.g. an admin).
+     *
+     * @param eventId          The event document ID.
+     * @param cancelledByUid   UID of whoever performed the cancellation; used to skip self-notify.
+     * @param onSuccess        Called after the status update succeeds (notif fan-out is fire-and-forget).
+     * @param onFailure        Called with an error message if the status update fails.
+     */
+    public void cancelEvent(String eventId, String cancelledByUid,
+                            Runnable onSuccess, Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    com.example.cosmos_discovery.model.Event ev = doc.toObject(
+                            com.example.cosmos_discovery.model.Event.class);
+                    if (ev == null) {
+                        onFailure.accept("Event not found.");
+                        return;
+                    }
+                    ev.setId(doc.getId());
+                    mDb.collection(EVENTS_COLLECTION).document(eventId)
+                            .update("status", Event.STATUS_CANCELLED)
+                            .addOnSuccessListener(unused -> {
+                                fireCancellationNotifs(ev, cancelledByUid);
+                                onSuccess.run();
+                            })
+                            .addOnFailureListener(ex -> onFailure.accept("Could not cancel event."));
+                })
+                .addOnFailureListener(ex -> onFailure.accept("Could not load event to cancel."));
+    }
+
+    private void fireCancellationNotifs(com.example.cosmos_discovery.model.Event ev,
+                                        String cancelledByUid) {
+        com.example.cosmos_discovery.database.NotificationService notifs =
+                new com.example.cosmos_discovery.database.NotificationService();
+
+        // Attendees get a personal-perspective cancellation notif.
+        List<String> attendees = new ArrayList<>();
+        if (ev.getAttendeeIds() != null) attendees.addAll(ev.getAttendeeIds());
+        if (cancelledByUid != null) attendees.remove(cancelledByUid);
+        if (ev.getOrganizerId() != null) attendees.remove(ev.getOrganizerId());
+
+        if (!attendees.isEmpty()) {
+            com.example.cosmos_discovery.model.Notification np =
+                    new com.example.cosmos_discovery.model.Notification(
+                        com.example.cosmos_discovery.model.Notification.TYPE_EVENT_CANCELLED,
+                        "Event Cancelled",
+                        "\"" + ev.getTitle() + "\" has been cancelled.",
+                        System.currentTimeMillis());
+            np.setEventId(ev.getId());
+            np.setEventTitle(ev.getTitle());
+            np.setAudience(com.example.cosmos_discovery.model.Notification.AUDIENCE_PERSONAL);
+            notifs.writeNotificationToUsers(attendees,
+                    "event_cancelled_" + ev.getId(), np, () -> {}, err -> {});
+        }
+
+        // Organizer gets an organizer-perspective notif (only when admin/someone-else cancelled).
+        if (ev.getOrganizerId() != null
+                && !ev.getOrganizerId().equals(cancelledByUid)) {
+            com.example.cosmos_discovery.model.Notification no =
+                    new com.example.cosmos_discovery.model.Notification(
+                        com.example.cosmos_discovery.model.Notification.TYPE_EVENT_CANCELLED,
+                        "Your event was cancelled",
+                        "\"" + ev.getTitle() + "\" was cancelled by an admin.",
+                        System.currentTimeMillis());
+            no.setEventId(ev.getId());
+            no.setEventTitle(ev.getTitle());
+            no.setAudience(com.example.cosmos_discovery.model.Notification.AUDIENCE_ORGANIZER);
+            notifs.writeNotificationToUsers(
+                    java.util.Collections.singletonList(ev.getOrganizerId()),
+                    "event_cancelled_org_" + ev.getId(), no, () -> {}, err -> {});
+        }
+    }
+
+    /**
      * Updates arbitrary fields on an event document.
      */
     public void updateEvent(String eventId,

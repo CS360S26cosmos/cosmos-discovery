@@ -8,6 +8,15 @@ public class Notification {
     public static final String TYPE_RSVP_CONFIRMED          = "rsvp_confirmed";
     public static final String TYPE_EVENT_UPDATED           = "event_updated";
     public static final String TYPE_EVENT_CANCELLED         = "event_cancelled";
+    public static final String TYPE_ANNOUNCEMENT            = "announcement";
+    public static final String TYPE_EVENT_APPROVED          = "event_approved";
+    public static final String TYPE_EVENT_REJECTED          = "event_rejected";
+    public static final String TYPE_CAPACITY_FULL           = "capacity_full";
+    public static final String TYPE_RSVP_RECEIVED           = "rsvp_received";
+
+    /** Audience values — used by the in-app list to split into Personal / Organizer tabs. */
+    public static final String AUDIENCE_PERSONAL  = "personal";
+    public static final String AUDIENCE_ORGANIZER = "organizer";
 
     private String  id;         // set post-fetch, NOT stored in Firestore
     private String  type;
@@ -17,6 +26,7 @@ public class Notification {
     private boolean read;
     private String  eventId;    // nullable
     private String  eventTitle; // nullable
+    private String  audience;   // "personal" | "organizer" | null (null = personal fallback)
 
     /** Required by Firestore toObject(). */
     public Notification() {}
@@ -52,4 +62,7 @@ public class Notification {
 
     public String  getEventTitle()          { return eventTitle; }
     public void    setEventTitle(String v)  { eventTitle = v; }
+
+    public String  getAudience()            { return audience; }
+    public void    setAudience(String v)    { audience = v; }
 }

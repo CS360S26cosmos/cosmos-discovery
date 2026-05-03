@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">cosmos-discovery</string>
+    <string name="fcm_default_channel_id">cosmos_default</string>
+    <string name="fcm_default_channel_name">General notifications</string>
     <string name="home" />
     <string name="friends" />
     <string name="my_events" />
@@ -35,4 +37,6 @@
     <string name="menu_view_statistics">View Statistics</string>
     <string name="menu_delete_event">Delete Event</string>
     <string name="menu_attendee_list">Attendee List</string>
+    <string name="menu_send_announcement">Send Announcement</string>
+    <string name="menu_cancel_event">Cancel Event</string>
 </resources>

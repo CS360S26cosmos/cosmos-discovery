@@ -13,15 +13,17 @@ public final class EventStatusUtil {
     private EventStatusUtil() {}
 
     public static String toDisplayText(String status) {
-        if (Event.STATUS_APPROVED.equals(status)) return "Approved";
-        if (Event.STATUS_REJECTED.equals(status)) return "Rejected";
+        if (Event.STATUS_APPROVED.equals(status))  return "Approved";
+        if (Event.STATUS_REJECTED.equals(status))  return "Rejected";
+        if (Event.STATUS_CANCELLED.equals(status)) return "Cancelled";
         return "Pending";
     }
 
     /** Returns a color resource ID for the given status. */
     public static int toColorRes(String status) {
-        if (Event.STATUS_APPROVED.equals(status)) return R.color.color_approved;
-        if (Event.STATUS_REJECTED.equals(status)) return R.color.color_rejected;
+        if (Event.STATUS_APPROVED.equals(status))  return R.color.color_approved;
+        if (Event.STATUS_REJECTED.equals(status))  return R.color.color_rejected;
+        if (Event.STATUS_CANCELLED.equals(status)) return R.color.color_cancelled;
         return R.color.color_pending;
     }
 }

@@ -198,6 +198,7 @@ public class FriendService {
                             sender.getName() + " sent you a friend request",
                             System.currentTimeMillis()
                     );
+                    notif.setAudience(Notification.AUDIENCE_PERSONAL);
                     notifService().writeNotification(target.getUid(), notif, () -> {}, err -> {});
                     onSuccess.run();
                 })
@@ -288,6 +289,7 @@ public class FriendService {
                             currentUser.getName() + " accepted your friend request",
                             System.currentTimeMillis()
                     );
+                    notif.setAudience(Notification.AUDIENCE_PERSONAL);
                     notifService().writeNotification(senderUid, notif, () -> {}, err -> {});
                     onSuccess.run();
                 })

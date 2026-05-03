@@ -136,6 +136,43 @@ public class NotificationService {
                 });
     }
 
+    /**
+     * Stamps the {@code audience} field on any legacy notification docs missing it.
+     * Inferred from the notification type. Safe to call repeatedly — only writes
+     * docs that lack the field.
+     */
+    public void backfillAudience(String userId, List<Notification> notifications) {
+        if (userId == null || notifications == null || notifications.isEmpty()) return;
+
+        WriteBatch batch = mDb.batch();
+        int writes = 0;
+        for (Notification n : notifications) {
+            if (n.getId() == null || n.getAudience() != null) continue;
+            String audience = inferAudience(n.getType());
+            DocumentReference ref = mDb.collection(USERS_COL)
+                    .document(userId)
+                    .collection(NOTIFS_SUB)
+                    .document(n.getId());
+            batch.update(ref, "audience", audience);
+            writes++;
+            if (writes >= 400) break; // Stay well under Firestore's 500-op batch limit.
+        }
+        if (writes > 0) batch.commit();
+    }
+
+    private String inferAudience(String type) {
+        if (type == null) return Notification.AUDIENCE_PERSONAL;
+        switch (type) {
+            case Notification.TYPE_RSVP_RECEIVED:
+            case Notification.TYPE_CAPACITY_FULL:
+            case Notification.TYPE_EVENT_APPROVED:
+            case Notification.TYPE_EVENT_REJECTED:
+                return Notification.AUDIENCE_ORGANIZER;
+            default:
+                return Notification.AUDIENCE_PERSONAL;
+        }
+    }
+
     // ── Private ───────────────────────────────────────────────────────────
 
     private Map<String, Object> toMap(Notification n) {
@@ -147,6 +184,7 @@ public class NotificationService {
         m.put("read",      false);
         if (n.getEventId()    != null) m.put("eventId",    n.getEventId());
         if (n.getEventTitle() != null) m.put("eventTitle", n.getEventTitle());
+        if (n.getAudience()   != null) m.put("audience",   n.getAudience());
         return m;
     }
 }

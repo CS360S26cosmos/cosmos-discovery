@@ -95,34 +95,96 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!-- Event Reminders -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/rowReminders"
+                <!-- Notifications section header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Notifications"
+                    android:textStyle="bold"
+                    android:textSize="18sp"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/swPushMaster"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:paddingVertical="0dp">
+                    android:text="Push notifications"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"/>
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="Event Reminders"
-                        android:textSize="16sp"
-                        android:textColor="@android:color/black"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/cbReminders"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/swPrefRsvp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="RSVP confirmations"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:paddingStart="16dp"/>
 
-                    <CheckBox
-                        android:id="@+id/cbReminders"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/swPrefEventUpdates"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Event updates and cancellations"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:paddingStart="16dp"/>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/swPrefAnnouncements"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Organizer announcements"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:paddingStart="16dp"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/swPrefFriendRequests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Friend requests"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:paddingStart="16dp"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/swPrefAdminDecisions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Admin decisions on your events"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:paddingStart="16dp"
+                    android:visibility="gone"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/swPrefCapacityFull"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Your event reaches capacity"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:paddingStart="16dp"
+                    android:visibility="gone"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/swPrefRsvpReceived"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="New RSVPs to your events"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:paddingStart="16dp"
+                    android:visibility="gone"/>
 
                 <!-- Request Organizer -->
                 <androidx.constraintlayout.widget.ConstraintLayout

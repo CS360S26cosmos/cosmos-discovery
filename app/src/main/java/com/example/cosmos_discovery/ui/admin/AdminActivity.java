@@ -52,6 +52,8 @@ public class AdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
+        com.example.cosmos_discovery.util.NotificationPermission.requestIfNeeded(this);
+
         bindViews();
         setupTopBar();
         setupNavBar();
