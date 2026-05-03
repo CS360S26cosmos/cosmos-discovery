@@ -1,6 +1,7 @@
 package com.example.cosmos_discovery.ui.shared;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -32,12 +33,26 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.tvResetPassword).setOnClickListener(v ->
                 startActivity(new Intent(this, ResetPasswordActivity.class)));
 
-        // Stubs (notifications no longer stubbed — handled below)
-        int[] stubs = { R.id.rowHelpCenter, R.id.rowContactUs, R.id.rowTerms };
-        for (int id : stubs) {
-            findViewById(id).setOnClickListener(v ->
-                    Toast.makeText(this, "Will be implemented soon", Toast.LENGTH_SHORT).show());
-        }
+        findViewById(R.id.rowHelpCenter).setOnClickListener(v ->
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle("Help Center")
+                        .setMessage("Q: How do I RSVP to an event?\nA: Tap any event card and press the RSVP button.\n\nQ: How do I become an organizer?\nA: Go to Settings → Request Organizer Role.\n\nQ: Can I cancel my RSVP?\nA: Yes, tap the event again and press Cancel RSVP.\n\nQ: Why can't I see some events?\nA: Private events are only visible to invited attendees.")
+                        .setPositiveButton("Got it", null)
+                        .show());
+
+        findViewById(R.id.rowContactUs).setOnClickListener(v -> {
+            Intent email = new Intent(Intent.ACTION_SENDTO,
+                    Uri.parse("mailto:support@cosmosdiscovery.lums.edu.pk"));
+            email.putExtra(Intent.EXTRA_SUBJECT, "CosmosDiscovery Support");
+            startActivity(Intent.createChooser(email, "Send email"));
+        });
+
+        findViewById(R.id.rowTerms).setOnClickListener(v ->
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle("Terms of Service")
+                        .setMessage("By using CosmosDiscovery, you agree to:\n\n1. Use the app only with a valid @lums.edu.pk email address.\n\n2. Not misuse RSVP features or create spam events.\n\n3. Respect other users' privacy and not share their information.\n\n4. Accept that event details may change at the organizer's discretion.\n\n5. Comply with LUMS's student conduct policy at all times.\n\nFor questions, contact support@cosmosdiscovery.lums.edu.pk.")
+                        .setPositiveButton("Close", null)
+                        .show());
 
         setupOrganizerRequestRow();
         setupNotificationToggles();
