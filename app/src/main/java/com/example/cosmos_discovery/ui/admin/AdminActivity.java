@@ -163,9 +163,11 @@ public class AdminActivity extends AppCompatActivity {
             loadSidebarPhoto(user);
         }
 
-        // Admin has no organizer section
+        // Admin has no organizer section and no friend requests
         View organizerSection = mSidebarView.findViewById(R.id.organizerSection);
         if (organizerSection != null) organizerSection.setVisibility(View.GONE);
+        View friendRequestsRow = mSidebarView.findViewById(R.id.friendRequestsRow);
+        if (friendRequestsRow != null) friendRequestsRow.setVisibility(View.GONE);
 
         mSidebarView.findViewById(R.id.sidebarOverlay).setOnClickListener(v -> hideSidebar());
         mSidebarView.findViewById(R.id.btnCloseSidebar).setOnClickListener(v -> hideSidebar());

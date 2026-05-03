@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -151,6 +152,36 @@ public class EventDetailsActivity extends AppCompatActivity {
             });
         }
 
+        MaterialCardView shareCard = findViewById(R.id.shareButtonCard);
+        if (shareCard != null) {
+            shareCard.setOnClickListener(v -> shareEvent(event));
+        }
+
+        // Category
+        LinearLayout categoryRow = findViewById(R.id.categoryRow);
+        TextView tvCategory = findViewById(R.id.tvCategoryValue);
+        String category = event.getCategory();
+        if (category != null && !category.trim().isEmpty()) {
+            tvCategory.setText(category);
+            categoryRow.setVisibility(View.VISIBLE);
+        } else {
+            categoryRow.setVisibility(View.GONE);
+        }
+
+        // Rejection reason (organizer/owner only, when status = rejected)
+        LinearLayout rejectionRow = findViewById(R.id.rejectionReasonRow);
+        if (isEventOwner && Event.STATUS_REJECTED.equals(event.getStatus())) {
+            String rejReason = event.getRejectionReason();
+            TextView tvRejReason = findViewById(R.id.tvRejectionReasonDetail);
+            tvRejReason.setText(rejReason != null && !rejReason.trim().isEmpty()
+                    ? rejReason : "No reason provided.");
+            rejectionRow.setVisibility(View.VISIBLE);
+        } else {
+            rejectionRow.setVisibility(View.GONE);
+        }
+
+        loadOrganizerRating(event.getOrganizerId());
+
         MaterialCardView rsvpCard = findViewById(R.id.rsvpButton);
         TextView tvRsvp = findViewById(R.id.tvRsvp);
         if (rsvpCard != null && tvRsvp != null) {
@@ -163,6 +194,42 @@ public class EventDetailsActivity extends AppCompatActivity {
                 rsvpCard.setVisibility(View.VISIBLE);
                 bindRsvpButton(event, rsvpCard, tvRsvp);
             }
+        }
+    }
+
+    private void loadOrganizerRating(String organizerId) {
+        LinearLayout ratingRow = findViewById(R.id.ratingRow);
+        TextView tvRating = findViewById(R.id.tvEventRatingValue);
+        if (organizerId == null || organizerId.isEmpty()) {
+            if (ratingRow != null) ratingRow.setVisibility(View.GONE);
+            return;
+        }
+        mEventService.fetchOrganizerAverageRating(organizerId,
+                avg -> {
+                    if (avg != null && ratingRow != null && tvRating != null) {
+                        tvRating.setText(String.format(java.util.Locale.getDefault(), "%.1f / 5", avg));
+                        ratingRow.setVisibility(View.VISIBLE);
+                    } else if (ratingRow != null) {
+                        ratingRow.setVisibility(View.GONE);
+                    }
+                },
+                err -> { if (ratingRow != null) ratingRow.setVisibility(View.GONE); }
+        );
+    }
+
+    private void shareEvent(Event event) {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d 'at' h:mma", java.util.Locale.getDefault());
+        String body = event.getTitle()
+                + "\n" + sdf.format(new Date(event.getDateTime()))
+                + (event.getLocation() != null ? "\n" + event.getLocation() : "");
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.putExtra(Intent.EXTRA_SUBJECT, event.getTitle());
+        share.putExtra(Intent.EXTRA_TEXT, body);
+        try {
+            startActivity(Intent.createChooser(share, "Share event"));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No app available to share", Toast.LENGTH_SHORT).show();
         }
     }
 

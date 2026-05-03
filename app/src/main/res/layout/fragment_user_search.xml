@@ -12,6 +12,7 @@
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:paddingTop="16dp"
+        android:paddingBottom="90dp"
         android:clipToPadding="false"
         android:nestedScrollingEnabled="false"
         android:overScrollMode="never" />

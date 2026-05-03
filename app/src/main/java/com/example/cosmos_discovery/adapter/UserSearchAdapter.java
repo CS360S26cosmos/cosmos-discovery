@@ -90,8 +90,9 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         String lower = mQuery.toLowerCase(java.util.Locale.getDefault());
         for (User u : mAllUsers) {
             if (u.getUid() == null || u.getUid().equals(mCurrentUid)) continue;
-            if (lower.isEmpty() || (u.getName() != null
-                    && u.getName().toLowerCase(java.util.Locale.getDefault()).contains(lower))) {
+            boolean nameMatch  = u.getName()  != null && u.getName() .toLowerCase(java.util.Locale.getDefault()).contains(lower);
+            boolean emailMatch = u.getEmail() != null && u.getEmail().toLowerCase(java.util.Locale.getDefault()).contains(lower);
+            if (lower.isEmpty() || nameMatch || emailMatch) {
                 mFiltered.add(u);
             }
         }

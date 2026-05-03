@@ -41,7 +41,8 @@ public class Event {
     private String       dateOfEvent; // raw form value (display), e.g. "2026-04-06"
     private String       startTime;   // raw form value, e.g. "5:00pm"
     private String       endTime;     // raw form value, e.g. "7:00pm"
-    private String       registerBy;  // raw form value (display)
+    private String       registerBy;       // raw form value (display)
+    private String       rejectionReason;  // set by admin when rejecting; persisted to Firestore
 
     /** Required by Firestore for deserialization. Do not use in application code. */
     protected Event() {}
@@ -154,6 +155,9 @@ public class Event {
     public String getEndTime()                       { return endTime; }
     public void   setEndTime(String endTime)         { this.endTime = endTime; }
 
-    public String getRegisterBy()                    { return registerBy; }
-    public void   setRegisterBy(String registerBy)   { this.registerBy = registerBy; }
+    public String getRegisterBy()                         { return registerBy; }
+    public void   setRegisterBy(String registerBy)        { this.registerBy = registerBy; }
+
+    public String getRejectionReason()                    { return rejectionReason; }
+    public void   setRejectionReason(String reason)       { this.rejectionReason = reason; }
 }
