@@ -78,6 +78,12 @@ public class EditEventActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_events_page);
 
+        if (!RoleUtil.isOrganizer()) {
+            Toast.makeText(this, "Only organizers can edit events.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         mEventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
         if (mEventId == null || mEventId.trim().isEmpty()) {
             Toast.makeText(this, "Missing event.", Toast.LENGTH_LONG).show();
@@ -382,6 +388,7 @@ public class EditEventActivity extends AppCompatActivity {
         }
         if (startText.isEmpty()) {
             mEtStartTime.setError("Start time is required.");
+            Toast.makeText(this, "Start time is required.", Toast.LENGTH_LONG).show();
             hasError = true;
         }
 
@@ -414,20 +421,24 @@ public class EditEventActivity extends AppCompatActivity {
         }
 
         String regByText = mEtRegisterBy.getText().toString().trim();
-        if (!regByText.isEmpty()) {
-            long regByMs = EventFormUtil.parseDateTimeMs(regByText, "11:59pm");
-            // Only block "in the past" if the organizer changed the value — the original
-            // deadline may already have passed and should not prevent saving other edits.
-            String originalRegBy = mEvent != null ? mEvent.getRegisterBy() : null;
-            boolean regByChanged = !regByText.equals(originalRegBy != null ? originalRegBy : "");
-            if (regByMs > 0 && regByChanged && regByMs < System.currentTimeMillis()) {
-                mEtRegisterBy.setError("Registration deadline cannot be in the past.");
-                return;
-            }
-            if (regByMs > 0 && regByMs > dateTimeMs) {
-                mEtRegisterBy.setError("Registration deadline must be before the event date.");
-                return;
-            }
+        if (regByText.isEmpty()) {
+            mEtRegisterBy.setError("Registration deadline is required.");
+            return;
+        }
+
+        long regByMs = EventFormUtil.parseDateTimeMs(regByText, "11:59pm");
+
+        String originalRegBy = mEvent != null ? mEvent.getRegisterBy() : null;
+        boolean regByChanged = !regByText.equals(originalRegBy != null ? originalRegBy : "");
+
+        if (regByMs > 0 && regByChanged && regByMs < System.currentTimeMillis()) {
+            mEtRegisterBy.setError("Registration deadline cannot be in the past.");
+            return;
+        }
+
+        if (regByMs > 0 && regByMs > dateTimeMs) {
+            mEtRegisterBy.setError("Registration deadline must be before the event date.");
+            return;
         }
 
         String category = mEtCategory.getText().toString().trim();

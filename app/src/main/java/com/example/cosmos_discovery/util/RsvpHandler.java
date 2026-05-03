@@ -56,6 +56,10 @@ public class RsvpHandler {
     // ── Private helpers ───────────────────────────────────────────────────
 
     private void addRsvp(Event event, String uid, Runnable onRefresh, Consumer<String> onError) {
+        if (event.isRegistrationClosed()) {
+            onError.accept("Registration is closed for this event.");
+            return;
+        }
         if (event.isFull()) {
             onError.accept("This event is full.");
             return;
