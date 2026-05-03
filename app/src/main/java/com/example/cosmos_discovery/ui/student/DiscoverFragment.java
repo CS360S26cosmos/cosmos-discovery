@@ -111,7 +111,7 @@ public class DiscoverFragment extends Fragment {
                         if (mInitialLoadsPending == 0) refreshSuggested();
                     }
                 },
-                err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
+                err -> { if (isAdded()) Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show(); });
 
         String uid = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : "";
         mEventService.fetchMyRsvpedEvents(uid,
@@ -127,7 +127,7 @@ public class DiscoverFragment extends Fragment {
 
         mThisWeekListener = mEventService.listenThisWeekEvents(
                 events -> updateThisWeek(events),
-                err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
+                err -> { if (isAdded()) Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show(); });
     }
 
     @Override
@@ -145,7 +145,7 @@ public class DiscoverFragment extends Fragment {
 
     /** Runs the recommendation engine and refreshes the For You carousel. */
     private void refreshSuggested() {
-        if (mSuggestedAdapter == null) return;
+        if (mSuggestedAdapter == null || !isAdded()) return;
         String uid = RoleUtil.getCurrentUser() != null ? RoleUtil.getCurrentUser().getUid() : "";
         DismissedEventsStore store = new DismissedEventsStore(requireContext());
         List<Event> recommendations = RecommendationEngine.recommend(

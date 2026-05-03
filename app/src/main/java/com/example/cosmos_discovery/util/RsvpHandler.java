@@ -18,14 +18,19 @@ import java.util.function.Consumer;
  */
 public class RsvpHandler {
 
-    private EventService       mService;      // lazily initialized — keeps RsvpHandler testable without Firebase
-    private NotificationService mNotifService = new NotificationService();
+    private EventService        mService;       // lazily initialized — keeps RsvpHandler testable without Firebase
+    private NotificationService mNotifService;  // lazily initialized — same reason
 
     public RsvpHandler() {}
 
     private EventService service() {
         if (mService == null) mService = new EventService();
         return mService;
+    }
+
+    private NotificationService notifService() {
+        if (mNotifService == null) mNotifService = new NotificationService();
+        return mNotifService;
     }
 
     /**
@@ -90,7 +95,7 @@ public class RsvpHandler {
             );
             notif.setEventId(event.getId());
             notif.setEventTitle(event.getTitle());
-            mNotifService.writeNotification(uid, notif, () -> {}, err -> {});
+            notifService().writeNotification(uid, notif, () -> {}, err -> {});
         }, onError);
     }
 

@@ -25,10 +25,15 @@ public class FriendService {
     private static final String FRIENDS_SUB       = "friends";
 
     private final FirebaseFirestore   mDb;
-    private final NotificationService mNotifService = new NotificationService();
+    private       NotificationService mNotifService; // lazily initialized — keeps FriendService testable without Firebase
 
     public FriendService() {
         mDb = FirebaseFirestore.getInstance();
+    }
+
+    private NotificationService notifService() {
+        if (mNotifService == null) mNotifService = new NotificationService();
+        return mNotifService;
     }
 
     /**
@@ -193,7 +198,7 @@ public class FriendService {
                             sender.getName() + " sent you a friend request",
                             System.currentTimeMillis()
                     );
-                    mNotifService.writeNotification(target.getUid(), notif, () -> {}, err -> {});
+                    notifService().writeNotification(target.getUid(), notif, () -> {}, err -> {});
                     onSuccess.run();
                 })
                 .addOnFailureListener(e -> onFailure.accept("Could not send request."));
@@ -283,7 +288,7 @@ public class FriendService {
                             currentUser.getName() + " accepted your friend request",
                             System.currentTimeMillis()
                     );
-                    mNotifService.writeNotification(senderUid, notif, () -> {}, err -> {});
+                    notifService().writeNotification(senderUid, notif, () -> {}, err -> {});
                     onSuccess.run();
                 })
                 .addOnFailureListener(e -> onFailure.accept("Could not accept request."));

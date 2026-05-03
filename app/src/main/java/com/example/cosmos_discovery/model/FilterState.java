@@ -78,11 +78,11 @@ public class FilterState {
                 end.add(Calendar.DAY_OF_YEAR, Calendar.SATURDAY - dayOfWeek);    // roll forward to Saturday
                 break;
             case THIS_WEEKEND:
-                // Coming Saturday (or next week's if today is already past Saturday)
-                start.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-                if (start.getTimeInMillis() < System.currentTimeMillis()) {
-                    start.add(Calendar.WEEK_OF_YEAR, 1);
-                }
+                // Use add() arithmetic — set(DAY_OF_WEEK) is locale-dependent (see THIS_WEEK comment)
+                int today = start.get(Calendar.DAY_OF_WEEK); // SUNDAY=1 … SATURDAY=7
+                int daysUntilSat = (Calendar.SATURDAY - today + 7) % 7;
+                if (daysUntilSat == 0) daysUntilSat = 7; // already Saturday → target next Saturday
+                start.add(Calendar.DAY_OF_YEAR, daysUntilSat);
                 end = (Calendar) start.clone();
                 end.add(Calendar.DAY_OF_YEAR, 1); // Sunday after that Saturday
                 end.set(Calendar.HOUR_OF_DAY, 23);

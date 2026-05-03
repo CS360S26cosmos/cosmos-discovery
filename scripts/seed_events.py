@@ -474,7 +474,7 @@ def main():
         col.add({"name": name})
     print(f"✅ Seeded {len(CATEGORIES)} categories")
 
-    # Seed events — auto-fill createdAt, registerBy, and dateOfEvent
+    # Seed events — auto-fill createdAt, registerBy, dateOfEvent, startTime, endTime
     col = db.collection("events")
     for event in EVENTS:
         doc = dict(event)
@@ -486,6 +486,18 @@ def main():
             doc["registerBy"] = (dt - timedelta(days=1)).strftime("%Y-%m-%d")
         if "dateOfEvent" not in doc:
             doc["dateOfEvent"] = dt.strftime("%Y-%m-%d")
+        if "startTime" not in doc:
+            # format: "10:00am" / "7:30pm" — matches EventFormUtil.parseDateTimeMs input
+            h, m = dt.hour, dt.minute
+            period = "am" if h < 12 else "pm"
+            h12 = h % 12 or 12
+            doc["startTime"] = f"{h12}:{m:02d}{period}"
+        if "endTime" not in doc:
+            end_dt = dt + timedelta(hours=2)
+            h, m = end_dt.hour, end_dt.minute
+            period = "am" if h < 12 else "pm"
+            h12 = h % 12 or 12
+            doc["endTime"] = f"{h12}:{m:02d}{period}"
         col.add(doc)
     print(f"✅ Seeded {len(EVENTS)} events")
 
