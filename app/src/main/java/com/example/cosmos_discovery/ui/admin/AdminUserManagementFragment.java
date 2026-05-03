@@ -304,18 +304,31 @@ public class AdminUserManagementFragment extends Fragment
             showToast("Please select a role.");
             return;
         }
+        if (mPendingRoleUser == null || mPendingRoleUser.getUid() == null
+                || mPendingRoleUser.getUid().isEmpty()) {
+            showToast("Error: could not identify user. Please reload the list.");
+            dismissRoleChangeOverlay();
+            return;
+        }
         String newLabel = getLabelForRole(mSelectedRole);
-        mAdminService.updateUserRole(
-                mPendingRoleUser.getUid(),
-                mSelectedRole,
-                () -> {
-                    if (!isAdded()) return;
-                    mPendingRoleUser.setRole(mSelectedRole);
-                    mUserAdapter.updateUser(mPendingRoleUser);
-                    showToast("Role updated to " + newLabel + ".");
-                    dismissRoleChangeOverlay();
-                },
-                err -> showToast(err));
+        try {
+            mAdminService.updateUserRole(
+                    mPendingRoleUser.getUid(),
+                    mSelectedRole,
+                    () -> {
+                        if (!isAdded()) return;
+                        mPendingRoleUser.setRole(mSelectedRole);
+                        mUserAdapter.updateUser(mPendingRoleUser);
+                        showToast("Role updated to " + newLabel + ".");
+                        dismissRoleChangeOverlay();
+                    },
+                    err -> {
+                        if (!isAdded()) return;
+                        showToast(err);
+                    });
+        } catch (Exception e) {
+            showToast("Failed to update role: " + e.getMessage());
+        }
     }
 
     private String getLabelForRole(String role) {
