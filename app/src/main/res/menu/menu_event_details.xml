@@ -3,13 +3,18 @@
         android:id="@+id/action_edit"
         android:title="@string/menu_edit_event" />
     <item
+        android:id="@+id/action_announcement"
+        android:title="@string/menu_send_announcement" />
+    <item
         android:id="@+id/action_stats"
         android:title="@string/menu_view_statistics" />
     <item
         android:id="@+id/action_attendee_list"
         android:title="@string/menu_attendee_list" />
     <item
+        android:id="@+id/action_cancel"
+        android:title="@string/menu_cancel_event" />
+    <item
         android:id="@+id/action_delete"
         android:title="@string/menu_delete_event" />
 </menu>
-

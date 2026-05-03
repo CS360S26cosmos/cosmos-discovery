@@ -10,12 +10,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
+import com.example.cosmos_discovery.database.PreferenceService;
 import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.util.RoleUtil;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
+import java.util.Map;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private final AuthService mAuthService = new AuthService();
+    private final AuthService        mAuthService = new AuthService();
+    private final PreferenceService  mPrefService = new PreferenceService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,14 +32,82 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.tvResetPassword).setOnClickListener(v ->
                 startActivity(new Intent(this, ResetPasswordActivity.class)));
 
-        // Stubs
-        int[] stubs = { R.id.rowReminders, R.id.rowHelpCenter, R.id.rowContactUs, R.id.rowTerms };
+        // Stubs (notifications no longer stubbed — handled below)
+        int[] stubs = { R.id.rowHelpCenter, R.id.rowContactUs, R.id.rowTerms };
         for (int id : stubs) {
             findViewById(id).setOnClickListener(v ->
                     Toast.makeText(this, "Will be implemented soon", Toast.LENGTH_SHORT).show());
         }
 
         setupOrganizerRequestRow();
+        setupNotificationToggles();
+    }
+
+    private void setupNotificationToggles() {
+        SwitchMaterial swMaster        = findViewById(R.id.swPushMaster);
+        SwitchMaterial swRsvp          = findViewById(R.id.swPrefRsvp);
+        SwitchMaterial swEventUpdates  = findViewById(R.id.swPrefEventUpdates);
+        SwitchMaterial swAnnouncements = findViewById(R.id.swPrefAnnouncements);
+        SwitchMaterial swFriends       = findViewById(R.id.swPrefFriendRequests);
+        SwitchMaterial swAdminDecs     = findViewById(R.id.swPrefAdminDecisions);
+        SwitchMaterial swCapacity      = findViewById(R.id.swPrefCapacityFull);
+        SwitchMaterial swRsvpReceived  = findViewById(R.id.swPrefRsvpReceived);
+
+        if (RoleUtil.isOrganizer()) {
+            swAdminDecs   .setVisibility(View.VISIBLE);
+            swCapacity    .setVisibility(View.VISIBLE);
+            swRsvpReceived.setVisibility(View.VISIBLE);
+        }
+
+        User user = RoleUtil.getCurrentUser();
+        if (user == null) return;
+        String uid = user.getUid();
+
+        // Disable interaction until prefs load to avoid stale-write races.
+        SwitchMaterial[] all = { swMaster, swRsvp, swEventUpdates, swAnnouncements,
+                                 swFriends, swAdminDecs, swCapacity, swRsvpReceived };
+        for (SwitchMaterial s : all) s.setEnabled(false);
+
+        mPrefService.getPrefs(uid, prefs -> {
+            applyPref(swMaster,        prefs, "push");
+            applyPref(swRsvp,          prefs, "rsvp");
+            applyPref(swEventUpdates,  prefs, "eventUpdates");
+            applyPref(swAnnouncements, prefs, "announcements");
+            applyPref(swFriends,       prefs, "friendRequests");
+            applyPref(swAdminDecs,     prefs, "adminDecisions");
+            applyPref(swCapacity,      prefs, "capacityFull");
+            applyPref(swRsvpReceived,  prefs, "rsvpReceived");
+
+            wireToggle(swMaster,        uid, "push");
+            wireToggle(swRsvp,          uid, "rsvp");
+            wireToggle(swEventUpdates,  uid, "eventUpdates");
+            wireToggle(swAnnouncements, uid, "announcements");
+            wireToggle(swFriends,       uid, "friendRequests");
+            wireToggle(swAdminDecs,     uid, "adminDecisions");
+            wireToggle(swCapacity,      uid, "capacityFull");
+            wireToggle(swRsvpReceived,  uid, "rsvpReceived");
+
+            for (SwitchMaterial s : all) s.setEnabled(true);
+        }, err -> Toast.makeText(this, err, Toast.LENGTH_SHORT).show());
+    }
+
+    private void applyPref(SwitchMaterial sw, Map<String, Boolean> prefs, String key) {
+        Boolean v = prefs.get(key);
+        sw.setChecked(v == null || v);
+    }
+
+    private void wireToggle(SwitchMaterial sw, String uid, String key) {
+        sw.setOnCheckedChangeListener((btn, checked) -> {
+            mPrefService.updatePref(uid, key, checked,
+                    () -> {},
+                    err -> {
+                        // Roll back the visual state on failure.
+                        sw.setOnCheckedChangeListener(null);
+                        sw.setChecked(!checked);
+                        wireToggle(sw, uid, key);
+                        Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
+                    });
+        });
     }
 
     private void setupOrganizerRequestRow() {

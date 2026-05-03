@@ -466,12 +466,22 @@ public class EditEventActivity extends AppCompatActivity {
         }
         fields.put("capacity", cap);
 
+        // Determine whether anything attendees actually care about changed.
+        // Cosmetic edits (description, banner, tags, category) do NOT trigger a notification —
+        // organizers have the explicit Announcements channel for that.
+        String  newAccess   = EventFormUtil.normalizeAccessType(mEtOpenTo.getText().toString());
+        boolean meaningfulChange =
+                   dateTimeMs != mEvent.getDateTime()
+                || !venue.equals(nullToEmpty(mEvent.getLocation()))
+                || cap != mEvent.getCapacity()
+                || !nullToEmpty(newAccess).equals(nullToEmpty(mEvent.getAccessType()));
+
         mEventService.updateEvent(
                 mEventId,
                 fields,
                 () -> {
                     Toast.makeText(this, "Event updated.", Toast.LENGTH_SHORT).show();
-                    notifyAttendeesOfUpdate();
+                    if (meaningfulChange) notifyAttendeesOfUpdate();
                     finish();
                 },
                 err -> Toast.makeText(this, err, Toast.LENGTH_LONG).show()
@@ -497,6 +507,7 @@ public class EditEventActivity extends AppCompatActivity {
         );
         notif.setEventId(mEventId);
         notif.setEventTitle(mEvent.getTitle());
+        notif.setAudience(Notification.AUDIENCE_PERSONAL);
 
         // Fixed doc ID per event — overwrites any previous "event updated" notification
         // so attendees only ever see one card regardless of how many times the organizer saves.

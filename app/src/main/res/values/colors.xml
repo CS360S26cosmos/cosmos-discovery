@@ -35,6 +35,7 @@
     <color name="color_pending">#1565C0</color>         <!-- blue -->
     <color name="color_rejected">#BF360C</color>        <!-- dark orange-red -->
     <color name="color_approved">#2E7D32</color>        <!-- green -->
+    <color name="color_cancelled">#616161</color>       <!-- grey -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 </resources>

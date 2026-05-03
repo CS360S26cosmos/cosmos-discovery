@@ -16,9 +16,10 @@ import java.util.List;
  */
 public class Event {
 
-    public static final String STATUS_APPROVED = "approved";
-    public static final String STATUS_PENDING  = "pending";
-    public static final String STATUS_REJECTED = "rejected";
+    public static final String STATUS_APPROVED  = "approved";
+    public static final String STATUS_PENDING   = "pending";
+    public static final String STATUS_REJECTED  = "rejected";
+    public static final String STATUS_CANCELLED = "cancelled";
 
     private String       id;          // doc ID — set post-fetch, not a Firestore field
     private String       title;

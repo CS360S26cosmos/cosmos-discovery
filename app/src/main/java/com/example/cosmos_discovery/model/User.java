@@ -1,5 +1,8 @@
 package com.example.cosmos_discovery.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Represents an application user profile.
  *
@@ -37,6 +40,10 @@ public class User {
     private String photoUrl;
     /** Flag set when an organizer request is approved; cleared after the promotion popup is dismissed. */
     private boolean promotionApproved;
+    /** FCM device token used for push notifications; null until first registration. */
+    private String fcmToken;
+    /** Per-category notification preferences. Null on legacy docs — treated as all-enabled. */
+    private Map<String, Boolean> notifPrefs;
 
     /**
      * Default constructor required for serialization/deserialization frameworks.
@@ -57,6 +64,21 @@ public class User {
         this.role        = ROLE_STUDENT;   // default role
         this.isActive    = true;
         this.createdAt   = System.currentTimeMillis();
+        this.notifPrefs  = defaultNotifPrefs();
+    }
+
+    /** All-true defaults for new users. Cloud Function treats missing keys as true too. */
+    public static Map<String, Boolean> defaultNotifPrefs() {
+        Map<String, Boolean> prefs = new HashMap<>();
+        prefs.put("push",           true);
+        prefs.put("rsvp",           true);
+        prefs.put("eventUpdates",   true);
+        prefs.put("announcements",  true);
+        prefs.put("friendRequests", true);
+        prefs.put("adminDecisions", true);
+        prefs.put("capacityFull",   true);
+        prefs.put("rsvpReceived",   true);
+        return prefs;
     }
 
     /**
@@ -241,4 +263,10 @@ public class User {
 
     public boolean isPromotionApproved() { return promotionApproved; }
     public void setPromotionApproved(boolean v) { this.promotionApproved = v; }
+
+    public String getFcmToken() { return fcmToken; }
+    public void setFcmToken(String fcmToken) { this.fcmToken = fcmToken; }
+
+    public Map<String, Boolean> getNotifPrefs() { return notifPrefs; }
+    public void setNotifPrefs(Map<String, Boolean> notifPrefs) { this.notifPrefs = notifPrefs; }
 }

@@ -129,6 +129,8 @@ public class StudentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student);
 
+        com.example.cosmos_discovery.util.NotificationPermission.requestIfNeeded(this);
+
         bindViews();
         setupTopBar();
         setupNavBar();

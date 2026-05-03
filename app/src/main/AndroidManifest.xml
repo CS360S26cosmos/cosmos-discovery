@@ -6,6 +6,8 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+    <!-- Android 13+ runtime permission for posting system notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -71,6 +73,9 @@
             android:name=".ui.organizer.AddEventActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.organizer.AnnouncementsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.organizer.EditEventActivity"
             android:exported="false" />
         <activity
@@ -102,6 +107,23 @@
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <!-- FCM messaging service: handles token refresh + foreground messages -->
+        <service
+            android:name=".messaging.CosmosFcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Default channel + icon for FCM-delivered notifications when the app is in background -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/fcm_default_channel_id" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notifications" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

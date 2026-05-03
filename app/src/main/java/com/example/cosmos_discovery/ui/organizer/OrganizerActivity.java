@@ -76,6 +76,8 @@ public class OrganizerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer);
 
+        com.example.cosmos_discovery.util.NotificationPermission.requestIfNeeded(this);
+
         if (RoleUtil.getCurrentUser() == null) {
             Toast.makeText(this, "Please sign in again.", Toast.LENGTH_LONG).show();
             finish();

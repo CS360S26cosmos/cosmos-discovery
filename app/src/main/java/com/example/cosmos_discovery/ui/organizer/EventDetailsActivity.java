@@ -19,6 +19,7 @@ import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.model.Event;
 import com.example.cosmos_discovery.ui.student.StudentActivity;
 import com.example.cosmos_discovery.util.CalendarUtil;
+import com.example.cosmos_discovery.util.OrganizerEventMenuHelper;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.example.cosmos_discovery.util.RsvpHandler;
 import com.google.android.material.card.MaterialCardView;
@@ -194,20 +195,19 @@ public class EventDetailsActivity extends AppCompatActivity {
     private void showOverflowMenu(ImageButton anchor) {
         PopupMenu popup = new PopupMenu(this, anchor);
         popup.getMenuInflater().inflate(R.menu.menu_event_details, popup.getMenu());
-
-        boolean isEventOwner = mEvent != null
-                && RoleUtil.getCurrentUser() != null
-                && mEvent.getOrganizerId() != null
-                && mEvent.getOrganizerId().equals(RoleUtil.getCurrentUser().getUid());
-        popup.getMenu().findItem(R.id.action_edit).setVisible(isEventOwner);
-        popup.getMenu().findItem(R.id.action_attendee_list).setVisible(isEventOwner);
-        popup.getMenu().findItem(R.id.action_delete).setVisible(isEventOwner);
+        OrganizerEventMenuHelper.applyOrganizerMenuVisibility(popup.getMenu(), mEvent);
 
         popup.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == R.id.action_edit) {
                 Intent intent = new Intent(this, EditEventActivity.class);
                 intent.putExtra(EditEventActivity.EXTRA_EVENT_ID, mEventId);
+                startActivity(intent);
+            } else if (id == R.id.action_announcement) {
+                Intent intent = new Intent(this, AnnouncementsActivity.class);
+                intent.putExtra(AnnouncementsActivity.EXTRA_EVENT_ID, mEventId);
+                intent.putExtra(AnnouncementsActivity.EXTRA_EVENT_TITLE,
+                        mEvent != null ? mEvent.getTitle() : "");
                 startActivity(intent);
             } else if (id == R.id.action_attendee_list) {
                 Intent intent = new Intent(this, AttendeeListActivity.class);
@@ -217,12 +217,34 @@ public class EventDetailsActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, EventStatsActivity.class);
                 intent.putExtra(EventStatsActivity.EXTRA_EVENT_ID, mEventId);
                 startActivity(intent);
+            } else if (id == R.id.action_cancel) {
+                confirmCancel();
             } else if (id == R.id.action_delete) {
                 confirmDelete();
             }
             return true;
         });
         popup.show();
+    }
+
+    private void confirmCancel() {
+        if (mEvent == null) return;
+        new AlertDialog.Builder(this)
+                .setTitle("Cancel event?")
+                .setMessage("All RSVP'd attendees will be notified that \""
+                        + mEvent.getTitle() + "\" is cancelled. This cannot be undone.")
+                .setNegativeButton("Keep event", null)
+                .setPositiveButton("Cancel event", (d, w) -> {
+                    String uid = RoleUtil.getCurrentUser() != null
+                            ? RoleUtil.getCurrentUser().getUid() : null;
+                    mEventService.cancelEvent(mEventId, uid,
+                            () -> {
+                                Toast.makeText(this, "Event cancelled.", Toast.LENGTH_SHORT).show();
+                                fetchAndBind();
+                            },
+                            err -> Toast.makeText(this, err, Toast.LENGTH_LONG).show());
+                })
+                .show();
     }
 
     private void confirmDelete() {
@@ -263,6 +285,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                         System.currentTimeMillis()
                 );
         notif.setEventTitle(mEvent.getTitle());
+        notif.setAudience(com.example.cosmos_discovery.model.Notification.AUDIENCE_PERSONAL);
 
         new com.example.cosmos_discovery.database.NotificationService()
                 .writeNotificationToUsers(recipients, notif, () -> {}, err -> {});
