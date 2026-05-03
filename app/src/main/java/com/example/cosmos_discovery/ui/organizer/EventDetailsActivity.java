@@ -24,7 +24,9 @@ import com.example.cosmos_discovery.util.RsvpHandler;
 import com.google.android.material.card.MaterialCardView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class EventDetailsActivity extends AppCompatActivity {
@@ -219,8 +221,8 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     private void confirmDelete() {
         new AlertDialog.Builder(this)
-                .setTitle("Delete event")
-                .setMessage("Are you sure you want to delete this event?")
+                .setTitle("Are you sure you want to delete this event?")
+                .setMessage("This action cannot be undone. All attendees will be notified that the event has been cancelled.")
                 .setNegativeButton("Cancel", (d, which) -> d.dismiss())
                 .setPositiveButton("Delete", (d, which) -> deleteEvent())
                 .show();
@@ -230,11 +232,34 @@ public class EventDetailsActivity extends AppCompatActivity {
         mEventService.removeEvent(
                 mEventId,
                 () -> {
+                    notifyAttendeesOfCancellation();
                     Toast.makeText(this, "Event deleted.", Toast.LENGTH_SHORT).show();
                     finish();
                 },
                 err -> Toast.makeText(this, err, Toast.LENGTH_LONG).show()
         );
+    }
+
+    private void notifyAttendeesOfCancellation() {
+        if (mEvent == null || mEvent.getAttendeeIds() == null || mEvent.getAttendeeIds().isEmpty()) return;
+
+        List<String> recipients = new ArrayList<>(mEvent.getAttendeeIds());
+        String organizerUid = RoleUtil.getCurrentUser() != null
+                ? RoleUtil.getCurrentUser().getUid() : null;
+        if (organizerUid != null) recipients.remove(organizerUid);
+        if (recipients.isEmpty()) return;
+
+        com.example.cosmos_discovery.model.Notification notif =
+                new com.example.cosmos_discovery.model.Notification(
+                        com.example.cosmos_discovery.model.Notification.TYPE_EVENT_CANCELLED,
+                        "Event Cancelled",
+                        "Sorry, " + mEvent.getTitle() + " has been cancelled.",
+                        System.currentTimeMillis()
+                );
+        notif.setEventTitle(mEvent.getTitle());
+
+        new com.example.cosmos_discovery.database.NotificationService()
+                .writeNotificationToUsers(recipients, notif, () -> {}, err -> {});
     }
 
     private void wireBottomNav() {

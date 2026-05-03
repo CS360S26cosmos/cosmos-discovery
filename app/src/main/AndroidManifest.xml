@@ -12,6 +12,9 @@
             android:name=".ui.organizer.PastEventDetailsActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.notifications.NotificationsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.student.ViewProfile"
             android:exported="false"
             android:label="@string/title_activity_view_profile"

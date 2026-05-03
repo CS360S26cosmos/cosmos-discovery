@@ -1,6 +1,7 @@
 package com.example.cosmos_discovery.database;
 
 import com.example.cosmos_discovery.model.FriendEntry;
+import com.example.cosmos_discovery.model.Notification;
 import com.example.cosmos_discovery.model.User;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -23,7 +24,8 @@ public class FriendService {
     private static final String USERS_COLLECTION = "users";
     private static final String FRIENDS_SUB       = "friends";
 
-    private final FirebaseFirestore mDb;
+    private final FirebaseFirestore   mDb;
+    private final NotificationService mNotifService = new NotificationService();
 
     public FriendService() {
         mDb = FirebaseFirestore.getInstance();
@@ -184,7 +186,16 @@ public class FriendService {
         batch.set(mDb.collection(USERS_COLLECTION).document(sender.getUid())
                         .collection(SENT_REQUESTS_SUB).document(target.getUid()), forSender);
         batch.commit()
-                .addOnSuccessListener(u -> onSuccess.run())
+                .addOnSuccessListener(u -> {
+                    Notification notif = new Notification(
+                            Notification.TYPE_FRIEND_REQUEST_RECEIVED,
+                            "New Friend Request",
+                            sender.getName() + " sent you a friend request",
+                            System.currentTimeMillis()
+                    );
+                    mNotifService.writeNotification(target.getUid(), notif, () -> {}, err -> {});
+                    onSuccess.run();
+                })
                 .addOnFailureListener(e -> onFailure.accept("Could not send request."));
     }
 
@@ -265,7 +276,16 @@ public class FriendService {
         batch.delete(mDb.collection(USERS_COLLECTION).document(senderUid)
                         .collection(SENT_REQUESTS_SUB).document(currentUser.getUid()));
         batch.commit()
-                .addOnSuccessListener(u -> onSuccess.run())
+                .addOnSuccessListener(u -> {
+                    Notification notif = new Notification(
+                            Notification.TYPE_FRIEND_REQUEST_ACCEPTED,
+                            "Friend Request Accepted",
+                            currentUser.getName() + " accepted your friend request",
+                            System.currentTimeMillis()
+                    );
+                    mNotifService.writeNotification(senderUid, notif, () -> {}, err -> {});
+                    onSuccess.run();
+                })
                 .addOnFailureListener(e -> onFailure.accept("Could not accept request."));
     }
 

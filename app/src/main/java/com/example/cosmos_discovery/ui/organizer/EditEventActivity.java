@@ -19,7 +19,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.EventService;
+import com.example.cosmos_discovery.database.NotificationService;
 import com.example.cosmos_discovery.model.Event;
+import com.example.cosmos_discovery.model.Notification;
 import com.example.cosmos_discovery.ui.student.StudentActivity;
 import com.example.cosmos_discovery.util.EventFormUtil;
 import com.example.cosmos_discovery.util.RoleUtil;
@@ -44,7 +46,8 @@ public class EditEventActivity extends AppCompatActivity {
 
     public static final String EXTRA_EVENT_ID = "extra_event_id";
 
-    private final EventService mEventService = new EventService();
+    private final EventService        mEventService  = new EventService();
+    private final NotificationService mNotifService  = new NotificationService();
 
     private String mEventId;
     private Event  mEvent;
@@ -398,7 +401,12 @@ public class EditEventActivity extends AppCompatActivity {
             Toast.makeText(this, "Could not parse date/time.", Toast.LENGTH_LONG).show();
             return;
         }
-        if (dateTimeMs < System.currentTimeMillis()) {
+        // Only block past dates if the organizer actually changed the date or start time.
+        // Editing other fields (e.g. title) on a today-or-past event should not be blocked.
+        String originalDate  = mEvent != null ? nullToEmpty(mEvent.getDateOfEvent()) : "";
+        String originalStart = mEvent != null ? nullToEmpty(mEvent.getStartTime())   : "";
+        boolean dateTimeChanged = !dateText.equals(originalDate) || !startText.equals(originalStart);
+        if (dateTimeChanged && dateTimeMs < System.currentTimeMillis()) {
             mEtDate.setError("Event date cannot be in the past.");
             return;
         }
@@ -417,14 +425,19 @@ public class EditEventActivity extends AppCompatActivity {
             mEtRegisterBy.setError("Registration deadline is required.");
             return;
         }
+
         long regByMs = EventFormUtil.parseDateTimeMs(regByText, "11:59pm");
-        if (regByMs > 0 && regByMs < System.currentTimeMillis()) {
+
+        String originalRegBy = mEvent != null ? mEvent.getRegisterBy() : null;
+        boolean regByChanged = !regByText.equals(originalRegBy != null ? originalRegBy : "");
+
+        if (regByMs > 0 && regByChanged && regByMs < System.currentTimeMillis()) {
             mEtRegisterBy.setError("Registration deadline cannot be in the past.");
             return;
         }
+
         if (regByMs > 0 && regByMs > dateTimeMs) {
             mEtRegisterBy.setError("Registration deadline must be before the event date.");
-            Toast.makeText(this, "Registration deadline must be before the event date.", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -458,10 +471,37 @@ public class EditEventActivity extends AppCompatActivity {
                 fields,
                 () -> {
                     Toast.makeText(this, "Event updated.", Toast.LENGTH_SHORT).show();
+                    notifyAttendeesOfUpdate();
                     finish();
                 },
                 err -> Toast.makeText(this, err, Toast.LENGTH_LONG).show()
         );
+    }
+
+    private void notifyAttendeesOfUpdate() {
+        if (mEvent == null || mEvent.getAttendeeIds() == null || mEvent.getAttendeeIds().isEmpty()) return;
+
+        String organizerUid = RoleUtil.getCurrentUser() != null
+                ? RoleUtil.getCurrentUser().getUid() : null;
+
+        List<String> recipients = new ArrayList<>(mEvent.getAttendeeIds());
+        if (organizerUid != null) recipients.remove(organizerUid);
+        if (recipients.isEmpty()) return;
+
+        Notification notif = new Notification(
+                Notification.TYPE_EVENT_UPDATED,
+                "Event Updated",
+                "There have been some changes to " + mEvent.getTitle()
+                        + ". Tap to view the latest details.",
+                System.currentTimeMillis()
+        );
+        notif.setEventId(mEventId);
+        notif.setEventTitle(mEvent.getTitle());
+
+        // Fixed doc ID per event — overwrites any previous "event updated" notification
+        // so attendees only ever see one card regardless of how many times the organizer saves.
+        String docId = "event_updated_" + mEventId;
+        mNotifService.writeNotificationToUsers(recipients, docId, notif, () -> {}, err -> {});
     }
 
     private String nullToEmpty(String s) {

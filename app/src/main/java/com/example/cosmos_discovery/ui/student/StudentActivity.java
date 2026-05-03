@@ -22,6 +22,8 @@ import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.database.EventService;
 import com.example.cosmos_discovery.database.FriendService;
+import com.example.cosmos_discovery.database.NotificationService;
+import com.example.cosmos_discovery.model.Notification;
 import com.example.cosmos_discovery.model.FilterState;
 import com.example.cosmos_discovery.model.FriendEntry;
 import com.example.cosmos_discovery.model.User;
@@ -116,6 +118,8 @@ public class StudentActivity extends AppCompatActivity {
     private final EventService mEventService = new EventService();
     private final FriendService mFriendService = new FriendService();
     private ListenerRegistration mIncomingRequestsListener;
+    private ListenerRegistration mNotifDotListener;
+    private View                 mNotifDot;
     private TextView             mSidebarRequestBadge;
 
     // ── Lifecycle ────────────────────────────────────────────────────────
@@ -161,6 +165,7 @@ public class StudentActivity extends AppCompatActivity {
         mIconMyEvents = findViewById(R.id.iconMyEvents);
         mIconFriends  = findViewById(R.id.iconFriends);
 
+        mNotifDot      = findViewById(R.id.notifDot);
         mSidebarView   = findViewById(R.id.sidebarView);
         mFilterOverlay = findViewById(R.id.filterOverlay);
     }
@@ -171,9 +176,11 @@ public class StudentActivity extends AppCompatActivity {
         ImageView iconMenu = findViewById(R.id.iconMenu);
         iconMenu.setOnClickListener(v -> showSidebar());
 
-        // Profile icon (left) opens the current user's profile
-        findViewById(R.id.iconProfile).setOnClickListener(v ->
-                startActivity(new Intent(this, ViewProfile.class)));
+        // Bell icon (left) opens the notifications screen; mark all as seen
+        findViewById(R.id.iconProfile).setOnClickListener(v -> {
+            markNotificationsSeen();
+            startActivity(new Intent(this, com.example.cosmos_discovery.ui.notifications.NotificationsActivity.class));
+        });
 
         // Search bar tap → enter event search or user search based on active tab
         mSearchBarInclude.findViewById(R.id.searchClickableArea)
@@ -292,6 +299,7 @@ public class StudentActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         attachIncomingRequestsListener();
+        attachNotifDotListener();
     }
 
     @Override
@@ -300,6 +308,10 @@ public class StudentActivity extends AppCompatActivity {
         if (mIncomingRequestsListener != null) {
             mIncomingRequestsListener.remove();
             mIncomingRequestsListener = null;
+        }
+        if (mNotifDotListener != null) {
+            mNotifDotListener.remove();
+            mNotifDotListener = null;
         }
     }
 
@@ -332,6 +344,38 @@ public class StudentActivity extends AppCompatActivity {
         } else {
             mSidebarRequestBadge.setVisibility(View.GONE);
         }
+    }
+
+    private void attachNotifDotListener() {
+        User current = RoleUtil.getCurrentUser();
+        if (current == null || mNotifDotListener != null) return;
+        mNotifDotListener = new NotificationService().listenNotifications(
+                current.getUid(),
+                this::updateNotifDot,
+                err -> { /* non-critical */ });
+    }
+
+    private void updateNotifDot(java.util.List<Notification> notifications) {
+        if (mNotifDot == null) return;
+        if (notifications == null || notifications.isEmpty()) {
+            mNotifDot.setVisibility(View.GONE);
+            return;
+        }
+        long lastSeen = getSharedPreferences("notifs", MODE_PRIVATE)
+                .getLong("last_seen_ms", 0L);
+        long newest = 0L;
+        for (Notification n : notifications) {
+            if (n.getTimestamp() > newest) newest = n.getTimestamp();
+        }
+        mNotifDot.setVisibility(newest > lastSeen ? View.VISIBLE : View.GONE);
+    }
+
+    private void markNotificationsSeen() {
+        getSharedPreferences("notifs", MODE_PRIVATE)
+                .edit()
+                .putLong("last_seen_ms", System.currentTimeMillis())
+                .apply();
+        if (mNotifDot != null) mNotifDot.setVisibility(View.GONE);
     }
 
     // ── Navigation ───────────────────────────────────────────────────────

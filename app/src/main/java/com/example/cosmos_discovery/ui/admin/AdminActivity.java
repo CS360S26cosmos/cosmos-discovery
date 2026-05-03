@@ -18,6 +18,7 @@ import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.model.User;
 import com.example.cosmos_discovery.ui.auth.LoginActivity;
 import com.example.cosmos_discovery.ui.shared.SettingsActivity;
+import com.example.cosmos_discovery.ui.notifications.NotificationsActivity;
 import com.example.cosmos_discovery.ui.student.ViewProfile;
 import com.example.cosmos_discovery.util.RoleUtil;
 
@@ -87,8 +88,9 @@ public class AdminActivity extends AppCompatActivity {
         ImageView iconMenu = findViewById(R.id.iconMenu);
         iconMenu.setOnClickListener(v -> showSidebar());
 
+        // Bell icon (left) opens the notifications screen
         findViewById(R.id.iconProfile).setOnClickListener(v ->
-                startActivity(new Intent(this, ViewProfile.class)));
+                startActivity(new Intent(this, NotificationsActivity.class)));
     }
 
     private void setupNavBar() {
