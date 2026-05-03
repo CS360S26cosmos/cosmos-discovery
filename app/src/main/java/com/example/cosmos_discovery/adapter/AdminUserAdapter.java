@@ -18,6 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * RecyclerView adapter for the admin "Users" tab.
+ *
+ * <p>Renders one row per {@link User} with controls to deactivate or reactivate
+ * the account, surfaced through {@link OnUserActionListener}.
+ */
 public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.ViewHolder> {
 
     public interface OnUserActionListener {

@@ -14,6 +14,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Firestore-backed access layer for the per-user notification feed.
+ *
+ * <p>Each user has a {@code users/{uid}/notifications} subcollection containing
+ * one document per notification. This service exposes async write/delete/listen
+ * operations and a backfill helper for the {@code audience} field added in a
+ * later schema version.
+ *
+ * <p>Async methods take {@code onSuccess} / {@code onError} callbacks rather
+ * than returning values. Real-time listeners return a
+ * {@link ListenerRegistration} which the caller MUST remove in
+ * {@code onDestroyView()} or {@code onStop()} to avoid leaks.
+ */
 public class NotificationService {
 
     private static final String USERS_COL  = "users";

@@ -41,7 +41,7 @@ public class SignupActivity extends AppCompatActivity {
         mProgressBar   = findViewById(R.id.progressBar);
 
         mSignUpButton.setOnClickListener(v -> attemptSignUp());
-        mSignInLink.setOnClickListener(v -> finish()); // go back to Login
+        mSignInLink.setOnClickListener(v -> finish());
     }
 
     /**

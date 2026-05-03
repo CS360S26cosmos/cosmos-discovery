@@ -17,6 +17,12 @@ import com.google.android.material.imageview.ShapeableImageView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * RecyclerView adapter for the admin queue of pending organizer-role requests.
+ *
+ * <p>Renders one row per {@link OrganizerRequest} with Approve/Reject actions
+ * dispatched to {@link OnRequestActionListener}.
+ */
 public class OrganizerRequestAdapter
         extends RecyclerView.Adapter<OrganizerRequestAdapter.ViewHolder> {
 

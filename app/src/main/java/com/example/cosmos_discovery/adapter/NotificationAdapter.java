@@ -20,6 +20,13 @@ import com.example.cosmos_discovery.util.TimeAgoUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * RecyclerView adapter for the in-app notification feed.
+ *
+ * <p>Mixes section headers and notification rows via two view types
+ * ({@code VIEW_TYPE_HEADER} / {@code VIEW_TYPE_ITEM}). Tapping a notification
+ * navigates to the relevant deep-link target (event details, friend requests, etc.).
+ */
 public class NotificationAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

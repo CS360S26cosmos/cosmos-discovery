@@ -97,6 +97,114 @@ public class EventTest {
         assertFalse(e.isRsvped("uid-1"));
     }
 
+    // ── hasCapacity / isFull ──────────────────────────────────────────────
+
+    @Test
+    public void hasCapacity_zeroCapacity_returnsFalse() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setCapacity(0);
+        assertFalse(e.hasCapacity());
+    }
+
+    @Test
+    public void hasCapacity_positiveCapacity_returnsTrue() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setCapacity(50);
+        assertTrue(e.hasCapacity());
+    }
+
+    @Test
+    public void isFull_unlimitedCapacity_returnsFalse() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setCapacity(0);
+        e.setRsvpCount(9999);
+        assertFalse(e.isFull());
+    }
+
+    @Test
+    public void isFull_belowCapacity_returnsFalse() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setCapacity(100);
+        e.setRsvpCount(99);
+        assertFalse(e.isFull());
+    }
+
+    @Test
+    public void isFull_atCapacity_returnsTrue() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setCapacity(100);
+        e.setRsvpCount(100);
+        assertTrue(e.isFull());
+    }
+
+    @Test
+    public void isFull_overCapacity_returnsTrue() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setCapacity(100);
+        e.setRsvpCount(101);
+        assertTrue(e.isFull());
+    }
+
+    // ── isRegistrationClosed ──────────────────────────────────────────────
+
+    @Test
+    public void isRegistrationClosed_nullRegisterBy_returnsFalse() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        assertFalse(e.isRegistrationClosed());
+    }
+
+    @Test
+    public void isRegistrationClosed_emptyRegisterBy_returnsFalse() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setRegisterBy("   ");
+        assertFalse(e.isRegistrationClosed());
+    }
+
+    @Test
+    public void isRegistrationClosed_unparseableRegisterBy_returnsFalse() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setRegisterBy("not a date");
+        assertFalse(e.isRegistrationClosed());
+    }
+
+    @Test
+    public void isRegistrationClosed_pastDeadline_returnsTrue() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setRegisterBy("2000-01-01");
+        assertTrue(e.isRegistrationClosed());
+    }
+
+    @Test
+    public void isRegistrationClosed_futureDeadline_returnsFalse() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setRegisterBy("2099-12-31");
+        assertFalse(e.isRegistrationClosed());
+    }
+
+    // ── getSpotsText ──────────────────────────────────────────────────────
+
+    @Test
+    public void getSpotsText_unlimitedCapacity_showsRsvpCount() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setCapacity(0);
+        e.setRsvpCount(23);
+        assertEquals("23 RSVPs", e.getSpotsText());
+    }
+
+    @Test
+    public void getSpotsText_withCapacity_showsRatio() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        e.setCapacity(100);
+        e.setRsvpCount(23);
+        assertEquals("23/100 spots taken", e.getSpotsText());
+    }
+
+    @Test
+    public void getSpotsText_zeroRsvps_unlimitedCapacity() {
+        Event e = new Event("E", 0L, "L", null, null, null);
+        assertEquals("0 RSVPs", e.getSpotsText());
+    }
+
     // ── Firestore field contract ──────────────────────────────────────────
 
     @Test

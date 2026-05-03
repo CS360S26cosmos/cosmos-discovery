@@ -142,10 +142,10 @@ public class EventSmallAdapter extends RecyclerView.Adapter<EventSmallAdapter.Vi
                 chip.setTextColor(ContextCompat.getColor(mContext, R.color.color_chip_text));
                 chip.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bg_chip_outline));
                 chip.setPadding(
-                        (int) dpToPx(7.85f),   // start
-                        (int) dpToPx(2.94f),   // top
-                        (int) dpToPx(7.85f),   // end
-                        (int) dpToPx(2.94f));  // bottom
+                        (int) dpToPx(7.85f),
+                        (int) dpToPx(2.94f),
+                        (int) dpToPx(7.85f),
+                        (int) dpToPx(2.94f));
                 chip.setIncludeFontPadding(false);
                 ChipGroup.LayoutParams lp = new ChipGroup.LayoutParams(
                         ChipGroup.LayoutParams.WRAP_CONTENT,
