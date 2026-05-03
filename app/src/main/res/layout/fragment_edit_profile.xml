@@ -224,7 +224,7 @@
                         app:boxStrokeWidth="0dp"
                         app:boxStrokeWidthFocused="0dp"
                         app:counterEnabled="true"
-                        app:counterMaxLength="150"
+                        app:counterMaxLength="30"
                         app:counterTextColor="@color/color_text_hint"
                         app:counterOverflowTextColor="@color/design_default_color_error">
 
@@ -235,7 +235,7 @@
                             android:gravity="top"
                             android:textColor="@color/color_text_secondary"
                             android:background="@null"
-                            android:maxLength="150"
+                            android:maxLength="30"
                             android:inputType="textMultiLine"
                             android:imeOptions="flagNoEnterAction"/>
 
