@@ -106,7 +106,7 @@ public class NotificationsFragment extends Fragment {
             refreshView();
         }, err -> {
             Log.e("NotificationsFragment", "Listener error: " + err);
-            Toast.makeText(requireContext(), "Notifications error: " + err, Toast.LENGTH_LONG).show();
+            if (isAdded()) Toast.makeText(requireContext(), "Notifications error: " + err, Toast.LENGTH_LONG).show();
         });
     }
 
@@ -143,7 +143,7 @@ public class NotificationsFragment extends Fragment {
 
                 mService.deleteNotification(mUid, notif.getId(),
                         () -> { /* real-time listener will refresh the list */ },
-                        err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show());
+                        err -> { if (isAdded()) Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show(); });
             }
 
             @Override
@@ -197,7 +197,7 @@ public class NotificationsFragment extends Fragment {
                 .setPositiveButton("Clear all", (d, w) ->
                         mService.deleteAllNotifications(mUid, mCurrentNotifications,
                                 () -> { /* real-time listener auto-refreshes */ },
-                                err -> Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()))
+                                err -> { if (isAdded()) Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show(); }))
                 .show();
     }
 

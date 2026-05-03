@@ -131,42 +131,70 @@ SEED_PASSWORD = "SeedPass1!"
 
 # ── Core functions ─────────────────────────────────────────────────────────────
 
+def delete_subcollection(uid, subcol):
+    """Batch-deletes all docs in users/{uid}/{subcol}."""
+    ref = db.collection("users").document(uid).collection(subcol)
+    docs = list(ref.stream())
+    if not docs:
+        return
+    batch = db.batch()
+    for doc in docs:
+        batch.delete(doc.reference)
+    batch.commit()
+
+
 def delete_seed_user(email):
     """
     Fully removes one previously seeded user:
       1. Reads their friends subcollection to find reverse entries to clean up.
       2. Deletes the reverse friendship doc from each friend's subcollection.
       3. Deletes every doc in users/{uid}/friends.
-      4. Deletes the users/{uid} Firestore document.
-      5. Deletes the Firebase Auth account.
+      4. Deletes every doc in users/{uid}/friendRequests (incoming requests).
+      5. Deletes every doc in users/{uid}/sentRequests (outgoing requests).
+      6. Deletes the reverse sentRequests entries from users who received a
+         request from this seed user (so their incoming queue is also clean).
+      7. Deletes the users/{uid} Firestore document.
+      8. Deletes the Firebase Auth account.
     Only acts if the email belongs to a SEED_USER — never touches existing real users.
     """
     uid = get_uid_by_email(email)
     if uid is None:
         return  # not in Auth — nothing to delete
 
-    # 1 + 2: collect friends, delete reverse entries
-    friends_ref = db.collection("users").document(uid).collection("friends")
-    friend_docs = list(friends_ref.stream())
-    for fdoc in friend_docs:
-        friend_uid = fdoc.id
-        reverse = (
-            db.collection("users").document(friend_uid)
-              .collection("friends").document(uid)
-        )
-        reverse.delete()
+    user_ref = db.collection("users").document(uid)
 
-    # 3: delete all docs in the user's own friends subcollection
+    # 1 + 2: collect friends, delete reverse friendship entries
+    friend_docs = list(user_ref.collection("friends").stream())
+    for fdoc in friend_docs:
+        db.collection("users").document(fdoc.id).collection("friends").document(uid).delete()
+
+    # 3: delete own friends subcollection
     batch = db.batch()
     for fdoc in friend_docs:
         batch.delete(fdoc.reference)
     if friend_docs:
         batch.commit()
 
-    # 4: delete Firestore user document
-    db.collection("users").document(uid).delete()
+    # 4 + 6: delete incoming friend requests; also remove the mirror sentRequests
+    #         entry from each sender so their outgoing queue is clean
+    req_docs = list(user_ref.collection("friendRequests").stream())
+    for rdoc in req_docs:
+        sender_uid = rdoc.id
+        db.collection("users").document(sender_uid).collection("sentRequests").document(uid).delete()
+    delete_subcollection(uid, "friendRequests")
 
-    # 5: delete Firebase Auth account
+    # 5 + reverse: delete outgoing sent requests; also remove the mirror
+    #              friendRequests entry from each target
+    sent_docs = list(user_ref.collection("sentRequests").stream())
+    for sdoc in sent_docs:
+        target_uid = sdoc.id
+        db.collection("users").document(target_uid).collection("friendRequests").document(uid).delete()
+    delete_subcollection(uid, "sentRequests")
+
+    # 7: delete Firestore user document
+    user_ref.delete()
+
+    # 8: delete Firebase Auth account
     try:
         auth.delete_user(uid)
     except auth.UserNotFoundError:
@@ -202,16 +230,17 @@ def create_auth_user(user):
 def write_user_doc(uid, user, photo_url):
     """Writes (or overwrites) the Firestore user document."""
     db.collection("users").document(uid).set({
-        "uid":       uid,
-        "name":      user["name"],
-        "email":     user["email"],
-        "role":      "student",
-        "isActive":  True,
-        "batch":     user["batch"],
-        "major":     user["major"],
-        "bio":       "",
-        "createdAt": now_ms(),
-        "photoUrl":  photo_url,
+        "uid":               uid,
+        "name":              user["name"],
+        "email":             user["email"],
+        "role":              "student",
+        "active":            True,   # matches User.isActive() getter → Firestore field "active"
+        "batch":             user["batch"],
+        "major":             user["major"],
+        "bio":               "",
+        "createdAt":         now_ms(),
+        "photoUrl":          photo_url,
+        "promotionApproved": False,
     })
 
 

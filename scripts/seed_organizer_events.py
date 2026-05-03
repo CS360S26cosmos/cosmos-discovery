@@ -61,7 +61,7 @@ SEEDED_TITLES = {
     "Tech Talk: Future of AI",
     "Campus Food Carnival",
     "Late Night Bonfire",
-    "Off-Campus Concert Trip",
+    "Live Music Night",          # renamed from "Off-Campus Concert Trip" to avoid collision with seed_events.py
 }
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -94,10 +94,12 @@ EVENTS = [
     # ── PENDING (3 events) ────────────────────────────────────────────────────
     {
         "title":       "Board Game Night",
+        "description": "A relaxed evening of strategy and fun. Settlers of Catan, Codenames, Ticket to Ride and more. All skill levels welcome — bring friends or come solo!",
         "dateTime":    at(5, 19),
         "location":    "LUMS Student Lounge",
-        "tags":        ["Cultural", "Social"],
+        "tags":        ["Cultural"],
         "category":    "Cultural",
+        "capacity":    40,
         "imageUrl":    "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800",
         "status":      "pending",
         "attendeeIds": [],
@@ -105,10 +107,12 @@ EVENTS = [
     },
     {
         "title":       "Open Mic Poetry Night",
+        "description": "Share your words or just listen. Open to original poetry, spoken word, and prose. Sign up at the door — 5 minutes per performer.",
         "dateTime":    at(8, 18, 30),
         "location":    "PDC Lobby",
         "tags":        ["Arts", "Cultural"],
         "category":    "Arts",
+        "capacity":    80,
         "imageUrl":    "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800",
         "status":      "pending",
         "attendeeIds": [],
@@ -116,10 +120,12 @@ EVENTS = [
     },
     {
         "title":       "Midnight Coding Marathon",
+        "description": "An overnight coding sprint — come solo or in pairs. Work on your own projects or pick up a challenge prompt. Coffee and snacks provided.",
         "dateTime":    at(12, 22),
         "location":    "SBASSE Labs",
         "tags":        ["Technology", "Workshop"],
         "category":    "Technology",
+        "capacity":    30,
         "imageUrl":    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800",
         "status":      "pending",
         "attendeeIds": [],
@@ -129,10 +135,12 @@ EVENTS = [
     # ── APPROVED (3 events) ───────────────────────────────────────────────────
     {
         "title":       "Spring Photography Walk",
+        "description": "A guided walk around campus capturing spring bloom. Bring any camera — phone cameras welcome. Best shots get featured on the society's Instagram.",
         "dateTime":    at(3, 16),
         "location":    "LUMS Main Lawn",
         "tags":        ["Arts", "Cultural"],
         "category":    "Arts",
+        "capacity":    25,
         "imageUrl":    "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800",
         "status":      "approved",
         "attendeeIds": [],
@@ -140,10 +148,12 @@ EVENTS = [
     },
     {
         "title":       "Tech Talk: Future of AI",
+        "description": "A panel discussion on large language models, AI regulation, and what it means for careers in tech. Q&A session follows the main talk.",
         "dateTime":    at(6, 14),
         "location":    "SDSB Auditorium",
         "tags":        ["Technology", "Academic"],
         "category":    "Technology",
+        "capacity":    120,
         "imageUrl":    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
         "status":      "approved",
         "attendeeIds": [],
@@ -151,6 +161,7 @@ EVENTS = [
     },
     {
         "title":       "Campus Food Carnival",
+        "description": "Student societies serve signature dishes from around Pakistan and beyond. Vote for your favourite stall to win the Golden Spoon award.",
         "dateTime":    at(10, 12),
         "location":    "REDC Lawn",
         "tags":        ["Food", "Cultural"],
@@ -164,6 +175,7 @@ EVENTS = [
     # ── REJECTED (2 events) ───────────────────────────────────────────────────
     {
         "title":       "Late Night Bonfire",
+        "description": "An end-of-semester bonfire by the cricket ground. Marshmallows, music, and memories. Rejected due to campus fire safety policy.",
         "dateTime":    at(7, 23),
         "location":    "Cricket Ground",
         "tags":        ["Cultural"],
@@ -174,10 +186,11 @@ EVENTS = [
         "accessType":  "open",
     },
     {
-        "title":       "Off-Campus Concert Trip",
+        "title":       "Live Music Night",
+        "description": "Local bands and student musicians perform live sets. Originally planned for a rooftop venue — rejected pending noise waiver approval.",
         "dateTime":    at(14, 20),
-        "location":    "Liberty Roundabout, Lahore",
-        "tags":        ["Music"],
+        "location":    "LUMS Rooftop, AC-3",
+        "tags":        ["Music", "Cultural"],
         "category":    "Music",
         "imageUrl":    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800",
         "status":      "rejected",
@@ -188,6 +201,15 @@ EVENTS = [
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def fmt_time(epoch_ms):
+    """Returns a display time string like '7:30pm' from an epoch-ms timestamp."""
+    dt = datetime.fromtimestamp(epoch_ms / 1000)
+    h, m = dt.hour, dt.minute
+    period = "am" if h < 12 else "pm"
+    h12 = h % 12 or 12
+    return f"{h12}:{m:02d}{period}"
+
+
 def main():
     # Look up organizer UID
     print(f"Looking up organizer: {ORGANIZER_EMAIL}")
@@ -195,7 +217,12 @@ def main():
     if organizer_uid is None:
         print(f"Error: {ORGANIZER_EMAIL} not found in Firebase Auth.")
         sys.exit(1)
-    print(f"Found UID: {organizer_uid}\n")
+    print(f"Found UID: {organizer_uid}")
+
+    # Fetch organizer display name from Firestore user doc
+    user_doc = db.collection("users").document(organizer_uid).get()
+    organizer_name = user_doc.to_dict().get("name", "Unknown Organizer") if user_doc.exists else "Unknown Organizer"
+    print(f"Organizer name: {organizer_name}\n")
 
     # ── Cleanup: delete all events by this organizer except KEEP_TITLES ────────
     print("Cleaning up previous events...")
@@ -221,9 +248,17 @@ def main():
 
     for event in EVENTS:
         doc = dict(event)
-        doc["organizerId"] = organizer_uid
-        doc["createdAt"] = now_ms()
-        doc["rsvpCount"] = len(doc.get("attendeeIds", []))
+        doc["organizerId"]   = organizer_uid
+        doc["organizerName"] = organizer_name
+        doc["createdAt"]     = now_ms()
+        doc["rsvpCount"]     = len(doc.get("attendeeIds", []))
+
+        # Derive display fields from epoch dateTime — matches how AddEventActivity stores them
+        dt = datetime.fromtimestamp(doc["dateTime"] / 1000)
+        doc["dateOfEvent"] = dt.strftime("%Y-%m-%d")
+        doc["startTime"]   = fmt_time(doc["dateTime"])
+        doc["endTime"]     = fmt_time(doc["dateTime"] + int(2 * 60 * 60 * 1000))  # +2 hours
+        doc["registerBy"]  = (dt - timedelta(days=1)).strftime("%Y-%m-%d")
 
         col.add(doc)
         counts[doc["status"]] += 1

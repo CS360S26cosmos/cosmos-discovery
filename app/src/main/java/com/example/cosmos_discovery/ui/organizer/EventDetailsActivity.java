@@ -55,6 +55,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         ImageButton btnOverflowMenu = findViewById(R.id.btnOverflowMenu);
+        btnOverflowMenu.setVisibility(View.GONE); // hidden until event loads; shown only for the event's owner
         btnOverflowMenu.setOnClickListener(v -> showOverflowMenu(btnOverflowMenu));
 
         wireBottomNav();
@@ -122,6 +123,11 @@ public class EventDetailsActivity extends AppCompatActivity {
         desc.setText(description != null && !description.trim().isEmpty()
                 ? description
                 : "No description provided.");
+
+        boolean isEventOwner = RoleUtil.getCurrentUser() != null
+                && event.getOrganizerId() != null
+                && event.getOrganizerId().equals(RoleUtil.getCurrentUser().getUid());
+        findViewById(R.id.btnOverflowMenu).setVisibility(isEventOwner ? View.VISIBLE : View.GONE);
 
         View capacityRow = findViewById(R.id.capacityRow);
         TextView capacityInfo = findViewById(R.id.tvCapacityInfo);
