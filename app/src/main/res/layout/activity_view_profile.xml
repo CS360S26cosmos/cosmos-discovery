@@ -289,29 +289,37 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
-                    android:id="@+id/llUpcomingEvents"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="8dp" />
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="8dp">
 
-                <TextView
-                    android:id="@+id/tvNoUpcomingEvents"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="@font/inter_variable"
-                    android:gravity="center"
-                    android:text="You haven't RSVP'd to any upcoming events yet"
-                    android:textColor="@color/color_text_hint"
-                    android:textSize="13sp"
-                    android:visibility="gone" />
+                    <androidx.core.widget.NestedScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
-                <!-- Spacer so Upcoming Events can always be scrolled to the top -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="600dp" />
+                        <LinearLayout
+                            android:id="@+id/llUpcomingEvents"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" />
+
+                    </androidx.core.widget.NestedScrollView>
+
+                    <TextView
+                        android:id="@+id/tvNoUpcomingEvents"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/inter_variable"
+                        android:gravity="center"
+                        android:text="You haven't RSVP'd to any upcoming events yet"
+                        android:textColor="@color/color_text_hint"
+                        android:textSize="13sp"
+                        android:visibility="gone" />
+
+                </FrameLayout>
 
             </LinearLayout>
 
