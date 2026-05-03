@@ -1,7 +1,9 @@
 package com.example.cosmos_discovery.util;
 
 import com.example.cosmos_discovery.database.EventService;
+import com.example.cosmos_discovery.database.NotificationService;
 import com.example.cosmos_discovery.model.Event;
+import com.example.cosmos_discovery.model.Notification;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -16,10 +18,19 @@ import java.util.function.Consumer;
  */
 public class RsvpHandler {
 
-    private final EventService mService;
+    private EventService        mService;       // lazily initialized — keeps RsvpHandler testable without Firebase
+    private NotificationService mNotifService;  // lazily initialized — same reason
 
-    public RsvpHandler() {
-        mService = new EventService();
+    public RsvpHandler() {}
+
+    private EventService service() {
+        if (mService == null) mService = new EventService();
+        return mService;
+    }
+
+    private NotificationService notifService() {
+        if (mNotifService == null) mNotifService = new NotificationService();
+        return mNotifService;
     }
 
     /**
@@ -50,13 +61,22 @@ public class RsvpHandler {
     // ── Private helpers ───────────────────────────────────────────────────
 
     private void addRsvp(Event event, String uid, Runnable onRefresh, Consumer<String> onError) {
+        if (event.isRegistrationClosed()) {
+            onError.accept("Registration is closed for this event.");
+            return;
+        }
+        if (event.isFull()) {
+            onError.accept("This event is full.");
+            return;
+        }
+
         Runnable applyLocally = () -> {
             ArrayList<String> ids = event.getAttendeeIds() != null
                     ? new ArrayList<>(event.getAttendeeIds())
                     : new ArrayList<>();
             ids.add(uid);
             event.setAttendeeIds(ids);
-            event.setRsvpCount(event.getRsvpCount() + 1);
+            event.setRsvpCount(ids.size());
             onRefresh.run();
         };
 
@@ -65,7 +85,18 @@ public class RsvpHandler {
             applyLocally.run();
             return;
         }
-        mService.rsvpToEvent(event.getId(), uid, applyLocally, onError);
+        service().rsvpToEvent(event.getId(), uid, () -> {
+            applyLocally.run();
+            Notification notif = new Notification(
+                    Notification.TYPE_RSVP_CONFIRMED,
+                    "RSVP Confirmed",
+                    "You have successfully RSVPed to " + event.getTitle() + "!",
+                    System.currentTimeMillis()
+            );
+            notif.setEventId(event.getId());
+            notif.setEventTitle(event.getTitle());
+            notifService().writeNotification(uid, notif, () -> {}, err -> {});
+        }, onError);
     }
 
     private void cancelRsvp(Event event, String uid, Runnable onRefresh, Consumer<String> onError) {
@@ -75,7 +106,7 @@ public class RsvpHandler {
                     : new ArrayList<>();
             ids.remove(uid);
             event.setAttendeeIds(ids);
-            event.setRsvpCount(Math.max(0, event.getRsvpCount() - 1));
+            event.setRsvpCount(ids.size());
             onRefresh.run();
         };
 
@@ -84,6 +115,6 @@ public class RsvpHandler {
             applyLocally.run();
             return;
         }
-        mService.cancelRsvp(event.getId(), uid, applyLocally, onError);
+        service().cancelRsvp(event.getId(), uid, applyLocally, onError);
     }
 }

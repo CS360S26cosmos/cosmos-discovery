@@ -22,6 +22,7 @@ A centralized campus event platform that allows students to discover, browse, an
 
 - [Team Information](#team-information)
 - [Meeting Minutes](#meeting-minutes)
+- [UML Diagram](#uml-diagram)
 - [CRC Diagrams](#crc-diagrams)
 - [Product Backlog](#product-backlog)
 - [Wireframes](#wireframes)
@@ -132,9 +133,59 @@ Thursday, 26th March – 5:30 PM
 - RSVP functionality that adds events to “My Events”  
 - Forgot password and reset password layout and implementation  
 - Sidebar navigation to user profile and settings page  
-- Friends screen layout and component design  
+- Friends screen layout and component design
 
-    
+### Meeting 6
+Thursday, 29th March – 7:00 PM
+
+#### Attendance  
+- Hamania Asim  
+- Hafsah Nasir  
+- Ammara Haroon  
+- Elizeh Faisal  
+- Sameen Abid  
+
+#### Key Takeaways
+- Reviewed all tasks currently in progress and under review to confirm completion status
+- Cross-checked all implemented features against their acceptance criteria
+- Identified any missing elements or incomplete requirements
+- At this stage for the next phase, the majority of workload is either in progress or in the review stage
+- Assigned work for the next sprint with an internal deadline 
+
+Sprint 3 Planning
+- Past sprint work is complete, 
+- Majority of features are actively being worked on or are pending review
+- Assigned the US-08 and US-09, creating new events and editing event details
+- Designing tests for the User stories in review
+- Assigned US-011 for View and check-in attendee list
+
+### Meeting 7
+Thursday, 3rd April – 7:00 PM
+
+### Attendance
+Hamania Asim
+Hafsah Nasir
+Ammara Haroon
+Elizeh Faisal
+Sameen Abid
+
+### Key Takeaways
+Reviewed progress of all user stories across Ready, In Progress, and In Review stages
+Confirmed task ownership and current development status for each team member
+Ensured features in review are aligned with requirements before final approval
+Identified that most remaining work is either actively being developed or under review
+
+### Sprint Progress Overview
+- US-13 (View Event Analytics) is ready to be picked up – Sameen Abid
+- US-07 (Rate & Review Attended Event) is in progress – Ammara Haroon
+- US-22 (Send & Accept Friend Requests) is in progress – Elizeh Faisal
+- US-21 (Personalized Event Recommendations) is in review – Hafsah Nasir
+- US-06 (Add Event to Phone Calendar) is in review – Hamania Asim
+
+## UML Diagram
+<img width="3381" height="929" alt="nLTjRzis4FwkNq5q7-OiJjSXQ50OGL37LX1XJXp8TejX60f6kiXSPT8bAMTU4M0_OhzmlsH7lTYKpDXE1yo64Ikyvrvul7kEUgyqbJgRfQGlPfHnCg1Ba9wdFZC-fvBEI9HIfRfQItQVQGWYmKViJo1lcf0hmNKk-UcqARe66eEyfD7dH8gCnpsH2ac-kphpBw_UDi6NGYAuXBnxStfwTcP1g9JYyJdX73tG1BPRK1ea2BsS" src="https://github.com/user-attachments/assets/72aed3ca-c89d-4096-8099-f7076712fc69" />
+
+
 ## CRC Diagrams
 
 <!--_Add CRC screenshots below._-->
@@ -151,6 +202,8 @@ View full backlog and Kanban board here:
 ### Kanban Board (Screenshot)
 <img width="2454" height="1792" alt="08 03 2026 at 02 54 53 PM" src="https://github.com/user-attachments/assets/40ad2948-6698-4ab0-aa5d-f8b5d3cb0467" />
 <img width="3024" height="1790" alt="08 03 2026 at 02 58 36 PM" src="https://github.com/user-attachments/assets/1d6791ae-cf2d-49aa-8407-6f5b93595556" />
+<img width="1920" height="1798" alt="07 04 2026 at 11 59 30 PM" src="https://github.com/user-attachments/assets/a6469db6-698b-4031-a027-acdc9263e442" />
+
 
 
 ---

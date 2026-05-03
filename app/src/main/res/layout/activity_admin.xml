@@ -1,13 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:text="ADMIN SCREEN"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_primary">
+
+        <!-- Purple header -->
+        <LinearLayout
+            android:id="@+id/layoutTopBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/color_primary"
+            android:paddingTop="12dp"
+            android:paddingBottom="32dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <include
+                android:id="@+id/topBarView"
+                layout="@layout/view_top_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <!-- Content card with rounded top corners -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/contentCard"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:shapeAppearance="@style/ShapeAppearance.ContentCard"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/color_surface"
+            app:strokeWidth="0dp"
+            app:layout_constraintTop_toBottomOf="@id/layoutTopBar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/adminFragmentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Bottom nav bar rendered on top of content card -->
+        <include
+            android:id="@+id/navBarView"
+            layout="@layout/component_navbar_admin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Sidebar overlay (GONE until menu icon tapped) -->
+    <include
+        android:id="@+id/sidebarView"
+        layout="@layout/component_sidebar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 </FrameLayout>

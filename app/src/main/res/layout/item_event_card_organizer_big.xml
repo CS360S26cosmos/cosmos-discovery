@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Organizer big card — same structure as item_event_card_big.xml
+    but without the RSVP button, and with a left border accent View.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    app:cardCornerRadius="17dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@color/color_card_event"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Left border accent — 4dp wide, full height, status color set in adapter -->
+        <View
+            android:id="@+id/accentBorder"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Full-width event image -->
+        <ImageView
+            android:id="@+id/imageViewEvent"
+            android:layout_width="0dp"
+            android:layout_height="155dp"
+            android:scaleType="centerCrop"
+            android:src="@color/color_text_hint"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Gradient scrim -->
+        <View
+            android:id="@+id/viewImageScrim"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_image_gradient"
+            app:layout_constraintTop_toTopOf="@id/imageViewEvent"
+            app:layout_constraintBottom_toBottomOf="@id/imageViewEvent"
+            app:layout_constraintStart_toStartOf="@id/imageViewEvent"
+            app:layout_constraintEnd_toEndOf="@id/imageViewEvent" />
+
+        <!-- Event title -->
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_surface_white"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/textViewDateTime" />
+
+        <!-- Date & time -->
+        <TextView
+            android:id="@+id/textViewDateTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="@color/color_surface_white"
+            android:includeFontPadding="false"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/imageViewEvent" />
+
+        <!-- Location pin icon -->
+        <ImageView
+            android:id="@+id/iconLocation"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:src="@drawable/ic_location_pin"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            app:tint="@color/color_text_secondary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageViewEvent"
+            app:layout_constraintBottom_toBottomOf="@id/textViewLocation" />
+
+        <!-- Location text -->
+        <TextView
+            android:id="@+id/textViewLocation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/color_text_secondary"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintStart_toEndOf="@id/iconLocation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageViewEvent" />
+
+        <!-- Chips row: tags + attendee count -->
+        <LinearLayout
+            android:id="@+id/layoutChipsRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="14dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewLocation"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupTags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:chipSpacingHorizontal="6dp"
+                app:singleLine="true" />
+
+            <ImageView
+                android:id="@+id/iconGroup"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_group"
+                android:layout_marginStart="8dp"
+                app:tint="@color/color_text_secondary" />
+
+            <TextView
+                android:id="@+id/textViewRsvpCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="@color/color_text_secondary"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:layout_marginStart="4dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -17,12 +17,21 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AuthService;
 import com.example.cosmos_discovery.database.EventService;
+import com.example.cosmos_discovery.database.FriendService;
+import com.example.cosmos_discovery.database.NotificationService;
+import com.example.cosmos_discovery.model.Notification;
 import com.example.cosmos_discovery.model.FilterState;
+import com.example.cosmos_discovery.model.FriendEntry;
 import com.example.cosmos_discovery.model.User;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.example.cosmos_discovery.ui.auth.LoginActivity;
+import com.example.cosmos_discovery.ui.organizer.AddEventActivity;
+import com.example.cosmos_discovery.ui.organizer.OrganizerActivity;
+import com.example.cosmos_discovery.util.DismissedEventsStore;
 import com.example.cosmos_discovery.util.RoleUtil;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -42,10 +51,11 @@ import java.util.Set;
  */
 public class StudentActivity extends AppCompatActivity {
 
-    private static final int TAB_DISCOVER   = 0;
-    private static final int TAB_MY_EVENTS  = 1;
-    private static final int TAB_FRIENDS    = 2;
+    public static final int TAB_DISCOVER   = 0;
+    public static final int TAB_MY_EVENTS  = 1;
+    public static final int TAB_FRIENDS    = 2;
     private static final String KEY_TAB     = "current_tab";
+    public static final String EXTRA_START_TAB = "extra_start_tab";
 
     private int mCurrentTab = -1; // -1 forces the first selectTab() call to load
 
@@ -57,13 +67,23 @@ public class StudentActivity extends AppCompatActivity {
     private View         mSearchActiveBar;
     private EditText     mEtSearchInput;
     private boolean      mInSearchMode     = false;
+    private boolean      mInUserSearchMode = false;
     private int          mTabBeforeSearch  = TAB_DISCOVER;
-    private SearchFragment mSearchFragment;
+    private SearchFragment     mSearchFragment;
+    private UserSearchFragment mUserSearchFragment;
 
     private final TextWatcher mSearchTextWatcher = new TextWatcher() {
         @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
         @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (mSearchFragment != null) mSearchFragment.updateQuery(s.toString());
+        }
+        @Override public void afterTextChanged(Editable s) {}
+    };
+
+    private final TextWatcher mUserSearchTextWatcher = new TextWatcher() {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (mUserSearchFragment != null) mUserSearchFragment.updateQuery(s.toString());
         }
         @Override public void afterTextChanged(Editable s) {}
     };
@@ -96,6 +116,11 @@ public class StudentActivity extends AppCompatActivity {
 
     private final AuthService  mAuthService  = new AuthService();
     private final EventService mEventService = new EventService();
+    private final FriendService mFriendService = new FriendService();
+    private ListenerRegistration mIncomingRequestsListener;
+    private ListenerRegistration mNotifDotListener;
+    private View                 mNotifDot;
+    private TextView             mSidebarRequestBadge;
 
     // ── Lifecycle ────────────────────────────────────────────────────────
 
@@ -109,9 +134,12 @@ public class StudentActivity extends AppCompatActivity {
         setupNavBar();
         setupSidebar();
 
-        int tab = savedInstanceState != null
-                ? savedInstanceState.getInt(KEY_TAB, TAB_DISCOVER)
-                : TAB_DISCOVER;
+        int tab;
+        if (savedInstanceState != null) {
+            tab = savedInstanceState.getInt(KEY_TAB, TAB_DISCOVER);
+        } else {
+            tab = getIntent().getIntExtra(EXTRA_START_TAB, TAB_DISCOVER);
+        }
         selectTab(tab);
     }
 
@@ -137,6 +165,7 @@ public class StudentActivity extends AppCompatActivity {
         mIconMyEvents = findViewById(R.id.iconMyEvents);
         mIconFriends  = findViewById(R.id.iconFriends);
 
+        mNotifDot      = findViewById(R.id.notifDot);
         mSidebarView   = findViewById(R.id.sidebarView);
         mFilterOverlay = findViewById(R.id.filterOverlay);
     }
@@ -146,11 +175,19 @@ public class StudentActivity extends AppCompatActivity {
         // Menu icon (right) opens the sidebar
         ImageView iconMenu = findViewById(R.id.iconMenu);
         iconMenu.setOnClickListener(v -> showSidebar());
-        // Profile icon (left) — placeholder, no action yet
 
-        // Search bar tap → enter search mode
+        // Bell icon (left) opens the notifications screen; mark all as seen
+        findViewById(R.id.iconProfile).setOnClickListener(v -> {
+            markNotificationsSeen();
+            startActivity(new Intent(this, com.example.cosmos_discovery.ui.notifications.NotificationsActivity.class));
+        });
+
+        // Search bar tap → enter event search or user search based on active tab
         mSearchBarInclude.findViewById(R.id.searchClickableArea)
-                .setOnClickListener(v -> enterSearchMode());
+                .setOnClickListener(v -> {
+                    if (mCurrentTab == TAB_FRIENDS) enterUserSearchMode();
+                    else enterSearchMode();
+                });
 
         // Filter button tap → enter search mode (if needed) then show filter overlay
         mSearchBarInclude.findViewById(R.id.buttonFilter)
@@ -183,6 +220,26 @@ public class StudentActivity extends AppCompatActivity {
             TextView email = mSidebarView.findViewById(R.id.sidebarUserEmail);
             name.setText(user.getName());
             email.setText(user.getEmail());
+            loadSidebarPhoto(user);
+        }
+
+        // Organizer-only section
+        View organizerSection = mSidebarView.findViewById(R.id.organizerSection);
+        if (organizerSection != null) {
+            organizerSection.setVisibility(RoleUtil.isOrganizer() ? View.VISIBLE : View.GONE);
+        }
+        if (RoleUtil.isOrganizer()) {
+            View posted = mSidebarView.findViewById(R.id.organizerPostedEventsRow);
+            View create = mSidebarView.findViewById(R.id.organizerCreateEventRow);
+
+            if (posted != null) posted.setOnClickListener(v -> {
+                hideSidebar();
+                startActivity(new Intent(this, OrganizerActivity.class));
+            });
+            if (create != null) create.setOnClickListener(v -> {
+                hideSidebar();
+                startActivity(new Intent(this, AddEventActivity.class));
+            });
         }
 
         // Dim overlay and X button both close the sidebar
@@ -195,11 +252,130 @@ public class StudentActivity extends AppCompatActivity {
         mSidebarView.findViewById(R.id.logoutRow)
                     .setOnClickListener(v -> {
                         mAuthService.signOut();
+                        new DismissedEventsStore(this).clear();
                         RoleUtil.clear();
                         Intent intent = new Intent(this, LoginActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     });
+
+        mSidebarView.findViewById(R.id.profileRow)
+                .setOnClickListener(v -> {
+                    hideSidebar();
+
+                    Intent intent = new Intent(this, ViewProfile.class);
+                    startActivity(intent);
+                });
+
+        mSidebarRequestBadge = mSidebarView.findViewById(R.id.sidebarRequestBadge);
+
+        View friendRequestsRow = mSidebarView.findViewById(R.id.friendRequestsRow);
+        if (friendRequestsRow != null) {
+            friendRequestsRow.setOnClickListener(v -> {
+                hideSidebar();
+                startActivity(new Intent(this, FriendRequestsActivity.class));
+            });
+        }
+
+        mSidebarView.findViewById(R.id.settingsRow)
+                .setOnClickListener(v -> {
+                    hideSidebar();
+                    startActivity(new Intent(this, com.example.cosmos_discovery.ui.shared.SettingsActivity.class));
+                });
+    }
+
+    private void loadSidebarPhoto(User user) {
+        if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
+            ImageView icon = mSidebarView.findViewById(R.id.sidebarProfileIcon);
+            Glide.with(this)
+                    .load(user.getPhotoUrl())
+                    .placeholder(R.drawable.ic_sidebar_main_profileimage)
+                    .centerCrop()
+                    .into(icon);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        attachIncomingRequestsListener();
+        attachNotifDotListener();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mIncomingRequestsListener != null) {
+            mIncomingRequestsListener.remove();
+            mIncomingRequestsListener = null;
+        }
+        if (mNotifDotListener != null) {
+            mNotifDotListener.remove();
+            mNotifDotListener = null;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        User user = RoleUtil.getCurrentUser();
+        if (user != null && mSidebarView != null) {
+            TextView name = mSidebarView.findViewById(R.id.sidebarUserName);
+            name.setText(user.getName());
+            loadSidebarPhoto(user);
+        }
+    }
+
+    private void attachIncomingRequestsListener() {
+        User current = RoleUtil.getCurrentUser();
+        if (current == null || mIncomingRequestsListener != null) return;
+        mIncomingRequestsListener = mFriendService.listenIncomingRequests(
+                current.getUid(),
+                this::updateSidebarBadge,
+                err -> { /* non-critical */ });
+    }
+
+    private void updateSidebarBadge(java.util.List<FriendEntry> entries) {
+        if (mSidebarRequestBadge == null) return;
+        int count = entries.size();
+        if (count > 0) {
+            mSidebarRequestBadge.setText(String.valueOf(count));
+            mSidebarRequestBadge.setVisibility(View.VISIBLE);
+        } else {
+            mSidebarRequestBadge.setVisibility(View.GONE);
+        }
+    }
+
+    private void attachNotifDotListener() {
+        User current = RoleUtil.getCurrentUser();
+        if (current == null || mNotifDotListener != null) return;
+        mNotifDotListener = new NotificationService().listenNotifications(
+                current.getUid(),
+                this::updateNotifDot,
+                err -> { /* non-critical */ });
+    }
+
+    private void updateNotifDot(java.util.List<Notification> notifications) {
+        if (mNotifDot == null) return;
+        if (notifications == null || notifications.isEmpty()) {
+            mNotifDot.setVisibility(View.GONE);
+            return;
+        }
+        long lastSeen = getSharedPreferences("notifs", MODE_PRIVATE)
+                .getLong("last_seen_ms", 0L);
+        long newest = 0L;
+        for (Notification n : notifications) {
+            if (n.getTimestamp() > newest) newest = n.getTimestamp();
+        }
+        mNotifDot.setVisibility(newest > lastSeen ? View.VISIBLE : View.GONE);
+    }
+
+    private void markNotificationsSeen() {
+        getSharedPreferences("notifs", MODE_PRIVATE)
+                .edit()
+                .putLong("last_seen_ms", System.currentTimeMillis())
+                .apply();
+        if (mNotifDot != null) mNotifDot.setVisibility(View.GONE);
     }
 
     // ── Navigation ───────────────────────────────────────────────────────
@@ -235,8 +411,15 @@ public class StudentActivity extends AppCompatActivity {
         mTextTitle.setText(title);
         updateNavIcons(tab);
 
-        // Search bar is only relevant on the Discover tab
-        mSearchBarInclude.setVisibility(tab == TAB_DISCOVER ? View.VISIBLE : View.GONE);
+        // Search bar is visible on Discover and Friends tabs; hint text and filter button differ
+        boolean showSearch = (tab == TAB_DISCOVER || tab == TAB_FRIENDS);
+        mSearchBarInclude.setVisibility(showSearch ? View.VISIBLE : View.GONE);
+        if (showSearch) {
+            ((TextView) mSearchBarInclude.findViewById(R.id.textSearchPlaceholder))
+                    .setText(tab == TAB_FRIENDS ? "Search Friends" : "Search Events");
+            mSearchBarInclude.findViewById(R.id.buttonFilter)
+                    .setVisibility(tab == TAB_FRIENDS ? View.GONE : View.VISIBLE);
+        }
 
         getSupportFragmentManager()
                 .beginTransaction()
@@ -296,6 +479,32 @@ public class StudentActivity extends AppCompatActivity {
     }
 
     /**
+     * Opens the search bar in user-search mode (Friends tab).
+     * Loads {@link UserSearchFragment} and wires the user-search text watcher.
+     */
+    private void enterUserSearchMode() {
+        mInSearchMode     = true;
+        mInUserSearchMode = true;
+        mTabBeforeSearch  = mCurrentTab;
+
+        mSearchBarInclude.setVisibility(View.GONE);
+        mSearchActiveBar.setVisibility(View.VISIBLE);
+        mEtSearchInput.setHint("Search Friends");
+        mSearchActiveBar.findViewById(R.id.filterButtonActive).setVisibility(View.GONE);
+
+        mUserSearchFragment = new UserSearchFragment();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.studentFragmentContainer, mUserSearchFragment)
+                .commit();
+
+        mEtSearchInput.addTextChangedListener(mUserSearchTextWatcher);
+        mEtSearchInput.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mEtSearchInput, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    /**
      * Restores the top bar from search mode: closes the filter overlay (if open), clears
      * the search text, hides the keyboard, and restores the tab that was active before
      * search was entered.
@@ -306,7 +515,17 @@ public class StudentActivity extends AppCompatActivity {
         if (mFilterOverlay.getVisibility() == View.VISIBLE) hideFilterOverlay();
         resetPendingFilters();
 
-        mEtSearchInput.removeTextChangedListener(mSearchTextWatcher);
+        if (mInUserSearchMode) {
+            mEtSearchInput.removeTextChangedListener(mUserSearchTextWatcher);
+            mEtSearchInput.setHint("Search Events");
+            mSearchActiveBar.findViewById(R.id.filterButtonActive).setVisibility(View.VISIBLE);
+            mInUserSearchMode   = false;
+            mUserSearchFragment = null;
+        } else {
+            mEtSearchInput.removeTextChangedListener(mSearchTextWatcher);
+            mSearchFragment = null;
+        }
+
         mEtSearchInput.setText("");
 
         mSearchActiveBar.setVisibility(View.GONE);
@@ -315,7 +534,6 @@ public class StudentActivity extends AppCompatActivity {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(mEtSearchInput.getWindowToken(), 0);
 
-        mSearchFragment = null;
         mCurrentTab = -1; // force fragment reload
         selectTab(mTabBeforeSearch);
     }
@@ -547,4 +765,5 @@ public class StudentActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
+
 }

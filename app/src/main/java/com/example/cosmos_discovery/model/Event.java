@@ -1,5 +1,7 @@
 package com.example.cosmos_discovery.model;
 
+import com.example.cosmos_discovery.util.EventFormUtil;
+
 import java.util.List;
 
 /**
@@ -24,12 +26,21 @@ public class Event {
     private String       location;
     private List<String> tags;
     private int          rsvpCount;
+    private int          capacity;    // 0 = unlimited
     private String       imageUrl;
     private String       organizerId;
+    private String       organizerName;
     private String       status;
     private List<String> attendeeIds;
+    private List<String> checkedInIds;
     private long         createdAt;
     private String       accessType;  // "lums_only" | "open" | null (null treated as open)
+    private String       description;
+    private String       category;
+    private String       dateOfEvent; // raw form value (display), e.g. "2026-04-06"
+    private String       startTime;   // raw form value, e.g. "5:00pm"
+    private String       endTime;     // raw form value, e.g. "7:00pm"
+    private String       registerBy;  // raw form value (display)
 
     /** Required by Firestore for deserialization. Do not use in application code. */
     protected Event() {}
@@ -56,6 +67,30 @@ public class Event {
         return attendeeIds != null && attendeeIds.contains(userId);
     }
 
+    /** Returns true if this event has a finite capacity set. */
+    public boolean hasCapacity() { return capacity > 0; }
+
+    /** Returns true if RSVPs have reached or exceeded the capacity limit. */
+    public boolean isFull() { return hasCapacity() && rsvpCount >= capacity; }
+
+    /** Returns true if the registration deadline has passed. */
+    public boolean isRegistrationClosed() {
+        if (registerBy == null || registerBy.trim().isEmpty()) return false;
+        long deadlineMs = EventFormUtil.parseDateTimeMs(registerBy, "11:59pm");
+        return deadlineMs > 0 && System.currentTimeMillis() > deadlineMs;
+    }
+
+    /**
+     * Returns a display string for RSVP/capacity info.
+     * "23/100 spots taken" when capacity is set, "23 RSVPs" when unlimited.
+     */
+    public String getSpotsText() {
+        if (hasCapacity()) {
+            return rsvpCount + "/" + capacity + " spots taken";
+        }
+        return rsvpCount + " RSVPs";
+    }
+
     // ── Getters & Setters ─────────────────────────────────────────────────
 
     public String getId()                    { return id; }
@@ -76,11 +111,17 @@ public class Event {
     public int  getRsvpCount()               { return rsvpCount; }
     public void setRsvpCount(int count)      { this.rsvpCount = count; }
 
+    public int  getCapacity()                { return capacity; }
+    public void setCapacity(int capacity)    { this.capacity = capacity; }
+
     public String getImageUrl()              { return imageUrl; }
     public void   setImageUrl(String url)    { this.imageUrl = url; }
 
     public String getOrganizerId()           { return organizerId; }
     public void   setOrganizerId(String id)  { this.organizerId = id; }
+
+    public String getOrganizerName()                   { return organizerName; }
+    public void   setOrganizerName(String organizerName) { this.organizerName = organizerName; }
 
     public String getStatus()                { return status; }
     public void   setStatus(String status)   { this.status = status; }
@@ -88,9 +129,30 @@ public class Event {
     public List<String> getAttendeeIds()     { return attendeeIds; }
     public void setAttendeeIds(List<String> ids) { this.attendeeIds = ids; }
 
+    public List<String> getCheckedInIds()    { return checkedInIds; }
+    public void setCheckedInIds(List<String> ids) { this.checkedInIds = ids; }
+
     public long getCreatedAt()               { return createdAt; }
     public void setCreatedAt(long ts)        { this.createdAt = ts; }
 
     public String getAccessType()                    { return accessType; }
     public void   setAccessType(String accessType)   { this.accessType = accessType; }
+
+    public String getDescription()                   { return description; }
+    public void   setDescription(String description) { this.description = description; }
+
+    public String getCategory()                      { return category; }
+    public void   setCategory(String category)       { this.category = category; }
+
+    public String getDateOfEvent()                   { return dateOfEvent; }
+    public void   setDateOfEvent(String dateOfEvent) { this.dateOfEvent = dateOfEvent; }
+
+    public String getStartTime()                     { return startTime; }
+    public void   setStartTime(String startTime)     { this.startTime = startTime; }
+
+    public String getEndTime()                       { return endTime; }
+    public void   setEndTime(String endTime)         { this.endTime = endTime; }
+
+    public String getRegisterBy()                    { return registerBy; }
+    public void   setRegisterBy(String registerBy)   { this.registerBy = registerBy; }
 }

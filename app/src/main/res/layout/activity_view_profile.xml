@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_primary">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- BACK BUTTON -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="16dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_back_arrow"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!-- PROFILE IMAGE -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardProfileImage"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                app:cardCornerRadius="60dp"
+                app:cardElevation="6dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/card"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="80dp">
+
+                <ImageView
+                    android:id="@+id/ivProfileImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sidebar_main_profileimage" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- MAIN CARD -->
+            <LinearLayout
+                android:id="@+id/card"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:background="@drawable/bg_bottom_card"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingTop="56dp"
+                android:paddingBottom="32dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="1.0"
+                android:layout_marginTop="100dp">
+
+                <!-- Name -->
+                <TextView
+                    android:id="@+id/tvName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/color_text_secondary"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="2dp"
+                    android:fontFamily="@font/inter_variable" />
+
+                <!-- Batch -->
+                <TextView
+                    android:id="@+id/tvBatch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:textColor="@color/color_text_hint"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/inter_variable" />
+
+                <!-- Major -->
+                <TextView
+                    android:id="@+id/tvMajor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:textColor="@color/color_text_hint"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/inter_variable" />
+
+                <!-- Bio container (hidden when empty) -->
+                <LinearLayout
+                    android:id="@+id/bioContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_bio_container"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tvBio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="14sp"
+                        android:textStyle="italic"
+                        android:textColor="@color/color_text_secondary"
+                        android:gravity="center_horizontal"
+                        android:fontFamily="@font/inter_variable" />
+
+                </LinearLayout>
+
+                <!-- Edit Profile button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEdtProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:minWidth="160dp"
+                    android:text="Edit Profile"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:textColor="@color/color_text_secondary"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="@font/inter_variable"
+                    app:cornerRadius="24dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/color_text_hint"
+                    android:backgroundTint="@android:color/transparent" />
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="#CAC4D0" />
+
+                <!-- Stats row — two tappable pill cards side by side -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardEvents"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:clickable="false"
+                        android:focusable="false"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="@android:color/transparent"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/color_chip_stroke">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp">
+
+                            <TextView
+                                android:id="@+id/tvEventsCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/color_primary"
+                                android:fontFamily="@font/inter_variable" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Events"
+                                android:textSize="12sp"
+                                android:textColor="@color/color_text_hint"
+                                android:fontFamily="@font/inter_variable" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardFriends"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="@color/color_card_event"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/color_chip_stroke">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:paddingTop="12dp"
+                                android:paddingBottom="12dp">
+
+                                <TextView
+                                    android:id="@+id/tvFriendsCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/color_primary"
+                                    android:fontFamily="@font/inter_variable" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Friends"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/color_text_hint"
+                                    android:fontFamily="@font/inter_variable" />
+
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_vertical|end"
+                                android:layout_marginEnd="10dp"
+                                android:src="@drawable/ic_sidebar_arrow_icon"
+                                android:alpha="0.45" />
+
+                        </FrameLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+                <!-- Divider before Upcoming Events -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="20dp"
+                    android:background="#CAC4D0" />
+
+                <!-- Upcoming Events section -->
+                <TextView
+                    android:id="@+id/tvUpcomingEventsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:text="✦ Upcoming Events"
+                    android:textColor="@color/color_text_secondary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/llUpcomingEvents"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/tvNoUpcomingEvents"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter_variable"
+                    android:gravity="center"
+                    android:text="You haven't RSVP'd to any upcoming events yet"
+                    android:textColor="@color/color_text_hint"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
+                <!-- Spacer so Upcoming Events can always be scrolled to the top -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="600dp" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

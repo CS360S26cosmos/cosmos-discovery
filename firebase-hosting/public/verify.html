@@ -1,180 +1,360 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Verify Your Email — Cosmos Discovery</title>
-        <style>
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-            }
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cosmos Discovery Action Handler</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f3eef5;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                padding: 24px;
-            }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3eef5;
+            display: flex;¸
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
 
-            .card {
-                background: #ffffff;
-                border-radius: 24px;
-                padding: 48px 36px;
-                max-width: 420px;
-                width: 100%;
-                text-align: center;
-                box-shadow: 0 4px 24px rgba(92, 26, 90, 0.12);
-            }
+        .card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 48px 36px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 24px rgba(92, 26, 90, 0.12);
+        }
 
-            .icon {
-                font-size: 48px;
-                margin-bottom: 24px;
-            }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 24px;
+        }
 
-            h1 {
-                font-size: 22px;
-                font-weight: bold;
-                color: #5c1a5a;
-                margin-bottom: 12px;
-            }
+        h1 {
+            font-size: 22px;
+            font-weight: bold;
+            color: #5c1a5a;
+            margin-bottom: 12px;
+        }
 
-            p {
-                font-size: 15px;
-                color: #666666;
-                line-height: 1.6;
-                margin-bottom: 32px;
-            }
+        p {
+            font-size: 15px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
 
-            button {
-                background-color: #5c1a5a;
-                color: #ffffff;
-                border: none;
-                border-radius: 100px;
-                padding: 16px 40px;
-                font-size: 16px;
-                font-weight: bold;
-                cursor: pointer;
-                width: 100%;
-                transition: background-color 0.2s;
-            }
+        button {
+            background-color: #5c1a5a;
+            color: #ffffff;
+            border: none;
+            border-radius: 100px;
+            padding: 16px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
 
-            button:hover {
-                background-color: #3d0f3b;
-            }
+        button:hover {
+            background-color: #3d0f3b;
+        }
 
-            button:disabled {
-                background-color: #c9a8d8;
-                cursor: not-allowed;
-            }
+        button:disabled {
+            background-color: #c9a8d8;
+            cursor: not-allowed;
+        }
 
-            .message {
-                margin-top: 24px;
-                font-size: 15px;
-                font-weight: bold;
-                display: none;
-            }
+        .message {
+            margin-top: 24px;
+            font-size: 15px;
+            font-weight: bold;
+            display: none;
+        }
 
-            .message.success {
-                color: #2e7d32;
-            }
+        .message.success {
+            color: #2e7d32;
+        }
 
-            .message.error {
-                color: #b71c1c;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="card">
-            <div class="icon">✉️</div>
-            <h1>Verify Your Email</h1>
-            <p>
-                Click the button below to verify your email address and activate
-                your Cosmos Discovery account.
-            </p>
+        .message.error {
+            color: #b71c1c;
+        }
 
-            <button id="verifyBtn" onclick="verifyEmail()">
-                Verify My Email
-            </button>
+        .hidden {
+            display: none !important;
+        }
 
-            <div class="message success" id="successMsg">
-                ✅ Email verified! You can now sign in to the app.
-            </div>
-            <div class="message error" id="errorMsg">
-                ❌ Verification failed. The link may have expired. Please
-                request a new one from the app.
-            </div>
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #5c1a5a;
+        }
+
+        .password-hint {
+            text-align: left;
+            font-size: 12px;
+            color: #999999;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .secondary-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #5c1a5a;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .secondary-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon" id="icon">✉️</div>
+
+    <!-- Verify Email UI -->
+    <div id="verifySection">
+        <h1 id="verifyTitle">Verify Your Email</h1>
+        <p id="verifyText">
+            Click the button below to verify your email address and activate
+            your Cosmos Discovery account.
+        </p>
+
+        <button id="verifyBtn" onclick="verifyEmail()">
+            Verify My Email
+        </button>
+    </div>
+
+    <!-- Reset Password UI -->
+    <div id="resetSection" class="hidden">
+        <h1>Reset Password</h1>
+        <p>
+            Enter your new password below to complete your password reset.
+        </p>
+
+        <div class="input-group">
+            <input
+                    type="password"
+                    id="newPassword"
+                    placeholder="New Password"
+            />
         </div>
 
-        <!-- Firebase SDKs -->
-        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+        <div class="input-group">
+            <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Confirm Password"
+            />
+        </div>
 
-        <script>
-            // ── Firebase config ───────────────────────────────────────────────────
-            // Replace these values with your actual Firebase project config.
-            // Find them in Firebase Console → Project Settings → Your apps → SDK setup
-            const firebaseConfig = {
-                apiKey: "AIzaSyBNHJBjJVVoRXV8Xsm5BP8bVJW7ueGeBTk",
-                authDomain: "cosmos-discovery.firebaseapp.com",
-                projectId: "cosmos-discovery",
-                storageBucket: "cosmos-discovery.firebasestorage.app",
-                messagingSenderId: "188035901686",
-                appId: "1:188035901686:android:780f26b5e7a5a3933824d7",
-            };
+        <div class="password-hint">
+            Password must include:
+            <br />• At least 8 characters
+            <br />• One uppercase letter
+            <br />• One lowercase letter
+            <br />• One number
+            <br />• One special character from !@#$%^&*!?~
+            <br />• No spaces
+        </div>
 
-            firebase.initializeApp(firebaseConfig);
+        <button id="resetBtn" onclick="resetPassword()">
+            Update Password
+        </button>
 
-            // ── Read the oobCode from the URL ─────────────────────────────────────
-            // Firebase puts the verification code in the URL as ?oobCode=XXXX
-            // We read it here but do NOT apply it yet — only on button click.
-            const urlParams = new URLSearchParams(window.location.search);
-            const oobCode = urlParams.get("oobCode");
+    </div>
 
-            if (!oobCode) {
-                // No code in URL — this page was visited directly, not from an email
-                document.getElementById("verifyBtn").disabled = true;
-                showError(
-                    "No verification code found. Please use the link from your email.",
-                );
+    <div class="message success" id="successMsg"></div>
+    <div class="message error" id="errorMsg"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBNHJBjJVVoRXV8Xsm5BP8bVJW7ueGeBTk",
+        authDomain: "cosmos-discovery.firebaseapp.com",
+        projectId: "cosmos-discovery",
+        storageBucket: "cosmos-discovery.firebasestorage.app",
+        messagingSenderId: "188035901686",
+        appId: "1:188035901686:android:780f26b5e7a5a3933824d7",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get("mode");
+    const oobCode = urlParams.get("oobCode");
+
+    const verifySection = document.getElementById("verifySection");
+    const resetSection = document.getElementById("resetSection");
+    const verifyBtn = document.getElementById("verifyBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const successMsg = document.getElementById("successMsg");
+    const errorMsg = document.getElementById("errorMsg");
+    const icon = document.getElementById("icon");
+
+    function hideMessages() {
+        successMsg.style.display = "none";
+        errorMsg.style.display = "none";
+        successMsg.textContent = "";
+        errorMsg.textContent = "";
+    }
+
+    function showSuccess(message) {
+        hideMessages();
+        successMsg.textContent = message;
+        successMsg.style.display = "block";
+    }
+
+    function showError(message) {
+        hideMessages();
+        errorMsg.textContent = "❌ " + message;
+        errorMsg.style.display = "block";
+    }
+
+    function showInvalidAction(message) {
+        verifySection.classList.add("hidden");
+        resetSection.classList.add("hidden");
+        showError(message);
+    }
+
+    function isValidPassword(password) {
+        const allowedSpecials = "!@#$%^&*!?~";
+
+        if (!password || password.length < 8) return false;
+
+        let hasUpper = false;
+        let hasLower = false;
+        let hasDigit = false;
+        let hasSpecial = false;
+
+        for (let i = 0; i < password.length; i++) {
+            const char = password[i];
+
+            if (/\s/.test(char)) return false;
+
+            if (/[A-Z]/.test(char)) {
+                hasUpper = true;
+            } else if (/[a-z]/.test(char)) {
+                hasLower = true;
+            } else if (/[0-9]/.test(char)) {
+                hasDigit = true;
+            } else if (allowedSpecials.includes(char)) {
+                hasSpecial = true;
+            } else {
+                return false;
             }
+        }
 
-            // ── Apply the code only when the user clicks the button ───────────────
-            function verifyEmail() {
-                if (!oobCode) return;
+        return hasUpper && hasLower && hasDigit && hasSpecial;
+    }
 
-                const btn = document.getElementById("verifyBtn");
-                btn.disabled = true;
-                btn.textContent = "Verifying...";
+    if (!oobCode) {
+        showInvalidAction("No action code found. Please use the link from your email.");
+    } else if (mode === "verifyEmail") {
+        verifySection.classList.remove("hidden");
+        resetSection.classList.add("hidden");
+        icon.textContent = "✉️";
+    } else if (mode === "resetPassword") {
+        verifySection.classList.add("hidden");
+        resetSection.classList.remove("hidden");
+        icon.textContent = "🔒";
 
-                firebase
-                    .auth()
-                    .applyActionCode(oobCode)
-                    .then(() => {
-                        showSuccess();
-                    })
-                    .catch((error) => {
-                        console.error("Verification error:", error);
-                        showError();
-                    });
-            }
+        firebase.auth().verifyPasswordResetCode(oobCode)
+            .then(() => {
+                // Valid reset link
+            })
+            .catch((error) => {
+                console.error("Reset code error:", error);
+                showInvalidAction("This password reset link is invalid or has expired.");
+            });
+    } else {
+        showInvalidAction("Unsupported action type.");
+    }
 
-            function showSuccess() {
-                document.getElementById("verifyBtn").style.display = "none";
-                const msg = document.getElementById("successMsg");
-                msg.style.display = "block";
-            }
+    function verifyEmail() {
+        if (!oobCode) return;
 
-            function showError(customMessage) {
-                document.getElementById("verifyBtn").style.display = "none";
-                const msg = document.getElementById("errorMsg");
-                if (customMessage) msg.textContent = "❌ " + customMessage;
-                msg.style.display = "block";
-            }
-        </script>
-    </body>
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = "Verifying...";
+
+        firebase.auth().applyActionCode(oobCode)
+            .then(() => {
+                verifyBtn.style.display = "none";
+                showSuccess("✅ Email verified! You can now sign in to the app.");
+            })
+            .catch((error) => {
+                console.error("Verification error:", error);
+                verifyBtn.style.display = "none";
+                showError("Verification failed. The link may have expired. Please request a new one from the app.");
+            });
+    }
+
+    function resetPassword() {
+        if (!oobCode) return;
+
+        const newPassword = document.getElementById("newPassword").value.trim();
+        const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+        if (!newPassword || !confirmPassword) {
+            showError("Please fill in both password fields.");
+            return;
+        }
+
+        if (!isValidPassword(newPassword)) {
+            showError(
+                "Password must be at least 8 characters and include uppercase, lowercase, number, and special (!@#$%^&*!?~), with no spaces."
+            );
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showError("Passwords do not match.");
+            return;
+        }
+
+        resetBtn.disabled = true;
+        resetBtn.textContent = "Updating...";
+
+        firebase.auth().confirmPasswordReset(oobCode, newPassword)
+            .then(() => {
+                resetBtn.style.display = "none";
+                document.querySelectorAll(".input-group").forEach(el => el.style.display = "none");
+                document.querySelector(".password-hint").style.display = "none";
+                showSuccess("✅ Password reset successful! You can now sign in with your new password.");
+            })
+            .catch((error) => {
+                console.error("Reset password error:", error);
+                resetBtn.disabled = false;
+                resetBtn.textContent = "Update Password";
+                showError("Password reset failed. The link may have expired or is invalid.");
+            });
+    }
+</script>
+</body>
 </html>

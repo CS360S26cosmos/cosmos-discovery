@@ -2,22 +2,50 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required for CSV export on Android 9 and below; API 29+ uses MediaStore (no permission needed) -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Cosmosdiscovery">
-
+        <activity
+            android:name=".ui.organizer.PastEventDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.notifications.NotificationsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.student.ViewProfile"
+            android:exported="false"
+            android:label="@string/title_activity_view_profile"
+            android:theme="@style/Theme.Cosmosdiscovery" />
+        <activity
+            android:name=".ui.student.EditProfile"
+            android:exported="false"
+            android:label="@string/title_activity_edit_profile"
+            android:theme="@style/Theme.Cosmosdiscovery" />
+        <activity
+            android:name=".ui.student.UserProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cosmosdiscovery" />
+        <activity
+            android:name=".ui.shared.MainActivity"
+            android:exported="false"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.Cosmosdiscovery" />
         <activity
             android:name=".ui.auth.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="false" />
@@ -31,15 +59,59 @@
             android:name=".ui.auth.ForgotPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.shared.MainActivity"
+            android:name=".ui.admin.AdminActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.admin.AdminActivity" />
+            android:name=".ui.organizer.OrganizerActivity"
+            android:exported="false" />
         <activity
-            android:name=".ui.organizer.OrganizerActivity" />
+            android:name=".ui.organizer.EventDetailsActivity"
+            android:exported="false" />
         <activity
-            android:name=".ui.student.StudentActivity" />
+            android:name=".ui.organizer.AddEventActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.organizer.EditEventActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.organizer.EventStatsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.organizer.AttendeeListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.organizer.ViewReviewsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.student.StudentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.student.FriendsListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cosmosdiscovery" />
+        <activity
+            android:name=".ui.student.FriendRequestsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cosmosdiscovery" />
+        <activity
+            android:name=".ui.shared.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.shared.ResetPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

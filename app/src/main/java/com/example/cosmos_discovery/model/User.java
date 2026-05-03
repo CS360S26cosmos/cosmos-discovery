@@ -33,11 +33,15 @@ public class User {
     private String bio;
     /** Timestamp when the user record was created. */
     private long createdAt;
+    /** URL of the user's profile photo, or null when not set. */
+    private String photoUrl;
+    /** Flag set when an organizer request is approved; cleared after the promotion popup is dismissed. */
+    private boolean promotionApproved;
 
     /**
      * Default constructor required for serialization/deserialization frameworks.
      */
-    protected User(){}
+    public User(){}
 
     /**
      * Creates a user with default initial values.
@@ -216,4 +220,25 @@ public class User {
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
+
+    /**
+     * Returns the URL of the user's profile photo, or null if not set.
+     *
+     * @return The photo URL, or null.
+     */
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    /**
+     * Sets the user's profile photo URL.
+     *
+     * @param photoUrl The photo URL to set, or null to clear.
+     */
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public boolean isPromotionApproved() { return promotionApproved; }
+    public void setPromotionApproved(boolean v) { this.promotionApproved = v; }
 }
