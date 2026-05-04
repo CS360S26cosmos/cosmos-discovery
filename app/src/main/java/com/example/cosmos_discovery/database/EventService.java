@@ -15,6 +15,7 @@ import com.example.cosmos_discovery.model.Review;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -263,6 +264,21 @@ public class EventService {
         mDb.collection(EVENTS_COLLECTION)
                 .document(eventId)
                 .update("status", status)
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> onFailure.accept("Could not update event status."));
+    }
+
+    /** Updates status and persists an optional rejection reason in a single Firestore write. */
+    public void updateEventStatusWithReason(String eventId, String status, String reason,
+                                            Runnable onSuccess, Consumer<String> onFailure) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", status);
+        if (reason != null && !reason.trim().isEmpty()) {
+            updates.put("rejectionReason", reason);
+        }
+        mDb.collection(EVENTS_COLLECTION)
+                .document(eventId)
+                .update(updates)
                 .addOnSuccessListener(unused -> onSuccess.run())
                 .addOnFailureListener(ex -> onFailure.accept("Could not update event status."));
     }
@@ -552,6 +568,35 @@ public class EventService {
                         ex.getMessage() != null ? ex.getMessage() : "Failed to load categories."));
     }
 
+    // ── Category management ───────────────────────────────────────────────
+
+    public ListenerRegistration listenCategories(
+            Consumer<List<DocumentSnapshot>> onUpdate, Consumer<String> onFailure) {
+        return mDb.collection("categories")
+                .orderBy("name")
+                .addSnapshotListener((snap, err) -> {
+                    if (err != null) {
+                        onFailure.accept("Could not load categories.");
+                        return;
+                    }
+                    onUpdate.accept(snap != null ? snap.getDocuments() : new ArrayList<>());
+                });
+    }
+
+    public void addCategory(String name, Runnable onSuccess, Consumer<String> onFailure) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", name);
+        mDb.collection("categories").add(data)
+                .addOnSuccessListener(ref -> onSuccess.run())
+                .addOnFailureListener(ex -> onFailure.accept("Could not add category."));
+    }
+
+    public void deleteCategory(String docId, Runnable onSuccess, Consumer<String> onFailure) {
+        mDb.collection("categories").document(docId).delete()
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(ex -> onFailure.accept("Could not delete category."));
+    }
+
     // ── Ratings ───────────────────────────────────────────────────────────
 
     /**
@@ -622,6 +667,42 @@ public class EventService {
                 .addOnFailureListener(ex -> {
                     Log.e(TAG, "fetchAverageRating failed: " + ex.getMessage(), ex);
                     onFailure.accept("Could not fetch average rating.");
+                });
+    }
+
+    /**
+     * Fetches the aggregate average rating for an organizer across all their events.
+     * Calls onSuccess with the average (1.0–5.0), or null if no ratings exist.
+     */
+    public void fetchOrganizerAverageRating(String organizerId,
+                                            Consumer<Double> onSuccess,
+                                            Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION)
+                .whereEqualTo("organizerId", organizerId)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    double sum = 0;
+                    int count = 0;
+                    for (DocumentSnapshot doc : snap.getDocuments()) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> ratingsMap =
+                                (Map<String, Object>) doc.get("ratings");
+                        if (ratingsMap == null) continue;
+                        for (Object val : ratingsMap.values()) {
+                            if (val instanceof Long) {
+                                sum += (Long) val;
+                                count++;
+                            } else if (val instanceof Double) {
+                                sum += (Double) val;
+                                count++;
+                            }
+                        }
+                    }
+                    onSuccess.accept(count > 0 ? sum / count : null);
+                })
+                .addOnFailureListener(ex -> {
+                    Log.e(TAG, "fetchOrganizerAverageRating failed: " + ex.getMessage(), ex);
+                    onFailure.accept("Could not fetch organizer rating.");
                 });
     }
 

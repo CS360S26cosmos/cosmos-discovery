@@ -1,12 +1,16 @@
 package com.example.cosmos_discovery.ui.admin;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -155,17 +159,32 @@ public class AdminEventQueueFragment extends Fragment {
     }
 
     private void confirmReject(Event event) {
-        EditText reason = new EditText(requireContext());
-        reason.setHint("Reason (optional)");
-        reason.setMinLines(2);
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Reject event")
-                .setMessage("Reject \"" + event.getTitle() + "\"?")
-                .setView(reason)
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Reject", (d, w) ->
-                        applyDecision(event, false, reason.getText().toString().trim()))
-                .show();
+        View dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_reject_event, null, false);
+
+        TextView tvSubtitle = dialogView.findViewById(R.id.tvRejectSubtitle);
+        tvSubtitle.setText("Reject \"" + event.getTitle() + "\"?");
+
+        TextInputEditText etReason = dialogView.findViewById(R.id.etRejectReason);
+
+        Dialog dialog = new Dialog(requireContext());
+        dialog.setContentView(dialogView);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+
+        dialogView.findViewById(R.id.btnRejectCancel).setOnClickListener(v -> dialog.dismiss());
+        dialogView.findViewById(R.id.btnRejectConfirm).setOnClickListener(v -> {
+            String reason = etReason.getText() != null
+                    ? etReason.getText().toString().trim() : "";
+            dialog.dismiss();
+            applyDecision(event, false, reason);
+        });
+
+        dialog.show();
     }
 
     private void confirmCancel(Event event) {
@@ -186,14 +205,21 @@ public class AdminEventQueueFragment extends Fragment {
 
     private void applyDecision(Event event, boolean approved, String rejectReason) {
         String newStatus = approved ? Event.STATUS_APPROVED : Event.STATUS_REJECTED;
-        mEventService.updateEventStatus(event.getId(), newStatus,
-                () -> {
-                    notifyOrganizer(event, approved, rejectReason);
-                    Toast.makeText(requireContext(),
-                            approved ? "Event approved." : "Event rejected.",
-                            Toast.LENGTH_SHORT).show();
-                },
-                err -> Toast.makeText(requireContext(), err, Toast.LENGTH_LONG).show());
+        if (approved) {
+            mEventService.updateEventStatus(event.getId(), newStatus,
+                    () -> {
+                        notifyOrganizer(event, true, null);
+                        Toast.makeText(requireContext(), "Event approved.", Toast.LENGTH_SHORT).show();
+                    },
+                    err -> Toast.makeText(requireContext(), err, Toast.LENGTH_LONG).show());
+        } else {
+            mEventService.updateEventStatusWithReason(event.getId(), newStatus, rejectReason,
+                    () -> {
+                        notifyOrganizer(event, false, rejectReason);
+                        Toast.makeText(requireContext(), "Event rejected.", Toast.LENGTH_SHORT).show();
+                    },
+                    err -> Toast.makeText(requireContext(), err, Toast.LENGTH_LONG).show());
+        }
     }
 
     private void notifyOrganizer(Event event, boolean approved, String rejectReason) {

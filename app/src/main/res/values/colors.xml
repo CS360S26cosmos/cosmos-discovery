@@ -19,6 +19,7 @@
     <!-- RSVP button -->
     <color name="color_button_going_stroke">#1C1B1F</color>  <!-- "Going" state outline + text -->
     <color name="color_card_bg">#FFFCFE</color>
+    <color name="color_surface_variant">#EAE6EB</color>  <!-- subtle action button bg -->
 
 
     <!-- Text -->

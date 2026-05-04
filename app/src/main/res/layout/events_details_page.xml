@@ -401,6 +401,43 @@
                             </LinearLayout>
                         </LinearLayout>
 
+                        <!-- Organizer rating row (hidden until organizer has ratings) -->
+                        <LinearLayout
+                            android:id="@+id/ratingRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="Rating"
+                                android:src="@drawable/star_filled"
+                                app:tint="@color/color_icon_outline" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:fontFamily="@font/inter_variable"
+                                android:text="Organizer rating:"
+                                android:textColor="@color/color_icon_outline"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvEventRatingValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:fontFamily="@font/inter_variable"
+                                android:textColor="@color/color_icon_outline"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
                         <!-- Capacity / spots info row -->
                         <LinearLayout
                             android:id="@+id/capacityRow"
@@ -435,6 +472,71 @@
                                 android:layout_marginStart="8dp"
                                 android:fontFamily="@font/inter_variable"
                                 android:textColor="@color/color_icon_outline"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <!-- Category row (hidden when no category set) -->
+                        <LinearLayout
+                            android:id="@+id/categoryRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="22dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="Category"
+                                android:src="@drawable/ic_eventdetails_calendar"
+                                app:tint="@color/color_icon_outline" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:fontFamily="@font/inter_variable"
+                                android:text="Category:"
+                                android:textColor="@color/color_icon_outline"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvCategoryValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:fontFamily="@font/inter_variable"
+                                android:textColor="@color/color_icon_outline"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <!-- Rejection reason row (organizer-only, shown when status = rejected) -->
+                        <LinearLayout
+                            android:id="@+id/rejectionReasonRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_variable"
+                                android:text="Rejection reason:"
+                                android:textColor="@color/color_rejected"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvRejectionReasonDetail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/inter_variable"
+                                android:textColor="@color/color_text_hint"
                                 android:textSize="13sp" />
                         </LinearLayout>
 
@@ -484,7 +586,7 @@
                         android:id="@+id/shareButtonCard"
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
-                        app:cardBackgroundColor="#EAE6EB"
+                        app:cardBackgroundColor="@color/color_surface_variant"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">

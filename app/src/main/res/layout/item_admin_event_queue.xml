@@ -53,6 +53,16 @@
             android:fontFamily="@font/inter_variable"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/tvRejectionReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:textColor="@color/color_text_hint"
+            android:fontFamily="@font/inter_variable"
+            android:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/actionRow"
             android:layout_width="match_parent"

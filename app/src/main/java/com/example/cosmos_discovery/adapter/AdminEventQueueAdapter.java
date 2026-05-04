@@ -102,6 +102,13 @@ public class AdminEventQueueAdapter
                 h.btnReject .setVisibility(View.GONE);
                 h.btnCancel .setVisibility(View.GONE);
                 bindStatusChip(h, e.getStatus());
+                String reason = e.getRejectionReason();
+                if (reason != null && !reason.isEmpty()) {
+                    h.rejectionReason.setVisibility(View.VISIBLE);
+                    h.rejectionReason.setText("Reason: " + reason);
+                } else {
+                    h.rejectionReason.setVisibility(View.GONE);
+                }
                 break;
         }
     }
@@ -118,17 +125,18 @@ public class AdminEventQueueAdapter
     public int getItemCount() { return mItems.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
-        final TextView title, meta, organizer, statusChip;
+        final TextView title, meta, organizer, statusChip, rejectionReason;
         final Button   btnApprove, btnReject, btnCancel;
         VH(@NonNull View v) {
             super(v);
-            title      = v.findViewById(R.id.tvAdminEventTitle);
-            meta       = v.findViewById(R.id.tvAdminEventMeta);
-            organizer  = v.findViewById(R.id.tvAdminEventOrganizer);
-            statusChip = v.findViewById(R.id.tvAdminEventStatus);
-            btnApprove = v.findViewById(R.id.btnApprove);
-            btnReject  = v.findViewById(R.id.btnReject);
-            btnCancel  = v.findViewById(R.id.btnAdminCancel);
+            title           = v.findViewById(R.id.tvAdminEventTitle);
+            meta            = v.findViewById(R.id.tvAdminEventMeta);
+            organizer       = v.findViewById(R.id.tvAdminEventOrganizer);
+            statusChip      = v.findViewById(R.id.tvAdminEventStatus);
+            rejectionReason = v.findViewById(R.id.tvRejectionReason);
+            btnApprove      = v.findViewById(R.id.btnApprove);
+            btnReject       = v.findViewById(R.id.btnReject);
+            btnCancel       = v.findViewById(R.id.btnAdminCancel);
         }
     }
 }

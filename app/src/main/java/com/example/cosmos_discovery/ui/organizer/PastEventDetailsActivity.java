@@ -80,6 +80,14 @@ public class PastEventDetailsActivity extends AppCompatActivity {
         loadAverageRating();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Re-check Firestore so the "Review Added!" lock persists if the activity was recreated
+        // or if the user returns here after the activity was retained in the back stack.
+        loadExistingReview();
+    }
+
     // ── Navigation ────────────────────────────────────────────────────────
 
     private void setupNavBar() {
