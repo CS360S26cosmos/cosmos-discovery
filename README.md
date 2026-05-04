@@ -21,6 +21,7 @@ A centralized campus event platform that allows students to discover, browse, an
 ## Table of Contents
 
 - [Team Information](#team-information)
+- [Getting Started](#getting-started)
 - [Meeting Minutes](#meeting-minutes)
 - [UML Diagram](#uml-diagram)
 - [CRC Diagrams](#crc-diagrams)
@@ -38,6 +39,25 @@ A centralized campus event platform that allows students to discover, browse, an
 | Ammara Haroon | 27100088   | amm4ra          |
 | Elizeh Faisal | 27100052   | ElizehFaisal    |
 | Sameen Abid   | 27100337   | sameenabid101   |
+
+## Getting Started
+                                                                                                                                                   
+  **cosmos-discovery** is an Android app written in Java (minSdk 24, targetSdk 36) backed by Firebase Auth + Firestore.                            
+   
+  ### Prerequisites                                                                                                                                
+  - Android Studio (Hedgehog or newer) with Android SDK 36                                                                            
+  - JDK 11                                                                                                                                         
+  - A connected device or emulator running Android 7.0+ (API 24)
+  - A `google-services.json` file from the project's Firebase console, placed in `app/
+
+  ### Using the App                                                                                                                                    
+   
+  1. Launch the app and you'll land on the splash screen, then the login screen.                                                                     
+  2. Sign up with a @lums.edu.pk email (other domains are rejected) and verify via the link sent to your inbox.                       
+  3. After verification, log in. New accounts default to the student role and land on the Discover tab.                                            
+  4. Browse events on Discover, RSVP to add them to My Events, and add classmates from the Friends tab.                                            
+  5. Admin roles must be assigned manually via the Firestore console, there's no in-app role upgrade.
+  6. Organizer roles are assigned via a request to the admin(s).
 
 ## Meeting Minutes
 
@@ -181,6 +201,41 @@ Identified that most remaining work is either actively being developed or under 
 - US-22 (Send & Accept Friend Requests) is in progress – Elizeh Faisal
 - US-21 (Personalized Event Recommendations) is in review – Hafsah Nasir
 - US-06 (Add Event to Phone Calendar) is in review – Hamania Asim
+
+### Meeting 8
+Friday, 24th April – 6:00 PM
+
+### Attendance
+Hamania Asim
+Hafsah Nasir
+Ammara Haroon
+Elizeh Faisal
+Sameen Abid
+
+### Key Takeaways
+- Focused on completing all remaining user stories marked as In Progress
+- Resolved minor UI inconsistencies across different screens (spacing, alignment, navigation flow)
+- Verified that all core features were functionally complete
+- Began consolidating documentation, including README updates and feature descriptions
+- Identified final bugs and assigned quick fixes before submission
+
+
+### Meeting 9
+Friday, 1st May – 8:30 PM
+
+### Attendance
+Hamania Asim
+Hafsah Nasir
+Ammara Haroon
+Elizeh Faisal
+Sameen Abid
+
+### Key Takeaways
+- Conducted final round of testing for all user stories against acceptance criteria
+- Reviewed edge cases and ensured proper error handling (e.g., invalid inputs, empty states)
+- Finalized documentation including setup instructions, feature explanations, and team contributions
+- Cleaned up repository (removed unused files, improved code readability and comments)
+- Confirmed readiness for final submission and walkthrough
 
 ## UML Diagram
 <img width="3381" height="929" alt="nLTjRzis4FwkNq5q7-OiJjSXQ50OGL37LX1XJXp8TejX60f6kiXSPT8bAMTU4M0_OhzmlsH7lTYKpDXE1yo64Ikyvrvul7kEUgyqbJgRfQGlPfHnCg1Ba9wdFZC-fvBEI9HIfRfQItQVQGWYmKViJo1lcf0hmNKk-UcqARe66eEyfD7dH8gCnpsH2ac-kphpBw_UDi6NGYAuXBnxStfwTcP1g9JYyJdX73tG1BPRK1ea2BsS" src="https://github.com/user-attachments/assets/72aed3ca-c89d-4096-8099-f7076712fc69" />
