@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/color_stats_card"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header row: icon + title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_check_circle"
+                android:contentDescription="Check-ins"
+                app:tint="@color/color_stats_accent"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RSVPs vs Check-ins"
+                android:textColor="@color/color_stats_text"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:fontFamily="@font/inter_variable" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
+
+            <!-- RSVPs column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="bottom|center_horizontal">
+
+                <TextView
+                    android:id="@+id/tvRsvpVal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/color_stats_text"
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/inter_variable"
+                    android:layout_marginBottom="4dp" />
+
+                <View
+                    android:id="@+id/barRsvp"
+                    android:layout_width="48dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/bg_bar_rsvp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RSVPs"
+                    android:textColor="@color/color_stats_text"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/inter_variable"
+                    android:layout_marginTop="6dp" />
+
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/color_stats_track" />
+
+            <!-- Check-ins column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="bottom|center_horizontal">
+
+                <TextView
+                    android:id="@+id/tvCheckinVal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/color_stats_text"
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/inter_variable"
+                    android:layout_marginBottom="4dp" />
+
+                <View
+                    android:id="@+id/barCheckin"
+                    android:layout_width="48dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/bg_bar_checkin" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Check-ins"
+                    android:textColor="@color/color_stats_text"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/inter_variable"
+                    android:layout_marginTop="6dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

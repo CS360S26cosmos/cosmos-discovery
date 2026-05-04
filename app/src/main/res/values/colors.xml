@@ -30,6 +30,13 @@
     <color name="color_text_on_primary">#FFFFFF</color>
 
 
+    <!-- Stats -->
+    <color name="color_stats_text">#4A205A</color>      <!-- dark purple text/labels -->
+    <color name="color_stats_accent">#7A0E53</color>    <!-- RSVP bar, icon tint, accent text -->
+    <color name="color_stats_track">#DBBDE0</color>     <!-- progress bar track, divider -->
+    <color name="color_stats_card">#EFDFF0</color>      <!-- stats card background -->
+    <color name="color_stats_checkin">#C47AC0</color>   <!-- check-in bar color -->
+
     <!-- Status -->
     <color name="color_arrived">#2E7D32</color>         <!-- green -->
     <color name="color_not_arrived">#9E9E9E</color>     <!-- grey -->

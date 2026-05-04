@@ -58,14 +58,39 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <TextView
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:fontFamily="@font/inter_variable"
-                android:text="To be Implemented soon"
-                android:textColor="@color/color_text_secondary"
-                android:textSize="18sp" />
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <include
+                        android:id="@+id/eventHeaderView"
+                        layout="@layout/item_event_stats_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp" />
+
+                    <include
+                        android:id="@+id/graphCapacity"
+                        layout="@layout/item_graph_rsvp_capacity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp" />
+
+                    <include
+                        android:id="@+id/graphCheckins"
+                        layout="@layout/item_graph_rsvp_checkins"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+            </ScrollView>
         </com.google.android.material.card.MaterialCardView>
 
         <include
