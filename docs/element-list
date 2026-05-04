@@ -1,8 +1,10 @@
 com.example.cosmos_discovery.adapter
 com.example.cosmos_discovery.database
+com.example.cosmos_discovery.messaging
 com.example.cosmos_discovery.model
 com.example.cosmos_discovery.ui.admin
 com.example.cosmos_discovery.ui.auth
+com.example.cosmos_discovery.ui.notifications
 com.example.cosmos_discovery.ui.organizer
 com.example.cosmos_discovery.ui.shared
 com.example.cosmos_discovery.ui.student
