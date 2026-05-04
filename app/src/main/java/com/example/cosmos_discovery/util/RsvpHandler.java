@@ -70,23 +70,31 @@ public class RsvpHandler {
             return;
         }
 
-        Runnable applyLocally = () -> {
-            ArrayList<String> ids = event.getAttendeeIds() != null
-                    ? new ArrayList<>(event.getAttendeeIds())
-                    : new ArrayList<>();
-            ids.add(uid);
-            event.setAttendeeIds(ids);
-            event.setRsvpCount(ids.size());
-            onRefresh.run();
-        };
+        // Snapshot for rollback if the Firestore write fails.
+        ArrayList<String> priorIds = event.getAttendeeIds() != null
+                ? new ArrayList<>(event.getAttendeeIds())
+                : new ArrayList<>();
+        int priorCount = event.getRsvpCount();
+
+        ArrayList<String> ids = new ArrayList<>(priorIds);
+        ids.add(uid);
+        event.setAttendeeIds(ids);
+        event.setRsvpCount(ids.size());
+        onRefresh.run();
 
         // Skip Firestore write for local-only / dummy events (no real document ID yet)
         if (event.getId() == null || event.getId().isEmpty()) {
-            applyLocally.run();
             return;
         }
+
+        Consumer<String> rollback = err -> {
+            event.setAttendeeIds(priorIds);
+            event.setRsvpCount(priorCount);
+            onRefresh.run();
+            onError.accept(err);
+        };
+
         service().rsvpToEvent(event.getId(), uid, () -> {
-            applyLocally.run();
             Notification notif = new Notification(
                     Notification.TYPE_RSVP_CONFIRMED,
                     "RSVP Confirmed",
@@ -139,25 +147,31 @@ public class RsvpHandler {
                         java.util.Collections.singletonList(event.getOrganizerId()),
                         docId, organizerNotif, () -> {}, err -> {});
             }
-        }, onError);
+        }, rollback);
     }
 
     private void cancelRsvp(Event event, String uid, Runnable onRefresh, Consumer<String> onError) {
-        Runnable applyLocally = () -> {
-            ArrayList<String> ids = event.getAttendeeIds() != null
-                    ? new ArrayList<>(event.getAttendeeIds())
-                    : new ArrayList<>();
-            ids.remove(uid);
-            event.setAttendeeIds(ids);
-            event.setRsvpCount(ids.size());
-            onRefresh.run();
-        };
+        ArrayList<String> priorIds = event.getAttendeeIds() != null
+                ? new ArrayList<>(event.getAttendeeIds())
+                : new ArrayList<>();
+        int priorCount = event.getRsvpCount();
+
+        ArrayList<String> ids = new ArrayList<>(priorIds);
+        ids.remove(uid);
+        event.setAttendeeIds(ids);
+        event.setRsvpCount(ids.size());
+        onRefresh.run();
 
         // Skip Firestore write for local-only / dummy events (no real document ID yet)
         if (event.getId() == null || event.getId().isEmpty()) {
-            applyLocally.run();
             return;
         }
-        service().cancelRsvp(event.getId(), uid, applyLocally, onError);
+
+        service().cancelRsvp(event.getId(), uid, () -> {}, err -> {
+            event.setAttendeeIds(priorIds);
+            event.setRsvpCount(priorCount);
+            onRefresh.run();
+            onError.accept(err);
+        });
     }
 }
