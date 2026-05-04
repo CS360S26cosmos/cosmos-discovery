@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/color_stats_card"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header row: icon + title + percentage badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_group"
+                android:contentDescription="RSVP"
+                app:tint="@color/color_stats_accent"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="RSVP Fill Rate"
+                android:textColor="@color/color_stats_text"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:fontFamily="@font/inter_variable" />
+
+            <TextView
+                android:id="@+id/tvFillPercent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0%"
+                android:textColor="@color/color_stats_accent"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:fontFamily="@font/inter_variable"
+                android:background="@drawable/bg_stat_badge"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressRsvp"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/bg_progress_bar_rounded" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/tvRsvpFillLabel"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="0 RSVPs"
+                android:textColor="@color/color_stats_text"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:fontFamily="@font/inter_variable" />
+
+            <TextView
+                android:id="@+id/tvCapacityLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="of 0 spots"
+                android:textColor="@color/color_stats_accent"
+                android:textSize="13sp"
+                android:fontFamily="@font/inter_variable" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
