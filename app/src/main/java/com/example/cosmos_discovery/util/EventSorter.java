@@ -25,7 +25,7 @@ public class EventSorter {
     }
 
     /**
-     * Returns approved events with dateTime < now, sorted most-recent-first.
+     * Returns approved events with {@code dateTime < now}, sorted most-recent-first.
      */
     public static List<Event> past(List<Event> events, long now) {
         List<Event> result = new ArrayList<>();
