@@ -487,6 +487,14 @@ public class EventService {
                     mDb.collection(EVENTS_COLLECTION).document(eventId),
                     "attendeeIds", newIds,
                     "rsvpCount",   newIds.size());
+
+            Map<String, Object> rsvpDoc = new HashMap<>();
+            rsvpDoc.put("uid", userId);
+            rsvpDoc.put("timestamp", System.currentTimeMillis());
+            transaction.set(
+                    mDb.collection(EVENTS_COLLECTION).document(eventId)
+                            .collection("rsvps").document(userId),
+                    rsvpDoc);
             return null;
         })
         .addOnSuccessListener(unused -> onSuccess.run())
@@ -511,10 +519,36 @@ public class EventService {
                     mDb.collection(EVENTS_COLLECTION).document(eventId),
                     "attendeeIds", newIds,
                     "rsvpCount",   newIds.size());
+            transaction.delete(
+                    mDb.collection(EVENTS_COLLECTION).document(eventId)
+                            .collection("rsvps").document(userId));
             return null;
         })
         .addOnSuccessListener(unused -> onSuccess.run())
         .addOnFailureListener(ex -> onFailure.accept("Could not cancel RSVP. Try again."));
+    }
+
+    /**
+     * Fetches RSVP timestamps for an event from the {@code rsvps} subcollection,
+     * sorted ascending. Used by EventStats for the per-day timeline chart.
+     */
+    public void getRsvpTimestamps(String eventId,
+                                  Consumer<List<Long>> onSuccess,
+                                  Consumer<String> onFailure) {
+        mDb.collection(EVENTS_COLLECTION).document(eventId)
+                .collection("rsvps")
+                .orderBy("timestamp", Query.Direction.ASCENDING)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<Long> out = new ArrayList<>(snap.size());
+                    for (DocumentSnapshot d : snap.getDocuments()) {
+                        Long ts = d.getLong("timestamp");
+                        if (ts != null) out.add(ts);
+                    }
+                    onSuccess.accept(out);
+                })
+                .addOnFailureListener(ex -> onFailure.accept(
+                        ex.getMessage() != null ? ex.getMessage() : "Could not load RSVP timestamps."));
     }
 
     // ── Check-in ──────────────────────────────────────────────────────────

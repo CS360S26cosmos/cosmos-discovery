@@ -26,6 +26,8 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingTop="8dp"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="outsideOverlay"
         android:paddingBottom="80dp"
         android:visibility="gone" />
 

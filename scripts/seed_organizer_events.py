@@ -14,6 +14,7 @@ SETUP:
 """
 
 import os
+import random
 import sys
 import time
 from datetime import datetime, timedelta
@@ -210,7 +211,20 @@ def fmt_time(epoch_ms):
     return f"{h12}:{m:02d}{period}"
 
 
+def realistic_created_at(dt_ms, status):
+    """
+    Believable createdAt: past events were announced 2–4 weeks before they
+    happened; upcoming events 1–3 weeks ago; pending/rejected events recent.
+    """
+    if status in ("pending", "rejected"):
+        return NOW - random.randint(1, 7) * days(1)
+    if dt_ms < NOW:
+        return dt_ms - random.randint(14, 28) * days(1)
+    return NOW - random.randint(7, 21) * days(1)
+
+
 def main():
+    random.seed(13)  # reproducible
     # Look up organizer UID
     print(f"Looking up organizer: {ORGANIZER_EMAIL}")
     organizer_uid = get_uid_by_email(ORGANIZER_EMAIL)
@@ -250,7 +264,7 @@ def main():
         doc = dict(event)
         doc["organizerId"]   = organizer_uid
         doc["organizerName"] = organizer_name
-        doc["createdAt"]     = now_ms()
+        doc["createdAt"]     = realistic_created_at(doc["dateTime"], doc["status"])
         doc["rsvpCount"]     = len(doc.get("attendeeIds", []))
 
         # Derive display fields from epoch dateTime — matches how AddEventActivity stores them

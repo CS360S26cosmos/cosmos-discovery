@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/color_stats_card"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header row: title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_group"
+                android:contentDescription="Timeline"
+                app:tint="@color/color_stats_accent"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="RSVPs per Day"
+                android:textColor="@color/color_stats_text"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:fontFamily="@font/inter_variable" />
+
+        </LinearLayout>
+
+        <!-- Week navigator: chevron + week label + chevron -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:id="@+id/btnPrevWeek"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_eventdetails_arrowback"
+                android:contentDescription="Previous week"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/color_stats_accent" />
+
+            <TextView
+                android:id="@+id/tvWeekLabel"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text=""
+                android:textColor="@color/color_stats_text"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter_variable" />
+
+            <ImageView
+                android:id="@+id/btnNextWeek"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_eventdetails_arrowback"
+                android:rotation="180"
+                android:contentDescription="Next week"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/color_stats_accent" />
+
+        </LinearLayout>
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/chartTimeline"
+            android:layout_width="match_parent"
+            android:layout_height="200dp" />
+
+        <TextView
+            android:id="@+id/tvTimelineFootnote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="* timestamps prior to the migration are estimated"
+            android:textSize="11sp"
+            android:textColor="@color/color_text_hint"
+            android:fontFamily="@font/inter_variable"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

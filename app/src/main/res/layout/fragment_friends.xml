@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_surface"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:scrollbars="vertical"
+    android:scrollbarStyle="outsideOverlay">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,7 +41,8 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:clipToPadding="false"
-            android:overScrollMode="never" />
+            android:overScrollMode="never"
+            android:scrollbars="horizontal" />
 
         <!-- Empty state: shown when friend list is empty -->
         <TextView

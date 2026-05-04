@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.cosmos_discovery.R;
 import com.example.cosmos_discovery.database.AdminService;
+import com.example.cosmos_discovery.database.RsvpBackfillMigration;
 import com.example.cosmos_discovery.model.Event;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
@@ -119,6 +120,24 @@ public class AdminDashboardFragment extends Fragment {
         mBtnTo.setOnClickListener(v -> showDatePicker(false));
         mBtnClearFilter.setOnClickListener(v -> clearFilter());
         root.findViewById(R.id.btnExport).setOnClickListener(v -> exportCsv());
+
+        // Hidden admin-only trigger: long-press the user count to run the
+        // one-time RSVP timestamp backfill migration. Idempotent.
+        if (mTextUsers != null) {
+            mTextUsers.setOnLongClickListener(v -> {
+                runRsvpBackfill();
+                return true;
+            });
+        }
+    }
+
+    private void runRsvpBackfill() {
+        if (!isAdded()) return;
+        Toast.makeText(requireContext(), "RSVP backfill starting…", Toast.LENGTH_SHORT).show();
+        new RsvpBackfillMigration().run(
+                msg -> { if (isAdded()) Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show(); },
+                err -> { if (isAdded()) Toast.makeText(requireContext(),
+                        "Backfill failed: " + err, Toast.LENGTH_LONG).show(); });
     }
 
     // ── Metrics loading ────────────────────────────────────────────────────
