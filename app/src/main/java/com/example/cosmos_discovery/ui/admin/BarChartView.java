@@ -2,7 +2,6 @@ package com.example.cosmos_discovery.ui.admin;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -18,6 +17,12 @@ import java.util.List;
  * Call {@link #setEntries(List)} to supply data; the view re-draws itself.
  */
 public class BarChartView extends View {
+
+    // Match the design-system tokens used elsewhere in the app theme.
+    private static final int COLOR_BAR         = 0xFF803366; // color_primary
+    private static final int COLOR_TEXT_HINT   = 0xFF999999; // color_text_hint
+    private static final int COLOR_TEXT_VALUE  = 0xFF000000; // color_text_secondary
+    private static final int COLOR_GRID_STROKE = 0xFFCAC4D0; // color_chip_stroke
 
     public static class BarEntry {
         public final String label;
@@ -55,23 +60,22 @@ public class BarChartView extends View {
     private void init() {
         float sp = getResources().getDisplayMetrics().scaledDensity;
 
-        // Dark purple bars (#803366 = color_primary)
-        mBarPaint.setColor(Color.parseColor("#803366"));
+        mBarPaint.setColor(COLOR_BAR);
 
-        mLabelPaint.setColor(Color.parseColor("#999999")); // color_text_hint
+        mLabelPaint.setColor(COLOR_TEXT_HINT);
         mLabelPaint.setTextSize(10 * sp);
         mLabelPaint.setTextAlign(Paint.Align.CENTER);
 
-        mValuePaint.setColor(Color.parseColor("#000000")); // color_text_secondary
+        mValuePaint.setColor(COLOR_TEXT_VALUE);
         mValuePaint.setTextSize(10 * sp);
         mValuePaint.setTextAlign(Paint.Align.CENTER);
         mValuePaint.setTypeface(Typeface.DEFAULT_BOLD);
 
-        mEmptyPaint.setColor(Color.parseColor("#999999")); // color_text_hint
+        mEmptyPaint.setColor(COLOR_TEXT_HINT);
         mEmptyPaint.setTextSize(12 * sp);
         mEmptyPaint.setTextAlign(Paint.Align.CENTER);
 
-        mGridPaint.setColor(Color.parseColor("#CAC4D0")); // color_chip_stroke — light gray
+        mGridPaint.setColor(COLOR_GRID_STROKE);
         mGridPaint.setAlpha(120);
         mGridPaint.setStrokeWidth(1f);
     }

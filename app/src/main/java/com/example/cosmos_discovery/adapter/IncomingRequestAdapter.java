@@ -15,6 +15,12 @@ import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
 
+/**
+ * RecyclerView adapter for incoming friend requests.
+ *
+ * <p>Renders one row per pending request with Accept/Decline actions
+ * dispatched to {@link OnActionListener}.
+ */
 public class IncomingRequestAdapter
         extends RecyclerView.Adapter<IncomingRequestAdapter.ViewHolder> {
 

@@ -4,13 +4,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents an application user profile.
+ * Firestore-mapped model for an application user profile.
+ *
+ * <p>Field names map 1:1 to Firestore document fields under the {@code users}
+ * collection (keyed by Firebase Auth UID). Renaming any field in this class
+ * will break deserialization of existing documents — migrate the data first.
+ *
+ * <p>The no-arg constructor is required by the Firestore SDK for
+ * deserialization. Application code should use
+ * {@link #User(String, String, String)} instead.
  *
  * @author Hafsah Nasir
  * @version 1.0
  * @since 1.0
  */
 public class User {
+
     /** Role value for student users. */
     public static final String ROLE_STUDENT   = "student";
     /** Role value for organizer users. */
@@ -18,56 +27,50 @@ public class User {
     /** Role value for admin users. */
     public static final String ROLE_ADMIN     = "admin";
 
-    /** Unique identifier of the user. */
-    private String uid;
-    /** Display name of the user. */
-    private String name;
-    /** Email address used by the user. */
-    private String email;
-    /** Current role assigned to the user. */
-    private String role;
-    /** Indicates whether the user account is active. */
+    private String  uid;
+    private String  name;
+    private String  email;
+    private String  role;
     private boolean isActive;
-    /** Academic batch of the user. */
-    private String batch;
-    /** Major or department of study. */
-    private String major;
-    /** Short biography or profile description. */
-    private String bio;
-    /** Timestamp when the user record was created. */
-    private long createdAt;
-    /** URL of the user's profile photo, or null when not set. */
-    private String photoUrl;
-    /** Flag set when an organizer request is approved; cleared after the promotion popup is dismissed. */
+    private String  batch;
+    private String  major;
+    private String  bio;
+    private long    createdAt;
+    private String  photoUrl;
+
+    /** Set when an organizer request is approved; cleared after the promotion popup is dismissed. */
     private boolean promotionApproved;
-    /** FCM device token used for push notifications; null until first registration. */
+
+    /** FCM device token used for push notifications; {@code null} until first registration. */
     private String fcmToken;
-    /** Per-category notification preferences. Null on legacy docs — treated as all-enabled. */
+
+    /** Per-category notification preferences. {@code null} on legacy docs — treated as all-enabled. */
     private Map<String, Boolean> notifPrefs;
 
-    /**
-     * Default constructor required for serialization/deserialization frameworks.
-     */
-    public User(){}
+    /** Required by the Firestore SDK for deserialization. Do not use in application code. */
+    public User() {}
 
     /**
-     * Creates a user with default initial values.
+     * Creates a new user with the {@link #ROLE_STUDENT} role and an active account.
      *
-     * @param uid Unique identifier of the user.
-     * @param email Email address of the user.
-     * @param displayName Display name of the user.
+     * @param uid          Firebase Auth UID — primary key for the {@code users} document.
+     * @param email        Email address used to sign in (must be a {@code @lums.edu.pk} address).
+     * @param displayName  Human-readable display name.
      */
-    public User(String uid, String email, String displayName){
-        this.uid         = uid;
-        this.email       = email;
-        this.name        = displayName;
-        this.role        = ROLE_STUDENT;   // default role
-        this.isActive    = true;
-        this.createdAt   = System.currentTimeMillis();
-        this.notifPrefs  = defaultNotifPrefs();
+    public User(String uid, String email, String displayName) {
+        this.uid        = uid;
+        this.email      = email;
+        this.name       = displayName;
+        this.role       = ROLE_STUDENT;
+        this.isActive   = true;
+        this.createdAt  = System.currentTimeMillis();
+        this.notifPrefs = defaultNotifPrefs();
     }
 
-    /** All-true defaults for new users. Cloud Function treats missing keys as true too. */
+    /**
+     * Returns the default per-category notification preferences (all enabled) used for
+     * new users. The notification Cloud Function treats missing keys as {@code true}.
+     */
     public static Map<String, Boolean> defaultNotifPrefs() {
         Map<String, Boolean> prefs = new HashMap<>();
         prefs.put("push",           true);
@@ -81,192 +84,44 @@ public class User {
         return prefs;
     }
 
-    /**
-     * Returns the user's unique identifier.
-     *
-     * @return The user id.
-     */
-    public String getUid() {
-        return uid;
-    }
+    // ── Getters & Setters ─────────────────────────────────────────────────
 
-    /**
-     * Sets the user's unique identifier.
-     *
-     * @param uid The user id to set.
-     */
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
+    public String getUid()                 { return uid; }
+    public void   setUid(String uid)       { this.uid = uid; }
 
-    /**
-     * Returns the user's display name.
-     *
-     * @return The user name.
-     */
-    public String getName() {
-        return name;
-    }
+    public String getName()                { return name; }
+    public void   setName(String name)     { this.name = name; }
 
-    /**
-     * Sets the user's display name.
-     *
-     * @param name The display name to set.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getEmail()               { return email; }
+    public void   setEmail(String email)   { this.email = email; }
 
-    /**
-     * Returns the user's email address.
-     *
-     * @return The email address.
-     */
-    public String getEmail() {
-        return email;
-    }
+    public boolean isActive()              { return isActive; }
+    public void    setActive(boolean v)    { isActive = v; }
 
-    /**
-     * Sets the user's email address.
-     *
-     * @param email The email address to set.
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getRole()                { return role; }
+    public void   setRole(String role)     { this.role = role; }
 
-    /**
-     * Returns whether the user account is active.
-     *
-     * @return True if active; otherwise false.
-     */
-    public boolean isActive() {
-        return isActive;
-    }
+    public String getBatch()               { return batch; }
+    public void   setBatch(String batch)   { this.batch = batch; }
 
-    /**
-     * Sets whether the user account is active.
-     *
-     * @param active The active status to set.
-     */
-    public void setActive(boolean active) {
-        isActive = active;
-    }
+    public String getMajor()               { return major; }
+    public void   setMajor(String major)   { this.major = major; }
 
-    /**
-     * Returns the role assigned to the user.
-     *
-     * @return The user's role.
-     */
-    public String getRole() {
-        return role;
-    }
+    public String getBio()                 { return bio; }
+    public void   setBio(String bio)       { this.bio = bio; }
 
-    /**
-     * Sets the role assigned to the user.
-     *
-     * @param role The role to set.
-     */
-    public void setRole(String role) {
-        this.role = role;
-    }
+    public long getCreatedAt()             { return createdAt; }
+    public void setCreatedAt(long ts)      { this.createdAt = ts; }
 
-    /**
-     * Returns the user's academic batch.
-     *
-     * @return The batch.
-     */
-    public String getBatch() {
-        return batch;
-    }
+    public String getPhotoUrl()            { return photoUrl; }
+    public void   setPhotoUrl(String url)  { this.photoUrl = url; }
 
-    /**
-     * Sets the user's academic batch.
-     *
-     * @param batch The batch to set.
-     */
-    public void setBatch(String batch) {
-        this.batch = batch;
-    }
+    public boolean isPromotionApproved()           { return promotionApproved; }
+    public void    setPromotionApproved(boolean v) { this.promotionApproved = v; }
 
-    /**
-     * Returns the user's major.
-     *
-     * @return The major.
-     */
-    public String getMajor() {
-        return major;
-    }
+    public String getFcmToken()                    { return fcmToken; }
+    public void   setFcmToken(String fcmToken)     { this.fcmToken = fcmToken; }
 
-    /**
-     * Sets the user's major.
-     *
-     * @param major The major to set.
-     */
-    public void setMajor(String major) {
-        this.major = major;
-    }
-
-    /**
-     * Returns the user's biography.
-     *
-     * @return The bio text.
-     */
-    public String getBio() {
-        return bio;
-    }
-
-    /**
-     * Sets the user's biography.
-     *
-     * @param bio The bio text to set.
-     */
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    /**
-     * Returns the creation timestamp of the user record.
-     *
-     * @return The creation time in milliseconds since epoch.
-     */
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    /**
-     * Sets the creation timestamp of the user record.
-     *
-     * @param createdAt The creation time in milliseconds since epoch.
-     */
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    /**
-     * Returns the URL of the user's profile photo, or null if not set.
-     *
-     * @return The photo URL, or null.
-     */
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
-
-    /**
-     * Sets the user's profile photo URL.
-     *
-     * @param photoUrl The photo URL to set, or null to clear.
-     */
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
-
-    public boolean isPromotionApproved() { return promotionApproved; }
-    public void setPromotionApproved(boolean v) { this.promotionApproved = v; }
-
-    public String getFcmToken() { return fcmToken; }
-    public void setFcmToken(String fcmToken) { this.fcmToken = fcmToken; }
-
-    public Map<String, Boolean> getNotifPrefs() { return notifPrefs; }
-    public void setNotifPrefs(Map<String, Boolean> notifPrefs) { this.notifPrefs = notifPrefs; }
+    public Map<String, Boolean> getNotifPrefs()                       { return notifPrefs; }
+    public void                 setNotifPrefs(Map<String, Boolean> p) { this.notifPrefs = p; }
 }

@@ -15,6 +15,12 @@ import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
 
+/**
+ * RecyclerView adapter for outgoing (sent) friend requests.
+ *
+ * <p>Renders one row per pending request with a Cancel action dispatched to
+ * {@link OnCancelListener}.
+ */
 public class SentRequestAdapter
         extends RecyclerView.Adapter<SentRequestAdapter.ViewHolder> {
 

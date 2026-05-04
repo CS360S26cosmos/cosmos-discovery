@@ -15,6 +15,12 @@ import com.example.cosmos_discovery.util.TimeAgoUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * RecyclerView adapter for the announcement feed shown to event attendees.
+ *
+ * <p>Each row renders an {@link Announcement} with its body and a relative
+ * "time ago" timestamp produced by {@link TimeAgoUtil}.
+ */
 public class AnnouncementAdapter extends RecyclerView.Adapter<AnnouncementAdapter.VH> {
 
     private final List<Announcement> mItems = new ArrayList<>();

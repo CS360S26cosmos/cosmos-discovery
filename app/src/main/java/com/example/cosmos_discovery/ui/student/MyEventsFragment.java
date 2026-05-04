@@ -41,16 +41,22 @@ public class MyEventsFragment extends Fragment
     private final EventService mEventService = new EventService();
     private final RsvpHandler  mRsvpHandler  = new RsvpHandler();
 
-    private ListenerRegistration mListener;        // detached in onStop()
+    /** Real-time Firestore listener; detached in {@link #onStop()} to avoid leaks. */
+    private ListenerRegistration mListener;
 
-    private EventSmallAdapter mUpcomingAdapter;    // showRsvp = true
-    private EventSmallAdapter mPastAdapter;        // showRsvp = false
+    /** Adapter for the upcoming-events section; RSVP toggle button visible. */
+    private EventSmallAdapter mUpcomingAdapter;
+    /** Adapter for the past-events section; RSVP toggle button hidden. */
+    private EventSmallAdapter mPastAdapter;
 
-    private final List<Event> mUpcomingEvents = new ArrayList<>(); // dateTime >= now, approved
-    private final List<Event> mPastEvents     = new ArrayList<>(); // dateTime <  now, approved
+    /** Approved events with {@code dateTime >= now}, sorted soonest first. */
+    private final List<Event> mUpcomingEvents = new ArrayList<>();
+    /** Approved events with {@code dateTime < now}, sorted most-recent first. */
+    private final List<Event> mPastEvents     = new ArrayList<>();
 
-    private TextView mTvEmptyUpcoming; // shown when mUpcomingEvents is empty
-    private TextView mTvEmptyPast;     // shown when mPastEvents is empty
+    /** Empty-state placeholders, shown when the corresponding list is empty. */
+    private TextView mTvEmptyUpcoming;
+    private TextView mTvEmptyPast;
 
     // ── Lifecycle ─────────────────────────────────────────────────────────
 
