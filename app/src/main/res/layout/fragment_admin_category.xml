@@ -99,7 +99,9 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:overScrollMode="never"
-            android:paddingBottom="90dp" />
+            android:paddingBottom="90dp"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="outsideOverlay" />
 
         <TextView
             android:id="@+id/tvEmptyCategories"

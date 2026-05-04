@@ -14,6 +14,8 @@
         android:paddingTop="16dp"
         android:paddingBottom="90dp"
         android:clipToPadding="false"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="outsideOverlay"
         android:nestedScrollingEnabled="false"
         android:overScrollMode="never" />
 

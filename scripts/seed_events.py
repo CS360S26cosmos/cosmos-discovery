@@ -457,7 +457,25 @@ EVENTS = [
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def realistic_created_at(dt_ms, status):
+    """
+    Returns a believable createdAt timestamp for an event so admin/event stats
+    have variety. Past events get announced 2–4 weeks before they happened;
+    upcoming events 1–3 weeks ago. Pending/rejected events are recent (1–7 days).
+    A small slice of events lands > 30 days ago so the admin "last 30 days"
+    counter has variation rather than every event qualifying.
+    """
+    if status in ("pending", "rejected"):
+        return NOW - random.randint(1, 7) * days(1)
+    if dt_ms < NOW:
+        # Past event — announced 14–28 days before it happened
+        return dt_ms - random.randint(14, 28) * days(1)
+    # Upcoming event — announced 7–35 days ago (some > 30d for chart variation)
+    return NOW - random.randint(7, 35) * days(1)
+
+
 def main():
+    random.seed(11)  # reproducible createdAt assignment
     now = now_ms()
 
     print("🗑  Deleting events collection...", end="  ", flush=True)
@@ -478,7 +496,7 @@ def main():
     col = db.collection("events")
     for event in EVENTS:
         doc = dict(event)
-        doc["createdAt"] = now
+        doc["createdAt"] = realistic_created_at(doc["dateTime"], doc["status"])
         doc["rsvpCount"] = len(doc.get("attendeeIds", []))
         doc["organizerName"] = ORGANIZER_NAMES.get(doc.get("organizerId", ""), "Unknown Organizer")
         dt = datetime.fromtimestamp(doc["dateTime"] / 1000)

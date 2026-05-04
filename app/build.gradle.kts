@@ -69,6 +69,7 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.github.yalantis:ucrop:2.2.9")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     androidTestImplementation(platform(libs.compose.bom))
